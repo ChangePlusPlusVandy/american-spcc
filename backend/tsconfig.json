@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",                // modern JS syntax
+    "module": "CommonJS",              // Node-compatible module system
+    "rootDir": ".",                    // where your .ts files live
+    "outDir": "dist",                  // compiled JS output folder
+    "strict": true,                    // enable type safety
+    "esModuleInterop": true,           // allows import express from "express"
+    "skipLibCheck": true,              // speeds up compilation
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["**/*.ts"],              // compile all TS files in project
+  "exclude": ["node_modules", "dist"]  // ignore these folders
+}
