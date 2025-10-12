@@ -1,16 +1,17 @@
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
-
-dotenv.config();
+import userRoutes from "./routes/userRoutes"; // ✅ no .js extension
 
 const app = express();
+
 app.use(cors());
 app.use(express.json());
 
-// sample route
-app.get("/", (req, res) => {
-  res.send("Backend is running 🚀");
-});
+// Mount routes
+app.use("/api/users", userRoutes);
+console.log("✅ User routes mounted at /api/users");
 
+app.get("/", (req, res) => res.send("API running ✅"));
+
+// ✅ Export only the app (no app.listen() here)
 export default app;
