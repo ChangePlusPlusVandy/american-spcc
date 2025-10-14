@@ -31,34 +31,8 @@ npm run dev
 
 The frontend will run on http://localhost:5173.
 
-## Prerequisites
-
-### 1. Install Node.js
-
-> [!NOTE]
-> You'll need Node 18 or higher. Download it from [nodejs.org](https://nodejs.org) or install with Homebrew.
-**Install for macOS:**
-
-```bash
-brew install node
-```
-
-**Install for Windows:**
-
-```powershell
-choco install nodejs
-```
-
 ### 2. Install PostgreSQL
 
-> [!TIP]
-> PostgreSQL stores your LMS data and is required for Prisma.
-**For macOS:**
-
-```bash
-brew install postgresql
-brew services start postgresql
-```
 
 **Database Setup**
 
