@@ -34,6 +34,7 @@ The frontend will run on http://localhost:5173.
 ### 2. Install PostgreSQL
 
 
+
 ### 2. Set up Local Supabase (PostgreSQL)
 
 The project uses Supabase for PostgreSQL and Prisma ORM. To work locally, you'll use a Dockerized Supabase instance.
@@ -71,14 +72,16 @@ Copy that URL for the next step.
 
 ### 3. Configure environment variables
 
-Create a `.env.local` file in the `/backend` directory:
+
+
+Create a `.env` file in the `/backend` directory:
+
 
 ```bash
 DATABASE_URL="postgresql://postgres:postgres@localhost:54322/postgres"
 DIRECT_URL="postgresql://postgres:postgres@localhost:54322/postgres"
 ```
 
-**Important:** Do not commit `.env.local` — it's already in `.gitignore`.
 
 ### 4. Initialize the database schema
 

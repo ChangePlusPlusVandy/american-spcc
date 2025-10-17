@@ -3,5 +3,8 @@ node_modules
 .env
 
 /generated/prisma
+<<<<<<< HEAD
 # Supabase local dev
+=======
+>>>>>>> 3da07a3001ca2b7aa7bc85840b7bb63f5942bbfd
 supabase/
