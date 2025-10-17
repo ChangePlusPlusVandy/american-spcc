@@ -43,14 +43,16 @@ export const createUser = async (req: Request, res: Response) => {
     if (!email) return res.status(400).json({ error: "Email is required" });
 
     const newUser = await prisma.user.create({
-      data: { email, lastName, role },
+      data: { email, firstName, lastName, role },
     });
+
     res.status(201).json(newUser);
   } catch (error) {
     console.error("Error creating user:", error);
     res.status(500).json({ error: "Failed to create user" });
   }
 };
+
 
 /**
  * @desc Update user info
