@@ -8,14 +8,3 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-
-model Resources {
-  id               Int      @id @default(autoincrement())
-  title            String
-  description      String?
-  resource_type_fk Int
-  hosting_type_fk  Int
-  category_fk      Int?
-  created_at       DateTime @default(now())
-  updated_at       DateTime @updatedAt
-}
