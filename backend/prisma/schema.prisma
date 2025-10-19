@@ -1,3 +1,24 @@
+enum RESOURCE_TYPE {
+  PDF
+  TXT
+  VIDEO 
+  WEBPAGE
+  INTERACTIVE_QUIZ
+  OTHER
+}
+
+//Justin Shi - add more categories here as needed
+enum HOSTING_TYPE {
+  AWS
+  WEBPAGE
+  OTHER
+}
+
+//Justin Shi - add more categories here as needed
+enum CATEGORY_TYPE {
+  KIDS_EDUCATIONAL
+  PARENTAL_EDUCATIONAL
+}
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,9 +29,25 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-model Resources {
-  id               Int      @id @default(autoincrement())
+model Resource {
+  resouce_id               Int      @id @default(autoincrement())
   title            String
   description      String?
+  recourse_type    RESOURCE_TYPE
+  hosting_type     HOSTING_TYPE
+  category_type    CATEGORY_TYPE
+  age_range_min    Int   
+  age_range_max    Int 
+  time_to_read     Int
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+  hosted_Recouce    HostedRecources[]
 }
+
+model HostedRecources {
+  id               Int      @id @default(autoincrement())
+  resource    Resource  @relation(fields: [id], references: [resouce_id], onDelete: Cascade)
+  s3_key           BigInt
+}
+
 
