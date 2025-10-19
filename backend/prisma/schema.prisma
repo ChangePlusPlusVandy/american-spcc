@@ -8,13 +8,14 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-model User {
-  id          Int       @id @default(autoincrement())
-  firebaseUid String?   @unique         // optional until Firebase Auth setup
-  email       String    @unique
-  firstName   String?
-  lastName    String?
-  role        String    @default("PARENT") // can be "PARENT" | "ADMIN" | "SUPER_ADMIN"
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+
+model Resources {
+  id               Int      @id @default(autoincrement())
+  title            String
+  description      String?
+  resource_type_fk Int
+  hosting_type_fk  Int
+  category_fk      Int?
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
 }
