@@ -50,7 +50,7 @@ brew install supabase/tap/supabase
 
 Docker Desktop must be installed and running (download here: https://www.docker.com/products/docker-desktop/)
 
-From the project root (where the `supabase` folder will live):
+From the project backend (where the `supabase` folder will live):
 
 ```bash
 supabase start
