@@ -31,9 +31,6 @@ npm run dev
 
 The frontend will run on http://localhost:5173.
 
-### 2. Install PostgreSQL
-
-
 
 ### 2. Set up Local Supabase (PostgreSQL)
 
