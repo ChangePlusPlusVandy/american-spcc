@@ -97,13 +97,10 @@ npx prisma generate
 
 You can verify tables in Supabase Studio at http://localhost:54323
 
-### 5. Clone the repository
+### 5. Run prettier
 
-In a terminal, go to a folder where you'd like to store this project (e.g. `/projects` or `/changeplusplus`), then clone it with Git:
+Before each commit, run prettier to fix formatting:
 
 ```bash
-# Using SSH
-git clone git@github.com:ChangePlusPlusVandy/american-spcc.git
+npm run format
 
-# OR using HTTPS
-git clone https://github.com/ChangePlusPlusVandy/american-spcc.git
