@@ -32,7 +32,7 @@ npm run dev
 The frontend will run on http://localhost:5173.
 
 
-### 2. Set up Local Supabase (PostgreSQL)
+### 3. Set up Local Supabase (PostgreSQL)
 
 The project uses Supabase for PostgreSQL and Prisma ORM. To work locally, you'll use a Dockerized Supabase instance.
 
@@ -48,7 +48,7 @@ brew install supabase/tap/supabase
 
 #### Initialize and Start Supabase Locally
 
-Docker Desktop must be installed and running (download here)
+Docker Desktop must be installed and running (download here: https://www.docker.com/products/docker-desktop/)
 
 From the project root (where the `supabase` folder will live):
 
@@ -69,7 +69,7 @@ postgres://postgres:postgres@localhost:54322/postgres
 
 Copy that URL for the next step.
 
-### 3. Configure environment variables
+### 4. Configure environment variables
 
 
 
@@ -82,7 +82,7 @@ DIRECT_URL="postgresql://postgres:postgres@localhost:54322/postgres"
 ```
 
 
-### 4. Initialize the database schema
+### 5. Initialize the database schema
 
 Push your Prisma schema to the local Supabase PostgreSQL database:
 
@@ -105,7 +105,7 @@ When you're done developing, stop the containers to free ports and memory:
 supabase stop
 ```
 
-### 5. Run prettier
+### 6. Run prettier
 
 Before each commit, run prettier to fix formatting:
 
