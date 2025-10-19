@@ -48,6 +48,8 @@ brew install supabase/tap/supabase
 
 #### Initialize and Start Supabase Locally
 
+Docker Desktop must be installed and running (download here)
+
 From the project root (where the `supabase` folder will live):
 
 ```bash
@@ -96,6 +98,12 @@ npx prisma generate
 ```
 
 You can verify tables in Supabase Studio at http://localhost:54323
+
+When you're done developing, stop the containers to free ports and memory:
+
+```bash
+supabase stop
+```
 
 ### 5. Run prettier
 
