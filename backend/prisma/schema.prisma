@@ -8,3 +8,9 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+model Resources {
+  id               Int      @id @default(autoincrement())
+  title            String
+  description      String?
+}
+
