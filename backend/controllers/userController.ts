@@ -1,5 +1,5 @@
-import { Request, Response } from "express";
-import prisma from "../config/prisma";
+import { Request, Response } from 'express';
+import prisma from '../config/prisma';
 
 /**
  * @desc Get all users
@@ -9,12 +9,12 @@ import prisma from "../config/prisma";
 export const getUsers = async (req: Request, res: Response) => {
   try {
     const users = await prisma.user.findMany({
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: 'desc' },
     });
     res.json(users);
   } catch (error) {
-    console.error("Error fetching users:", error);
-    res.status(500).json({ error: "Failed to fetch users" });
+    console.error('Error fetching users:', error);
+    res.status(500).json({ error: 'Failed to fetch users' });
   }
 };
 
@@ -26,10 +26,10 @@ export const getUserById = async (req: Request, res: Response) => {
   try {
     const id = parseInt(req.params.id);
     const user = await prisma.user.findUnique({ where: { id } });
-    if (!user) return res.status(404).json({ error: "User not found" });
+    if (!user) return res.status(404).json({ error: 'User not found' });
     res.json(user);
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch user" });
+    res.status(500).json({ error: 'Failed to fetch user' });
   }
 };
 
@@ -40,7 +40,7 @@ export const getUserById = async (req: Request, res: Response) => {
 export const createUser = async (req: Request, res: Response) => {
   try {
     const { email, firstName, lastName, role } = req.body;
-    if (!email) return res.status(400).json({ error: "Email is required" });
+    if (!email) return res.status(400).json({ error: 'Email is required' });
 
     const newUser = await prisma.user.create({
       data: { email, firstName, lastName, role },
@@ -48,11 +48,10 @@ export const createUser = async (req: Request, res: Response) => {
 
     res.status(201).json(newUser);
   } catch (error) {
-    console.error("Error creating user:", error);
-    res.status(500).json({ error: "Failed to create user" });
+    console.error('Error creating user:', error);
+    res.status(500).json({ error: 'Failed to create user' });
   }
 };
-
 
 /**
  * @desc Update user info
@@ -69,8 +68,8 @@ export const updateUser = async (req: Request, res: Response) => {
     });
     res.json(updatedUser);
   } catch (error) {
-    console.error("Error updating user:", error);
-    res.status(500).json({ error: "Failed to update user" });
+    console.error('Error updating user:', error);
+    res.status(500).json({ error: 'Failed to update user' });
   }
 };
 
@@ -82,9 +81,9 @@ export const deleteUser = async (req: Request, res: Response) => {
   try {
     const id = parseInt(req.params.id);
     await prisma.user.delete({ where: { id } });
-    res.json({ message: "User deleted successfully" });
+    res.json({ message: 'User deleted successfully' });
   } catch (error) {
-    console.error("Error deleting user:", error);
-    res.status(500).json({ error: "Failed to delete user" });
+    console.error('Error deleting user:', error);
+    res.status(500).json({ error: 'Failed to delete user' });
   }
 };
