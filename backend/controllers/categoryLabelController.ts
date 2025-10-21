@@ -24,7 +24,7 @@ export const createLabel = async (req: Request, res: Response): Promise<void> =>
 
     res.status(201).json(label);
   } catch (error) {
-    console.error('❌ Error creating label:', error);
+    console.error('Error creating label:', error);
     res.status(500).json({ error: 'Failed to create label' });
   }
 };
@@ -49,7 +49,7 @@ export const getLabels = async (req: Request, res: Response): Promise<void> => {
 
     res.json(labels);
   } catch (error) {
-    console.error('❌ Error fetching labels:', error);
+    console.error('Error fetching labels:', error);
     res.status(500).json({ error: 'Failed to fetch labels' });
   }
 };
@@ -67,9 +67,9 @@ export const deleteLabel = async (req: Request, res: Response): Promise<void> =>
     }
 
     await prisma.categoryLabel.delete({ where: { id } });
-    res.json({ message: '✅ Label deleted successfully' });
+    res.json({ message: 'Label deleted successfully' });
   } catch (error) {
-    console.error('❌ Error deleting label:', error);
+    console.error('Error deleting label:', error);
     res.status(500).json({ error: 'Failed to delete label' });
   }
 };
