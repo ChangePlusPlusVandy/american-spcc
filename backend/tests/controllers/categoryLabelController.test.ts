@@ -1,9 +1,8 @@
 import { CATEGORY_TYPE } from '@prisma/client';
 import { mockReset } from 'jest-mock-extended';
 import { prismaMock } from '../setup/prismaMock.setup';
-import { createLabel, getLabels, deleteLabel } from '../../controllers/categoryLabelController'; // ✅ Capitalized to match filename
+import { createLabel, getLabels, deleteLabel } from '../../controllers/categoryLabelController'; 
 
-// ✅ Mock Express req/res helpers
 const mockReq = (overrides: any = {}): any => ({
   body: {},
   query: {},
@@ -29,13 +28,13 @@ describe('CategoryLabelController', () => {
       prismaMock.categoryLabel.create.mockResolvedValue({
         id: 1,
         label_name: 'Positive Discipline',
-        category: CATEGORY_TYPE.PARENTING_SKILLS_RELATIONSHIPS, // ✅ fixed enum
+        category: CATEGORY_TYPE.PARENTING_SKILLS_RELATIONSHIPS, 
       } as any);
 
       const req = mockReq({
         body: {
           label_name: 'Positive Discipline',
-          category: CATEGORY_TYPE.PARENTING_SKILLS_RELATIONSHIPS, // ✅ fixed enum
+          category: CATEGORY_TYPE.PARENTING_SKILLS_RELATIONSHIPS, 
         },
       });
       const res = mockRes();
