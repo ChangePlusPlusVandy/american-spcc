@@ -9,13 +9,10 @@ import {
 
 const router = express.Router();
 
-/**
- * Base path: /api/resources
- */
-router.post('/', createResource); // Create a new resource
-router.get('/', getResources); // Get all resources
-router.get('/:id', getResourceById); // Get a single resource by ID
-router.put('/:id', updateResource); // Update a resource
-router.delete('/:id', deleteResource); // Delete a resource
+router.post('/', createResource);
+router.get('/', getResources);
+router.get('/:id', getResourceById);
+router.put('/:id', updateResource);
+router.delete('/:id', deleteResource); 
 
 export default router;
