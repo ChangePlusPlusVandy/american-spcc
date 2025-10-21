@@ -54,7 +54,7 @@ Docker Desktop must be installed and running (download here: https://www.docker.
 From the project backend (where the `supabase` folder will live):
 
 ```bash
-supabase start
+npx supabase start
 ```
 
 This launches local containers for:
@@ -103,7 +103,7 @@ You can verify tables in Supabase Studio at http://localhost:54323
 When you're done developing, stop the containers to free ports and memory:
 
 ```bash
-supabase stop
+npx supabase stop
 ```
 
 ### 6. Run prettier
