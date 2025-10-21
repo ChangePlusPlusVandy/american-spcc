@@ -8,9 +8,54 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-model Resources {
-  id               Int      @id @default(autoincrement())
-  title            String
-  description      String?
+enum RESOURCE_TYPE {
+  PDF
+  TXT
+  VIDEO 
+  WEBPAGE
+  INTERACTIVE_QUIZ
+  OTHER
 }
 
+enum HOSTING_TYPE {
+  AWS
+  WEBPAGE
+  OTHER
+}
+
+enum CATEGORY_TYPE {
+  PARENTING_SKILLS_RELATIONSHIPS
+  CHILD_DEVELOPMENT
+  MENTAL_EMOTIONAL_HEALTH
+  SAFETY_PROTECTION
+  EDUCATION_LEARNING
+  HEALTH_WELLBEING
+  LIFE_SKILLS_INDEPENDENCE
+  FAMILY_SUPPORT_COMMUNITY
+}
+
+
+model CategoryLabel {
+  id          Int           @id @default(autoincrement())
+  label_name  String
+  category    CATEGORY_TYPE
+  resources   Resource[]
+  @@map("categorylabel")
+}
+
+model Resource {
+  resource_id       Int             @id @default(autoincrement())
+  title             String
+  description       String?
+  resource_type     RESOURCE_TYPE
+  hosting_type      HOSTING_TYPE
+  category_type     CATEGORY_TYPE
+  label_id          Int? 
+  label             CategoryLabel?  @relation(fields: [label_id], references: [id])
+  age_range_min     Int
+  age_range_max     Int
+  time_to_read      Int
+  created_at        DateTime        @default(now())
+  updated_at        DateTime        @updatedAt
+  @@map("resource")
+}

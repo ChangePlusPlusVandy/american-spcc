@@ -1,20 +1,17 @@
-/**
- * Jest configuration for the backend (TypeScript + Node + Prisma)
- * Docs: https://jestjs.io/docs/configuration
- */
-
 import type { Config } from 'jest';
 
 const config: Config = {
-  preset: 'ts-jest', // use ts-jest for TypeScript support
-  testEnvironment: 'node', // backend environment
-  clearMocks: true, // auto clear mocks between tests
-  verbose: true, // show individual test results
+  preset: 'ts-jest',
+  testEnvironment: 'node',
+  clearMocks: true,
+  verbose: true,
   testMatch: ['**/tests/**/*.ts', '**/__tests__/**/*.ts'],
   moduleFileExtensions: ['ts', 'js', 'json'],
   transform: {
     '^.+\\.ts$': ['ts-jest', { isolatedModules: true }],
   },
+  setupFilesAfterEnv: ['<rootDir>/tests/setup/prismaMock.setup.ts'],
+  testPathIgnorePatterns: ['/node_modules/', '/tests/setup/prismaMock.setup.ts'], // 👈 add this
 };
 
 export default config;
