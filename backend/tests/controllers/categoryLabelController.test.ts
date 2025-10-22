@@ -32,7 +32,7 @@ describe('CategoryLabelController', () => {
   describe('createLabel', () => {
     it('should create a label successfully', async () => {
       const newLabel = {
-        id: 1,
+        id: 'cktest1234abcd',
         label_name: 'Positive Discipline',
         category: CATEGORY_TYPE.PARENTING_SKILLS_RELATIONSHIPS,
       };
@@ -56,7 +56,7 @@ describe('CategoryLabelController', () => {
         },
       });
       expect(res.status).toHaveBeenCalledWith(201);
-      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ id: 1 }));
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ id: 'cktest1234abcd' }));
     });
 
     it('should return 400 if category is invalid', async () => {
@@ -91,12 +91,12 @@ describe('CategoryLabelController', () => {
     it('should return all labels', async () => {
       const labels = [
         {
-          id: 1,
+          id: 'cktest1111',
           label_name: 'Co-Parenting',
           category: CATEGORY_TYPE.PARENTING_SKILLS_RELATIONSHIPS,
         },
         {
-          id: 2,
+          id: 'cktest2222',
           label_name: 'Positive Discipline',
           category: CATEGORY_TYPE.PARENTING_SKILLS_RELATIONSHIPS,
         },
@@ -115,7 +115,7 @@ describe('CategoryLabelController', () => {
 
     it('should filter labels by category when query param provided', async () => {
       prismaMock.categoryLabel.findMany.mockResolvedValue([
-        { id: 3, label_name: 'Child Safety', category: CATEGORY_TYPE.SAFETY_PROTECTION },
+        { id: 'cktest3333', label_name: 'Child Safety', category: CATEGORY_TYPE.SAFETY_PROTECTION },
       ] as any);
 
       const req = mockReq({ query: { category: CATEGORY_TYPE.SAFETY_PROTECTION } });
@@ -134,19 +134,19 @@ describe('CategoryLabelController', () => {
   describe('getLabelById', () => {
     it('should return a label if found', async () => {
       const label = {
-        id: 1,
+        id: 'cktest4444',
         label_name: 'Co-Parenting',
         category: CATEGORY_TYPE.PARENTING_SKILLS_RELATIONSHIPS,
       };
       prismaMock.categoryLabel.findUnique.mockResolvedValue(label as any);
 
-      const req = mockReq({ params: { id: 1 } });
+      const req = mockReq({ params: { id: 'cktest4444' } });
       const res = mockRes();
 
       await getLabelById(req, res);
 
       expect(prismaMock.categoryLabel.findUnique).toHaveBeenCalledWith({
-        where: { id: 1 },
+        where: { id: 'cktest4444' },
         include: { resources: true },
       });
       expect(res.json).toHaveBeenCalledWith(label);
@@ -155,7 +155,7 @@ describe('CategoryLabelController', () => {
     it('should return 404 if label not found', async () => {
       prismaMock.categoryLabel.findUnique.mockResolvedValue(null);
 
-      const req = mockReq({ params: { id: 999 } });
+      const req = mockReq({ params: { id: 'cknotfound' } });
       const res = mockRes();
 
       await getLabelById(req, res);
@@ -168,7 +168,7 @@ describe('CategoryLabelController', () => {
   describe('updateLabel', () => {
     it('should update a label successfully', async () => {
       const updated = {
-        id: 1,
+        id: 'cktest5555',
         label_name: 'Updated Label',
         category: CATEGORY_TYPE.HEALTH_WELLBEING,
       };
@@ -176,7 +176,7 @@ describe('CategoryLabelController', () => {
       prismaMock.categoryLabel.update.mockResolvedValue(updated as any);
 
       const req = mockReq({
-        params: { id: 1 },
+        params: { id: 'cktest5555' },
         body: { label_name: 'Updated Label', category: CATEGORY_TYPE.HEALTH_WELLBEING },
       });
       const res = mockRes();
@@ -184,7 +184,7 @@ describe('CategoryLabelController', () => {
       await updateLabel(req, res);
 
       expect(prismaMock.categoryLabel.update).toHaveBeenCalledWith({
-        where: { id: 1 },
+        where: { id: 'cktest5555' },
         data: { label_name: 'Updated Label', category: CATEGORY_TYPE.HEALTH_WELLBEING },
       });
       expect(res.json).toHaveBeenCalledWith(updated);
@@ -193,7 +193,7 @@ describe('CategoryLabelController', () => {
     it('should handle errors during update', async () => {
       prismaMock.categoryLabel.update.mockRejectedValue(new Error('Update failed'));
 
-      const req = mockReq({ params: { id: 1 }, body: { label_name: 'Broken' } });
+      const req = mockReq({ params: { id: 'ckfail9999' }, body: { label_name: 'Broken' } });
       const res = mockRes();
 
       await updateLabel(req, res);
@@ -207,14 +207,14 @@ describe('CategoryLabelController', () => {
 
   describe('deleteLabel', () => {
     it('should delete a label successfully', async () => {
-      prismaMock.categoryLabel.delete.mockResolvedValue({ id: 1 } as any);
+      prismaMock.categoryLabel.delete.mockResolvedValue({ id: 'cktest6666' } as any);
 
-      const req = mockReq({ params: { id: 1 } });
+      const req = mockReq({ params: { id: 'cktest6666' } });
       const res = mockRes();
 
       await deleteLabel(req, res);
 
-      expect(prismaMock.categoryLabel.delete).toHaveBeenCalledWith({ where: { id: 1 } });
+      expect(prismaMock.categoryLabel.delete).toHaveBeenCalledWith({ where: { id: 'cktest6666' } });
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({ message: expect.stringMatching(/deleted/i) })
       );
@@ -223,7 +223,7 @@ describe('CategoryLabelController', () => {
     it('should handle delete errors', async () => {
       prismaMock.categoryLabel.delete.mockRejectedValue(new Error('Delete failed'));
 
-      const req = mockReq({ params: { id: 1 } });
+      const req = mockReq({ params: { id: 'ckbroken1234' } });
       const res = mockRes();
 
       await deleteLabel(req, res);

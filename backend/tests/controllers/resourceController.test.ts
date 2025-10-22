@@ -32,7 +32,7 @@ describe('ResourceController', () => {
   describe('createResource', () => {
     it('should create a resource successfully with labels', async () => {
       const mockResource = {
-        resource_id: 1,
+        id: 'ckres1234abcd',
         title: 'Guide to Positive Discipline',
         resource_type: RESOURCE_TYPE.PDF,
         hosting_type: HOSTING_TYPE.INTERNAL,
@@ -40,7 +40,7 @@ describe('ResourceController', () => {
         age_group: AGE_GROUP.AGE_4_7,
         language: LANGUAGE.ENGLISH,
         time_to_read: 10,
-        labels: [{ label: { id: 2, label_name: 'Co-Parenting' } }],
+        labels: [{ label: { id: 'cklbl5678efgh', label_name: 'Co-Parenting' } }],
       };
 
       prismaMock.resource.create.mockResolvedValue(mockResource as any);
@@ -54,7 +54,7 @@ describe('ResourceController', () => {
           age_group: AGE_GROUP.AGE_4_7,
           language: LANGUAGE.ENGLISH,
           time_to_read: 10,
-          label_ids: [2],
+          label_ids: ['cklbl5678efgh'],
         },
       });
       const res = mockRes();
@@ -67,7 +67,7 @@ describe('ResourceController', () => {
             title: 'Guide to Positive Discipline',
             labels: expect.objectContaining({
               create: expect.arrayContaining([
-                expect.objectContaining({ label: { connect: { id: 2 } } }),
+                expect.objectContaining({ label: { connect: { id: 'cklbl5678efgh' } } }),
               ]),
             }),
           }),
@@ -104,8 +104,8 @@ describe('ResourceController', () => {
   describe('getAllResources', () => {
     it('should return all resources', async () => {
       prismaMock.resource.findMany.mockResolvedValue([
-        { resource_id: 1, title: 'Guide 1' },
-        { resource_id: 2, title: 'Guide 2' },
+        { id: 'ckres1111', title: 'Guide 1' },
+        { id: 'ckres2222', title: 'Guide 2' },
       ] as any);
 
       const req = mockReq();
@@ -121,7 +121,7 @@ describe('ResourceController', () => {
 
     it('should filter resources by category', async () => {
       prismaMock.resource.findMany.mockResolvedValue([
-        { resource_id: 5, title: 'Safety Guide' },
+        { id: 'cksafety1234', title: 'Safety Guide' },
       ] as any);
 
       const req = mockReq({ query: { category: CATEGORY_TYPE.SAFETY_PROTECTION } });
@@ -151,16 +151,16 @@ describe('ResourceController', () => {
 
   describe('getResourceById', () => {
     it('should return a resource if found', async () => {
-      const mockResource = { resource_id: 1, title: 'Parenting 101' };
+      const mockResource = { id: 'ckres3333', title: 'Parenting 101' };
       prismaMock.resource.findUnique.mockResolvedValue(mockResource as any);
 
-      const req = mockReq({ params: { id: 1 } });
+      const req = mockReq({ params: { id: 'ckres3333' } });
       const res = mockRes();
 
       await getResourceById(req, res);
 
       expect(prismaMock.resource.findUnique).toHaveBeenCalledWith({
-        where: { resource_id: 1 },
+        where: { id: 'ckres3333' },
         include: { labels: { include: { label: true } } },
       });
       expect(res.json).toHaveBeenCalledWith(mockResource);
@@ -168,7 +168,7 @@ describe('ResourceController', () => {
 
     it('should return 404 if resource not found', async () => {
       prismaMock.resource.findUnique.mockResolvedValue(null);
-      const req = mockReq({ params: { id: 999 } });
+      const req = mockReq({ params: { id: 'cknotfound' } });
       const res = mockRes();
 
       await getResourceById(req, res);
@@ -183,12 +183,12 @@ describe('ResourceController', () => {
   describe('updateResource', () => {
     it('should update a resource successfully', async () => {
       prismaMock.resource.update.mockResolvedValue({
-        resource_id: 1,
+        id: 'ckres4444',
         title: 'Updated Title',
       } as any);
 
       const req = mockReq({
-        params: { id: '1' },
+        params: { id: 'ckres4444' },
         body: { title: 'Updated Title' },
       });
       const res = mockRes();
@@ -197,7 +197,7 @@ describe('ResourceController', () => {
 
       expect(prismaMock.resource.update).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: { resource_id: 1 },
+          where: { id: 'ckres4444' },
           data: expect.objectContaining({ title: 'Updated Title' }),
         })
       );
@@ -207,7 +207,7 @@ describe('ResourceController', () => {
     it('should handle errors during update', async () => {
       prismaMock.resource.update.mockRejectedValue(new Error('Update failed'));
 
-      const req = mockReq({ params: { id: '1' }, body: { title: 'Broken' } });
+      const req = mockReq({ params: { id: 'ckfail9999' }, body: { title: 'Broken' } });
       const res = mockRes();
 
       await updateResource(req, res);
@@ -221,14 +221,14 @@ describe('ResourceController', () => {
 
   describe('deleteResource', () => {
     it('should delete a resource successfully', async () => {
-      prismaMock.resource.delete.mockResolvedValue({ resource_id: 1 } as any);
+      prismaMock.resource.delete.mockResolvedValue({ id: 'ckres5555' } as any);
 
-      const req = mockReq({ params: { id: '1' } });
+      const req = mockReq({ params: { id: 'ckres5555' } });
       const res = mockRes();
 
       await deleteResource(req, res);
 
-      expect(prismaMock.resource.delete).toHaveBeenCalledWith({ where: { resource_id: 1 } });
+      expect(prismaMock.resource.delete).toHaveBeenCalledWith({ where: { id: 'ckres5555' } });
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({ message: expect.stringMatching(/deleted/i) })
       );
@@ -236,7 +236,7 @@ describe('ResourceController', () => {
 
     it('should handle errors during delete', async () => {
       prismaMock.resource.delete.mockRejectedValue(new Error('Delete failed'));
-      const req = mockReq({ params: { id: '1' } });
+      const req = mockReq({ params: { id: 'ckbroken1234' } });
       const res = mockRes();
 
       await deleteResource(req, res);

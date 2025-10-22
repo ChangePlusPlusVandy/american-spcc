@@ -45,7 +45,7 @@ export const getAllLabels = async (req: Request, res: Response) => {
 
 export const getLabelById = async (req: Request, res: Response) => {
   try {
-    const id = Number(req.params.id);
+    const id = req.params.id as string;
     const label = await prisma.categoryLabel.findUnique({
       where: { id },
       include: { resources: true },
@@ -61,7 +61,7 @@ export const getLabelById = async (req: Request, res: Response) => {
 
 export const updateLabel = async (req: Request, res: Response) => {
   try {
-    const id = Number(req.params.id);
+    const id = req.params.id as string;
     const { label_name, category } = req.body;
 
     const updated = await prisma.categoryLabel.update({
@@ -78,7 +78,7 @@ export const updateLabel = async (req: Request, res: Response) => {
 
 export const deleteLabel = async (req: Request, res: Response) => {
   try {
-    const id = Number(req.params.id);
+    const id = req.params.id as string;
     await prisma.categoryLabel.delete({ where: { id } });
     res.json({ message: 'Label deleted successfully' });
   } catch (error) {

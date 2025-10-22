@@ -51,7 +51,7 @@ enum LANGUAGE {
 }
 
 model CategoryLabel {
-  id          Int           @id @default(autoincrement())
+  id          String         @id @default(cuid())
   label_name  String
   category    CATEGORY_TYPE
   resources   ResourceLabel[]
@@ -59,7 +59,7 @@ model CategoryLabel {
 }
 
 model Resource {
-  resource_id   Int             @id @default(autoincrement())
+  id          String         @id @default(cuid())
   title         String
   description   String?
   resource_type RESOURCE_TYPE
@@ -75,10 +75,11 @@ model Resource {
 }
 
 model ResourceLabel {
-  resource_id Int
-  label_id    Int
-  resource Resource      @relation(fields: [resource_id], references: [resource_id])
+  id          String         @id @default(cuid())
+  resource_id String
+  label_id    String
+  resource Resource      @relation(fields: [resource_id], references: [id])
   label    CategoryLabel @relation(fields: [label_id], references: [id])
-  @@id([resource_id, label_id])
+  @@unique([resource_id, label_id])
   @@map("resourcelabel")
 }

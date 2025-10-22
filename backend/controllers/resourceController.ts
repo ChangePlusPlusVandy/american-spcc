@@ -27,7 +27,7 @@ export const createResource = async (req: Request, res: Response) => {
         time_to_read,
         labels: label_ids
           ? {
-              create: label_ids.map((labelId: number) => ({
+              create: label_ids.map((labelId: string) => ({
                 label: { connect: { id: labelId } },
               })),
             }
@@ -50,7 +50,8 @@ export const getAllResources = async (req: Request, res: Response) => {
     const { category, label_id } = req.query;
     const where: any = {};
     if (category) where.category = category;
-    if (label_id) where.labels = { some: { label_id: Number(label_id) } };
+    if (label_id) where.labels = { some: { label_id: label_id as string } };
+
     const resources = await prisma.resource.findMany({
       where,
       include: {
@@ -58,6 +59,7 @@ export const getAllResources = async (req: Request, res: Response) => {
       },
       orderBy: { updated_at: 'desc' },
     });
+
     res.json(resources);
   } catch (error) {
     console.error('Error fetching resources:', error);
@@ -67,9 +69,9 @@ export const getAllResources = async (req: Request, res: Response) => {
 
 export const getResourceById = async (req: Request, res: Response) => {
   try {
-    const id = Number(req.params.id);
+    const id = req.params.id as string;
     const resource = await prisma.resource.findUnique({
-      where: { resource_id: id },
+      where: { id },
       include: { labels: { include: { label: true } } },
     });
     if (!resource) return res.status(404).json({ error: 'Resource not found' });
@@ -82,7 +84,7 @@ export const getResourceById = async (req: Request, res: Response) => {
 
 export const updateResource = async (req: Request, res: Response) => {
   try {
-    const id = Number(req.params.id);
+    const id = req.params.id as string;
     const {
       title,
       description,
@@ -96,7 +98,7 @@ export const updateResource = async (req: Request, res: Response) => {
     } = req.body;
 
     const updated = await prisma.resource.update({
-      where: { resource_id: id },
+      where: { id },
       data: {
         title,
         description,
@@ -109,7 +111,7 @@ export const updateResource = async (req: Request, res: Response) => {
         ...(label_ids && {
           labels: {
             deleteMany: {},
-            create: label_ids.map((labelId: number) => ({
+            create: label_ids.map((labelId: string) => ({
               label: { connect: { id: labelId } },
             })),
           },
@@ -127,8 +129,8 @@ export const updateResource = async (req: Request, res: Response) => {
 
 export const deleteResource = async (req: Request, res: Response) => {
   try {
-    const id = Number(req.params.id);
-    await prisma.resource.delete({ where: { resource_id: id } });
+    const id = req.params.id as string;
+    await prisma.resource.delete({ where: { id } });
     res.json({ message: 'Resource deleted successfully' });
   } catch (error) {
     console.error('Error deleting resource:', error);
