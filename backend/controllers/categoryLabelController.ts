@@ -2,48 +2,37 @@ import { Request, Response } from 'express';
 import prisma from '../config/prisma';
 import { CATEGORY_TYPE } from '@prisma/client';
 
-/**
- * CREATE a new label under a specific category
- */
-export const createLabel = async (req: Request, res: Response): Promise<void> => {
+export const createLabel = async (req: Request, res: Response) => {
   try {
     const { label_name, category } = req.body;
 
-    // Validate category
-    if (!Object.values(CATEGORY_TYPE).includes(category)) {
-      res.status(400).json({ error: 'Invalid category type.' });
-      return;
+    if (!label_name || !category) {
+      return res.status(400).json({ error: 'Missing label_name or category' });
     }
 
-    const label = await prisma.categoryLabel.create({
-      data: {
-        label_name,
-        category,
-      },
+    if (!Object.values(CATEGORY_TYPE).includes(category)) {
+      return res.status(400).json({ error: 'Invalid category type' });
+    }
+
+    const newLabel = await prisma.categoryLabel.create({
+      data: { label_name, category },
     });
 
-    res.status(201).json(label);
+    res.status(201).json(newLabel);
   } catch (error) {
     console.error('Error creating label:', error);
     res.status(500).json({ error: 'Failed to create label' });
   }
 };
 
-/**
- * GET all labels (optionally filtered by category)
- * Example: /api/labels?category=CHILD_DEVELOPMENT
- */
-export const getLabels = async (req: Request, res: Response): Promise<void> => {
+export const getAllLabels = async (req: Request, res: Response) => {
   try {
     const { category } = req.query;
 
-    const filters =
-      category && Object.values(CATEGORY_TYPE).includes(category as CATEGORY_TYPE)
-        ? { category: category as CATEGORY_TYPE }
-        : undefined;
+    const where = category ? { category: category as CATEGORY_TYPE } : undefined;
 
     const labels = await prisma.categoryLabel.findMany({
-      where: filters,
+      where,
       orderBy: { label_name: 'asc' },
     });
 
@@ -54,18 +43,42 @@ export const getLabels = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-/**
- * DELETE a label by ID
- */
-export const deleteLabel = async (req: Request, res: Response): Promise<void> => {
+export const getLabelById = async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id);
+    const label = await prisma.categoryLabel.findUnique({
+      where: { id },
+      include: { resources: true },
+    });
 
-    if (isNaN(id)) {
-      res.status(400).json({ error: 'Invalid label ID.' });
-      return;
-    }
+    if (!label) return res.status(404).json({ error: 'Label not found' });
+    res.json(label);
+  } catch (error) {
+    console.error('Error fetching label:', error);
+    res.status(500).json({ error: 'Failed to fetch label' });
+  }
+};
 
+export const updateLabel = async (req: Request, res: Response) => {
+  try {
+    const id = Number(req.params.id);
+    const { label_name, category } = req.body;
+
+    const updated = await prisma.categoryLabel.update({
+      where: { id },
+      data: { label_name, category },
+    });
+
+    res.json(updated);
+  } catch (error) {
+    console.error('Error updating label:', error);
+    res.status(500).json({ error: 'Failed to update label' });
+  }
+};
+
+export const deleteLabel = async (req: Request, res: Response) => {
+  try {
+    const id = Number(req.params.id);
     await prisma.categoryLabel.delete({ where: { id } });
     res.json({ message: 'Label deleted successfully' });
   } catch (error) {

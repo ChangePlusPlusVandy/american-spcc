@@ -1,9 +1,6 @@
 import { Request, Response } from 'express';
 import prisma from '../config/prisma';
 
-/**
- * CREATE a new resource
- */
 export const createResource = async (req: Request, res: Response) => {
   try {
     const {
@@ -11,11 +8,11 @@ export const createResource = async (req: Request, res: Response) => {
       description,
       resource_type,
       hosting_type,
-      category_type,
-      label_id,
-      age_range_min,
-      age_range_max,
+      category,
+      age_group,
+      language,
       time_to_read,
+      label_ids,
     } = req.body;
 
     const resource = await prisma.resource.create({
@@ -24,13 +21,21 @@ export const createResource = async (req: Request, res: Response) => {
         description,
         resource_type,
         hosting_type,
-        category_type,
-        label_id,
-        age_range_min: Number(age_range_min),
-        age_range_max: Number(age_range_max),
-        time_to_read: Number(time_to_read),
+        category,
+        age_group,
+        language,
+        time_to_read,
+        labels: label_ids
+          ? {
+              create: label_ids.map((labelId: number) => ({
+                label: { connect: { id: labelId } },
+              })),
+            }
+          : undefined,
       },
-      include: { label: true },
+      include: {
+        labels: { include: { label: true } },
+      },
     });
 
     res.status(201).json(resource);
@@ -40,14 +45,18 @@ export const createResource = async (req: Request, res: Response) => {
   }
 };
 
-/**
- * READ all resources
- */
-export const getResources = async (req: Request, res: Response) => {
+export const getAllResources = async (req: Request, res: Response) => {
   try {
+    const { category, label_id } = req.query;
+    const where: any = {};
+    if (category) where.category = category;
+    if (label_id) where.labels = { some: { label_id: Number(label_id) } };
     const resources = await prisma.resource.findMany({
-      include: { label: true },
-      orderBy: { created_at: 'desc' },
+      where,
+      include: {
+        labels: { include: { label: true } },
+      },
+      orderBy: { updated_at: 'desc' },
     });
     res.json(resources);
   } catch (error) {
@@ -56,21 +65,14 @@ export const getResources = async (req: Request, res: Response) => {
   }
 };
 
-/**
- * READ a single resource by ID
- */
 export const getResourceById = async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id);
     const resource = await prisma.resource.findUnique({
       where: { resource_id: id },
-      include: { label: true },
+      include: { labels: { include: { label: true } } },
     });
-
-    if (!resource) {
-      return res.status(404).json({ error: 'Resource not found' });
-    }
-
+    if (!resource) return res.status(404).json({ error: 'Resource not found' });
     res.json(resource);
   } catch (error) {
     console.error('Error fetching resource:', error);
@@ -78,9 +80,6 @@ export const getResourceById = async (req: Request, res: Response) => {
   }
 };
 
-/**
- * UPDATE a resource
- */
 export const updateResource = async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id);
@@ -89,39 +88,43 @@ export const updateResource = async (req: Request, res: Response) => {
       description,
       resource_type,
       hosting_type,
-      category_type,
-      label_id,
-      age_range_min,
-      age_range_max,
+      category,
+      age_group,
+      language,
       time_to_read,
+      label_ids,
     } = req.body;
 
-    const resource = await prisma.resource.update({
+    const updated = await prisma.resource.update({
       where: { resource_id: id },
       data: {
         title,
         description,
         resource_type,
         hosting_type,
-        category_type,
-        label_id,
-        age_range_min: Number(age_range_min),
-        age_range_max: Number(age_range_max),
-        time_to_read: Number(time_to_read),
+        category,
+        age_group,
+        language,
+        time_to_read,
+        ...(label_ids && {
+          labels: {
+            deleteMany: {},
+            create: label_ids.map((labelId: number) => ({
+              label: { connect: { id: labelId } },
+            })),
+          },
+        }),
       },
-      include: { label: true },
+      include: { labels: { include: { label: true } } },
     });
 
-    res.json(resource);
+    res.json(updated);
   } catch (error) {
     console.error('Error updating resource:', error);
     res.status(500).json({ error: 'Failed to update resource' });
   }
 };
 
-/**
- * DELETE a resource
- */
 export const deleteResource = async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id);

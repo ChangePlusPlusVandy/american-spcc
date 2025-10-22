@@ -12,14 +12,15 @@ enum RESOURCE_TYPE {
   PDF
   TXT
   VIDEO 
+  WEBINAR
   WEBPAGE
   INTERACTIVE_QUIZ
   OTHER
 }
 
 enum HOSTING_TYPE {
-  AWS
-  WEBPAGE
+  INTERNAL
+  EXTERNAL
   OTHER
 }
 
@@ -34,28 +35,50 @@ enum CATEGORY_TYPE {
   FAMILY_SUPPORT_COMMUNITY
 }
 
+enum AGE_GROUP {
+  AGE_0_3
+  AGE_4_7
+  AGE_8_12
+  TEEN
+  OTHER
+}
+
+enum LANGUAGE {
+  ENGLISH
+  SPANISH
+  CHINESE
+  OTHER
+}
 
 model CategoryLabel {
   id          Int           @id @default(autoincrement())
   label_name  String
   category    CATEGORY_TYPE
-  resources   Resource[]
+  resources   ResourceLabel[]
   @@map("categorylabel")
 }
 
 model Resource {
-  resource_id       Int             @id @default(autoincrement())
-  title             String
-  description       String?
-  resource_type     RESOURCE_TYPE
-  hosting_type      HOSTING_TYPE
-  category_type     CATEGORY_TYPE
-  label_id          Int? 
-  label             CategoryLabel?  @relation(fields: [label_id], references: [id])
-  age_range_min     Int
-  age_range_max     Int
-  time_to_read      Int
-  created_at        DateTime        @default(now())
-  updated_at        DateTime        @updatedAt
+  resource_id   Int             @id @default(autoincrement())
+  title         String
+  description   String?
+  resource_type RESOURCE_TYPE
+  hosting_type  HOSTING_TYPE
+  category      CATEGORY_TYPE
+  age_group     AGE_GROUP
+  language      LANGUAGE
+  time_to_read  Int
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+  labels        ResourceLabel[]
   @@map("resource")
+}
+
+model ResourceLabel {
+  resource_id Int
+  label_id    Int
+  resource Resource      @relation(fields: [resource_id], references: [resource_id])
+  label    CategoryLabel @relation(fields: [label_id], references: [id])
+  @@id([resource_id, label_id])
+  @@map("resourcelabel")
 }

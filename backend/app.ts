@@ -8,7 +8,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Mount routers
 app.use('/api/resources', resourceRoutes);
 app.use('/api/labels', categoryLabelRoutes);
 
