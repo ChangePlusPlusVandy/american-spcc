@@ -6,5 +6,5 @@
  * - These will protect routes so only logged-in users
  *   — and the right roles (admin/parent) — can access them.
  */
-import Clerk from "@clerk/express";
+import Clerk from '@clerk/express';
 import prisma from '../config/prisma';
