@@ -228,7 +228,9 @@ describe('InternalHostedResourceController', () => {
 
       await deleteInternalHostedResource(req, res);
 
-      expect(prismaMock.internalhostedresource.delete).toHaveBeenCalledWith({ where: { id: 'ckres5555' } });
+      expect(prismaMock.internalhostedresource.delete).toHaveBeenCalledWith({
+        where: { id: 'ckres5555' },
+      });
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({ message: expect.stringMatching(/deleted/i) })
       );
