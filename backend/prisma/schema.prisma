@@ -84,28 +84,10 @@ model ResourceLabel {
   @@map("resourcelabel")
 }
 
-model InternalHostedResource {
+model InternalHostedResources {
   id          String         @id @default(cuid())
-  title         String
-  description   String?
-  resource_type RESOURCE_TYPE
-  hosting_type  HOSTING_TYPE
-  category      CATEGORY_TYPE
-  age_group     AGE_GROUP
-  language      LANGUAGE
-  time_to_read  Int
-  created_at    DateTime @default(now())
-  updated_at    DateTime @updatedAt
-  labels        ResourceLabel[]
-  @@map("internalhostedresource")
-}
-
-model InternalHostedResourceLabel {
-  id          String         @id @default(cuid())
-  resource_id String
-  label_id    String
-  resource InternalHostedResource      @relation(fields: [resource_id], references: [id])
-  label    CategoryLabel @relation(fields: [label_id], references: [id])
-  @@unique([resource_id, label_id])
-  @@map("internalhostedresourcelabel")
+  resource_fk    String
+  s3_key    String
+  resource     Resource     @relation(fields: [resource_fk], references: [id])
+  @@map("internalHostedResources")
 }

@@ -10,8 +10,8 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/api/resources', resourceRoutes);
-app.use('/api/internalHostedResources', internalHostedResourceRoutes);
 app.use('/api/labels', categoryLabelRoutes);
+app.use('/api/internalHostedResources', internalHostedResourceRoutes);
 
 app.get('/', (req, res) => {
   res.send('API is running');
