@@ -50,6 +50,23 @@ enum LANGUAGE {
   OTHER
 }
 
+enum ROLE {
+  PARENT
+  ADMIN
+}
+
+model User {
+  id         String   @id @default(cuid())
+  clerk_id   String   @unique
+  role       ROLE     @default(PARENT)
+  first_name String
+  last_name  String
+  email      String   @unique
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  @@map("user")
+}
+
 model CategoryLabel {
   id          String         @id @default(cuid())
   label_name  String
@@ -59,18 +76,19 @@ model CategoryLabel {
 }
 
 model Resource {
-  id          String         @id @default(cuid())
-  title         String
-  description   String?
-  resource_type RESOURCE_TYPE
-  hosting_type  HOSTING_TYPE
-  category      CATEGORY_TYPE
-  age_group     AGE_GROUP
-  language      LANGUAGE
-  time_to_read  Int
-  created_at    DateTime @default(now())
-  updated_at    DateTime @updatedAt
-  labels        ResourceLabel[]
+  id                 String               @id @default(cuid())
+  title              String
+  description        String?
+  resource_type      RESOURCE_TYPE
+  hosting_type       HOSTING_TYPE
+  category           CATEGORY_TYPE
+  age_group          AGE_GROUP
+  language           LANGUAGE
+  time_to_read       Int
+  created_at         DateTime             @default(now())
+  updated_at         DateTime             @updatedAt
+  labels             ResourceLabel[]
+  externalResources  ExternalResources[]
   @@map("resource")
 }
 
@@ -89,5 +107,5 @@ model ExternalResources {
   resource_fk  String
   external_url String
   resource     Resource     @relation(fields: [resource_fk], references: [id])
-  @@map("externalResources)
+  @@map("externalResources")
 }

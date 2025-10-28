@@ -12,6 +12,9 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
+    "@clerk/clerk-react": "^5.53.3",
+    "node": "^22.21.0",
+    "npm": "^10.9.4",
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
   },
