@@ -83,3 +83,11 @@ model ResourceLabel {
   @@unique([resource_id, label_id])
   @@map("resourcelabel")
 }
+
+model ExternalResources {
+  id           String         @id @default(cuid())
+  resource_fk  String
+  external_url String
+  resource     Resource     @relation(fields: [resource_fk], references: [id])
+  @@map("externalResources)
+}
