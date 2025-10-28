@@ -1,7 +1,7 @@
-import { Response, NextFunction } from "express";
-import { ClerkExpressWithAuth } from "@clerk/clerk-sdk-node";
-import type { WithAuthProp } from "@clerk/clerk-sdk-node";
-import type { Request } from "express";
+import { Response, NextFunction } from 'express';
+import { ClerkExpressWithAuth } from '@clerk/clerk-sdk-node';
+import type { WithAuthProp } from '@clerk/clerk-sdk-node';
+import type { Request } from 'express';
 
 /**
  * AUTHENTICATION & AUTHORIZATION TEMPLATE
@@ -13,11 +13,7 @@ import type { Request } from "express";
  *  3. Enforce role-based access control
  */
 
-export const authenticateUser = (
-  req: WithAuthProp<Request>,
-  res: Response,
-  next: NextFunction
-) => {
+export const authenticateUser = (req: WithAuthProp<Request>, res: Response, next: NextFunction) => {
   // TODO: Implement Clerk session validation
   ClerkExpressWithAuth({})(req as any, res as any, async () => {
     // Call next() if session is valid; else return 401
@@ -26,21 +22,20 @@ export const authenticateUser = (
 };
 
 export const syncUserWithDB = async (
-    req: WithAuthProp<Request>,
-    res: Response,
-    next: NextFunction
-  ) => {
-    // STEP 1: Get Clerk user ID (maps to `clerk_id` in DB)
-    const clerkId = req.auth?.userId;
-  
-    // STEP 2: Look up user in `users` table by clerk_id (via Prisma)
-    // If not found, fetch from Clerk and create a new user (default role: "PARENT")
-    // DB fields: id, clerk_id, first_name, last_name, email, role, timestamps
-  
-    // STEP 3: Attach user record to req for role-based middleware
-    next();
-  };
-  
+  req: WithAuthProp<Request>,
+  res: Response,
+  next: NextFunction
+) => {
+  // STEP 1: Get Clerk user ID (maps to `clerk_id` in DB)
+  const clerkId = req.auth?.userId;
+
+  // STEP 2: Look up user in `users` table by clerk_id (via Prisma)
+  // If not found, fetch from Clerk and create a new user (default role: "PARENT")
+  // DB fields: id, clerk_id, first_name, last_name, email, role, timestamps
+
+  // STEP 3: Attach user record to req for role-based middleware
+  next();
+};
 
 export const requireParent = async (
   req: WithAuthProp<Request>,
