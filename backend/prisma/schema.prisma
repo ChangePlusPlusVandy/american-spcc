@@ -71,6 +71,7 @@ model Resource {
   created_at    DateTime @default(now())
   updated_at    DateTime @updatedAt
   labels        ResourceLabel[]
+  externalResources ExternalResources?
   @@map("resource")
 }
 
@@ -86,10 +87,10 @@ model ResourceLabel {
 
 model ExternalResources {
   id           String         @id @default(cuid())
-  resource_fk  String
+  resource_fk  String         @unique 
   external_url String
   resource     Resource     @relation(fields: [resource_fk], references: [id])
-  @@map("externalResources)
+  @@map("externalResources")
 }
 
 enum ROLE {
