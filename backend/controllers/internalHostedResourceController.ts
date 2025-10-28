@@ -3,16 +3,13 @@ import prisma from '../config/prisma';
 
 export const createInternalHostedResource = async (req: Request, res: Response) => {
   try {
-    const {
-      resource_fk,
-      s3_key
-    } = req.body;
+    const { resource_fk, s3_key } = req.body;
 
     const internalHostedResources = await prisma.internalHostedResources.create({
       data: {
         resource_fk,
-        s3_key
-      }
+        s3_key,
+      },
     });
 
     res.status(201).json(internalHostedResources);
@@ -40,7 +37,8 @@ export const getInternalHostedResourceById = async (req: Request, res: Response)
       include: { resources: true },
     });
 
-    if (!internalHostedResource) return res.status(404).json({ error: 'Internal Hosted Resource not found' });
+    if (!internalHostedResource)
+      return res.status(404).json({ error: 'Internal Hosted Resource not found' });
     res.json(internalHostedResource);
   } catch (error) {
     console.error('Error fetching internal hosted resource:', error);
@@ -51,17 +49,14 @@ export const getInternalHostedResourceById = async (req: Request, res: Response)
 export const updateInternalHostedResource = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;
-    const {
-      resource_fk,
-      s3_key
-    } = req.body;
+    const { resource_fk, s3_key } = req.body;
 
     const updated = await prisma.internalHostedResources.update({
       where: { id },
       data: {
         resource_fk,
-        s3_key
-      }
+        s3_key,
+      },
     });
 
     res.json(updated);
