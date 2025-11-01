@@ -1,10 +1,9 @@
 import { Request, Response } from 'express';
-import type { WithAuthProp } from '@clerk/clerk-sdk-node';
 import prisma from '../config/prisma';
 
-export const createBookmark = async (req: WithAuthProp<Request>, res: Response) => {
+export const createBookmark = async (req: Request, res: Response) => {
   try {
-    const clerkId = req.auth?.userId;
+    const clerkId = (req as any).auth?.userId;
 
     if (!clerkId) {
       return res.status(401).json({ error: 'Unauthorized' });
@@ -52,9 +51,9 @@ export const createBookmark = async (req: WithAuthProp<Request>, res: Response) 
   }
 };
 
-export const removeBookmark = async (req: WithAuthProp<Request>, res: Response) => {
+export const removeBookmark = async (req: Request, res: Response) => {
   try {
-    const clerkId = req.auth?.userId;
+    const clerkId = (req as any).auth?.userId;
 
     if (!clerkId) {
       return res.status(401).json({ error: 'Unauthorized' });
@@ -95,9 +94,9 @@ export const removeBookmark = async (req: WithAuthProp<Request>, res: Response) 
   }
 };
 
-export const getBookmarks = async (req: WithAuthProp<Request>, res: Response) => {
+export const getBookmarks = async (req: Request, res: Response) => {
   try {
-    const clerkId = req.auth?.userId;
+    const clerkId = (req as any).auth?.userId;
 
     if (!clerkId) {
       return res.status(401).json({ error: 'Unauthorized' });
@@ -132,9 +131,9 @@ export const getBookmarks = async (req: WithAuthProp<Request>, res: Response) =>
   }
 };
 
-export const checkBookmarkStatus = async (req: WithAuthProp<Request>, res: Response) => {
+export const checkBookmarkStatus = async (req: Request, res: Response) => {
   try {
-    const clerkId = req.auth?.userId;
+    const clerkId = (req as any).auth?.userId;
 
     if (!clerkId) {
       return res.status(401).json({ error: 'Unauthorized' });
