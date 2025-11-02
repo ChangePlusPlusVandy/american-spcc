@@ -22,7 +22,7 @@ const mockRes = (): any => {
 };
 
 describe('bookmarkController', () => {
-    beforeEach(() => {
+  beforeEach(() => {
     jest.clearAllMocks();
     mockReset(prismaMock);
   });
@@ -213,7 +213,6 @@ describe('bookmarkController', () => {
         expect.objectContaining({ error: 'Failed to delete bookmark' })
       );
     });
-
   });
 
   describe('getBookmarks', () => {
@@ -273,10 +272,7 @@ describe('bookmarkController', () => {
         },
       });
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith([
-        mockBookmarks[0].resource,
-        mockBookmarks[1].resource,
-      ]);
+      expect(res.json).toHaveBeenCalledWith([mockBookmarks[0].resource, mockBookmarks[1].resource]);
     });
 
     it('should return 401 when unauthorized', async () => {
@@ -327,7 +323,6 @@ describe('bookmarkController', () => {
         expect.objectContaining({ error: 'Failed to fetch bookmarks' })
       );
     });
-
   });
 
   describe('checkBookmarkStatus', () => {

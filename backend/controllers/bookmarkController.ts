@@ -77,7 +77,7 @@ export const removeBookmark = async (req: Request, res: Response) => {
       where: {
         user_fk_resource_fk: {
           user_fk: user.id,
-          resource_fk: resource_id
+          resource_fk: resource_id,
         },
       },
     });
@@ -157,9 +157,9 @@ export const checkBookmarkStatus = async (req: Request, res: Response) => {
       where: {
         user_fk_resource_fk: {
           user_fk: user.id,
-          resource_fk: resource_id
-        }
-      }
+          resource_fk: resource_id,
+        },
+      },
     });
 
     if (bookmark) {
