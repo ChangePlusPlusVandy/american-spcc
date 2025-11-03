@@ -1,0 +1,63 @@
+.loginContainer {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f7fafc;
+  padding: 2rem;
+}
+
+.formCard {
+  background-color: white;
+  border-radius: 20px;
+  padding: 3rem 2.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  max-width: 450px;
+  width: 100%;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #5a6c7d;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.socialButtons {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.signUpSection {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.signUpText {
+  color: #4a5568;
+  font-size: 0.95rem;
+}
+
+.signUpLink {
+  background: none;
+  border: none;
+  color: #5a6c7d;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.signUpLink:hover {
+  color: #4a5568;
+}

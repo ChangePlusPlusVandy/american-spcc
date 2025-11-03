@@ -20,5 +20,6 @@ export interface ButtonProps {
   
   export enum ButtonColor {
     Grey = "grey",
+    DarkBlue = "darkBlue",
     // Add more colors here as you discover what you need
   }
