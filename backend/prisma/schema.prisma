@@ -72,6 +72,7 @@ model Resource {
   updated_at    DateTime @updatedAt
   labels        ResourceLabel[]
   externalResources ExternalResources?
+  bookmarks     Bookmarks[]
   @@map("resource")
 }
 
@@ -107,5 +108,17 @@ model User {
   email      String   @unique
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
+  bookmarks  Bookmarks[]
   @@map("user")
+}
+
+model Bookmarks {
+  id          String  @id @default(cuid())
+  user_fk     String
+  user        User     @relation(fields: [user_fk], references: [id], onDelete: Cascade)
+  resource_fk String
+  resource    Resource @relation(fields: [resource_fk], references: [id], onDelete: Cascade)
+  created_at  DateTime @default(now())
+  @@unique([user_fk, resource_fk])
+  @@map("bookmarks")
 }

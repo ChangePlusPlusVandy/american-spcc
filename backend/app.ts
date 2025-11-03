@@ -4,6 +4,7 @@ import resourceRoutes from './routes/resourceRoutes';
 import categoryLabelRoutes from './routes/categoryLabelsRoutes';
 import externalResourcesRoutes from './routes/externalResourcesRoutes';
 import userRoutes from './routes/userRoutes';
+import bookmarkRoutes from './routes/bookmarkRoutes';
 
 const app = express();
 
@@ -14,7 +15,7 @@ app.use('/api/resources', resourceRoutes);
 app.use('/api/labels', categoryLabelRoutes);
 app.use('/api/externalResources', externalResourcesRoutes);
 app.use('/api/users', userRoutes);
-
+app.use('/api/bookmarks', bookmarkRoutes);
 
 app.get('/', (req, res) => {
   res.send('API is running');
