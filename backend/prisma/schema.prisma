@@ -122,3 +122,12 @@ model Bookmarks {
   @@unique([user_fk, resource_fk])
   @@map("bookmarks")
 }
+
+model ResourceView {
+  id           String         @id @default(cuid())
+  user_fk      String
+  resource_fk  String         @unique 
+  viewed_at    String
+  view_count   String
+  @@map("resourceView")
+}
