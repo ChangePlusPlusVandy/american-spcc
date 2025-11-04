@@ -131,3 +131,13 @@ model InternalHostedResources {
   resource     Resource @relation(fields: [resource_fk], references: [id])
   @@map("internalHostedResources")
 }
+
+model AdminLog {
+  id          String   @id @default(cuid())
+  admin_fk    String
+  admin       User     @relation(fields: [admin_fk], references: [id], onDelete: Cascade)
+  action      String
+  details     String?
+  created_at  DateTime @default(now())
+  @@map("adminlog")
+}
