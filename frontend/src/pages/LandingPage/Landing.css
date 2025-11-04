@@ -1,0 +1,15 @@
+@import 'tailwindcss';
+
+@-ms-viewport {
+  width: device-width;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  margin: 0;
+  box-shadow: none;
+  appearance: none;
+  outline: none;
+}
