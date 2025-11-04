@@ -2,10 +2,12 @@ import { Link } from 'react-router-dom';
 import { SignedIn, SignedOut, UserButton } from '@clerk/clerk-react';
 import homepageBackground from '../../assets/SPCC - Homepage.png';
 import searchIcon from '../../assets/search_icon.png';
+import NavBar from '../../components/NavBarComponent/NavBar.tsx';
 
 function Landing() {
   return (
     <div className="min-w-screen relative min-h-screen overflow-y-auto bg-[#6EC6C5]">
+      <NavBar />
       {/* Image background */}
       <div
         className="relative h-[370px] bg-cover w-full [background-position:50%_20%]"
