@@ -1,13 +1,13 @@
 import { useState } from "react";
 import styles from "./LoginForm.module.css";
 import { type LoginFormProps } from "./LoginFormDefinitions";
-import InputField from "../InputFieldComponent/InputField";
-import { InputType } from "../InputFieldComponent/InputFieldDefinitions";
-import Button from "../ButtonComponent/Button";
-import { ButtonColor, ButtonVariant } from "../ButtonComponent/ButtonDefinitions";
-import SocialLoginButton from "../SocialLoginButtonComponent/SocialLoginButton";
-import { SocialProvider } from "../SocialLoginButtonComponent/SocialLoginButtonDefinitions";
-import Divider from "../DividerComponent/Divider";
+import InputField from "@components/InputFieldComponent/InputField";
+import { InputType } from "@components/InputFieldComponent/InputFieldDefinitions";
+import Button from "@components/ButtonComponent/Button";
+import { ButtonColor, ButtonVariant } from "@components/ButtonComponent/ButtonDefinitions";
+import americanSPCCLogo from "@assets/AmericanSPCCLogo.png";
+import googleLogo from "@assets/GoogleLogo.png";
+import loginPageImage from "@assets/SPCC - Login Page.png";
 
 function LoginForm({
   onSubmit,
@@ -25,61 +25,76 @@ function LoginForm({
 
   return (
     <div className={styles.loginContainer}>
-      <div className={styles.formCard}>
-        <h1 className={styles.title}>Login</h1>
+      <div className={styles.leftSection}>
+        <img
+          src={loginPageImage}
+          alt="Children in circle"
+          className={styles.loginImage}
+        />
+      </div>
+      <div className={styles.rightSection}>
+        <img
+          src={americanSPCCLogo}
+          alt="American SPCC"
+          className={styles.logo}
+        />
+        <div className={styles.formCard}>
+          <h1 className={styles.title}>Login</h1>
 
-        <form className={styles.form} onSubmit={handleSubmit}>
-          <InputField
-            label="Email"
-            type={InputType.Email}
-            placeholder="example@mail.com"
-            value={email}
-            onChange={setEmail}
-            name="email"
-            required
-          />
+          <form className={styles.form} onSubmit={handleSubmit}>
+            <InputField
+              label="Email"
+              type={InputType.Email}
+              placeholder="example@mail.com"
+              value={email}
+              onChange={setEmail}
+              name="email"
+              required
+            />
 
-          <InputField
-            label="Password"
-            type={InputType.Password}
-            placeholder="************"
-            value={password}
-            onChange={setPassword}
-            name="password"
-            required
-            showPasswordToggle
-          />
+            <InputField
+              label="Password"
+              type={InputType.Password}
+              placeholder="************"
+              value={password}
+              onChange={setPassword}
+              name="password"
+              required
+              showPasswordToggle
+            />
 
-          <Button
-            text="SIGN IN"
-            type="submit"
-            color={ButtonColor.DarkBlue}
-            variant={ButtonVariant.Regular}
-          />
-        </form>
+            <Button
+              text="SIGN IN"
+              type="submit"
+              color={ButtonColor.DarkBlue}
+              variant={ButtonVariant.Regular}
+            />
+          </form>
 
-        <Divider text="OR" />
+          <div className={styles.divider}>
+            <div className={styles.line}></div>
+            <span className={styles.dividerText}>OR</span>
+            <div className={styles.line}></div>
+          </div>
 
-        <div className={styles.socialButtons}>
-          <SocialLoginButton
-            provider={SocialProvider.Google}
-            onClick={onGoogleLogin}
-          />
-          <SocialLoginButton
-            provider={SocialProvider.Facebook}
-            onClick={onFacebookLogin}
-          />
-        </div>
-
-        <div className={styles.signUpSection}>
-          <span className={styles.signUpText}>Don't have an account? </span>
           <button
             type="button"
-            className={styles.signUpLink}
-            onClick={onSignUpClick}
+            className={styles.googleButton}
+            onClick={onGoogleLogin}
           >
-            SIGN UP
+            <img src={googleLogo} alt="Google" className={styles.googleIcon} />
           </button>
+
+          <div className={styles.signUpSection}>
+            <span className={styles.signUpText}>Don't have an account? </span>
+            <button
+              type="button"
+              className={styles.signUpLink}
+              onClick={onSignUpClick}
+            >
+              SIGN UP
+            </button>
+          </div>
         </div>
       </div>
     </div>

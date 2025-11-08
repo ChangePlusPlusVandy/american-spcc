@@ -1,19 +1,56 @@
 import { useNavigate } from "react-router-dom";
-import LoginForm from "../../components/LoginFormComponent/LoginForm";
+import { useSignIn } from "@clerk/clerk-react";
+import LoginForm from "@components/LoginFormComponent/LoginForm";
 
 function Login() {
   const navigate = useNavigate();
+  const { signIn, setActive } = useSignIn();
 
-  const handleLogin = (email: string, password: string) => {
-    console.log("Login with:", email, password);
+  const handleLogin = async (email: string, password: string) => {
+    if (!signIn) return;
+
+    try {
+      const result = await signIn.create({
+        identifier: email,
+        password,
+      });
+
+      if (result.status === "complete") {
+        await setActive({ session: result.createdSessionId });
+        navigate("/");
+      }
+    } catch (err: any) {
+      console.error("Login error:", err);
+      alert(err.errors?.[0]?.message || "Login failed");
+    }
   };
 
-  const handleGoogleLogin = () => {
-    console.log("Google login");
+  const handleGoogleLogin = async () => {
+    if (!signIn) return;
+
+    try {
+      await signIn.authenticateWithRedirect({
+        strategy: "oauth_google",
+        redirectUrl: "/sso-callback",
+        redirectUrlComplete: "/",
+      });
+    } catch (err) {
+      console.error("Google login error:", err);
+    }
   };
 
-  const handleFacebookLogin = () => {
-    console.log("Facebook login");
+  const handleFacebookLogin = async () => {
+    if (!signIn) return;
+
+    try {
+      await signIn.authenticateWithRedirect({
+        strategy: "oauth_facebook",
+        redirectUrl: "/sso-callback",
+        redirectUrlComplete: "/",
+      });
+    } catch (err) {
+      console.error("Facebook login error:", err);
+    }
   };
 
   const handleSignUpClick = () => {

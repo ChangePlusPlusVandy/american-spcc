@@ -1,13 +1,6 @@
-/**
- * Button component implementation
- * 
- * Renders a reusable button with customizable text, color, variant, and behavior.
- * Uses props from Button.definitions.ts and applies appropriate CSS styles.
- */
 import styles from "./Button.module.css";
 import { type ButtonProps, ButtonVariant, ButtonColor } from "./ButtonDefinitions";
 
-// Reusable Button component
 function Button({ 
   text, 
   variant = ButtonVariant.Regular, 
@@ -17,7 +10,6 @@ function Button({
   disabled = false 
 }: ButtonProps) {
   
-  // Combine CSS classes
   const buttonClassName = `${styles.button} ${styles[variant]} ${styles[color]}`;
   
   return (

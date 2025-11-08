@@ -1,6 +1,8 @@
 import { useState } from "react";
 import styles from "./InputField.module.css";
 import { type InputFieldProps, InputType } from "./InputFieldDefinitions";
+import eyeIcon from "@assets/eye.png";
+import eyeOpenIcon from "@assets/eye-open.svg";
 
 function InputField({
   label,
@@ -44,7 +46,11 @@ function InputField({
             onClick={togglePasswordVisibility}
             aria-label={showPassword ? "Hide password" : "Show password"}
           >
-            {showPassword ? "��️" : "🙈"}
+            <img
+              src={showPassword ? eyeOpenIcon : eyeIcon}
+              alt={showPassword ? "Hide password" : "Show password"}
+              className={styles.eyeIcon}
+            />
           </button>
         )}
       </div>

@@ -1,12 +1,14 @@
 .button {
-  padding: 0.875rem 2rem;
-  font-size: 1rem;
-  font-weight: 600;
+  padding: 1.5vh 3vw;
+  font-size: clamp(0.85rem, 1vw, 1rem);
+  font-weight: 700;
   border: none;
   border-radius: 50px;
   cursor: pointer;
   transition: all 0.3s ease;
   outline: none;
+  font-family: 'Lato', sans-serif;
+  width: 100%;
 }
 
 .button:disabled {
@@ -14,12 +16,10 @@
   cursor: not-allowed;
 }
 
-/* Variants */
 .regular {
   min-width: 120px;
 }
 
-/* Colors */
 .grey {
   background-color: #718096;
   color: white;
