@@ -10,7 +10,7 @@ export interface InputFieldProps {
 }
 
 export enum InputType {
-  Text = "text",
-  Email = "email",
-  Password = "password",
+  Text = 'text',
+  Email = 'email',
+  Password = 'password',
 }

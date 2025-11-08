@@ -1,5 +1,5 @@
-import styles from "./Divider.module.css";
-import { type DividerProps } from "./DividerDefinitions";
+import styles from './Divider.module.css';
+import { type DividerProps } from './DividerDefinitions';
 
 function Divider({ text }: DividerProps) {
   return (

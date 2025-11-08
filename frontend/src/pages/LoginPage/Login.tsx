@@ -1,6 +1,6 @@
-import { useNavigate } from "react-router-dom";
-import { useSignIn } from "@clerk/clerk-react";
-import LoginForm from "@components/LoginFormComponent/LoginForm";
+import { useNavigate } from 'react-router-dom';
+import { useSignIn } from '@clerk/clerk-react';
+import LoginForm from '@components/LoginFormComponent/LoginForm';
 
 function Login() {
   const navigate = useNavigate();
@@ -15,13 +15,14 @@ function Login() {
         password,
       });
 
-      if (result.status === "complete") {
+      if (result.status === 'complete') {
         await setActive({ session: result.createdSessionId });
-        navigate("/");
+        navigate('/');
       }
-    } catch (err: any) {
-      console.error("Login error:", err);
-      alert(err.errors?.[0]?.message || "Login failed");
+    } catch (err: unknown) {
+      console.error('Login error:', err);
+      const error = err as { errors?: Array<{ message: string }> };
+      alert(error.errors?.[0]?.message || 'Login failed');
     }
   };
 
@@ -30,38 +31,23 @@ function Login() {
 
     try {
       await signIn.authenticateWithRedirect({
-        strategy: "oauth_google",
-        redirectUrl: "/sso-callback",
-        redirectUrlComplete: "/",
+        strategy: 'oauth_google',
+        redirectUrl: '/sso-callback',
+        redirectUrlComplete: '/',
       });
     } catch (err) {
-      console.error("Google login error:", err);
-    }
-  };
-
-  const handleFacebookLogin = async () => {
-    if (!signIn) return;
-
-    try {
-      await signIn.authenticateWithRedirect({
-        strategy: "oauth_facebook",
-        redirectUrl: "/sso-callback",
-        redirectUrlComplete: "/",
-      });
-    } catch (err) {
-      console.error("Facebook login error:", err);
+      console.error('Google login error:', err);
     }
   };
 
   const handleSignUpClick = () => {
-    navigate("/sign-up");
+    navigate('/sign-up');
   };
 
   return (
     <LoginForm
       onSubmit={handleLogin}
       onGoogleLogin={handleGoogleLogin}
-      onFacebookLogin={handleFacebookLogin}
       onSignUpClick={handleSignUpClick}
     />
   );

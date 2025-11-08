@@ -4,6 +4,6 @@ export interface SocialLoginButtonProps {
 }
 
 export enum SocialProvider {
-  Google = "google",
-  Facebook = "facebook",
+  Google = 'google',
+  Facebook = 'facebook',
 }
