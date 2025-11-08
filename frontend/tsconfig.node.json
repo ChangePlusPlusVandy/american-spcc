@@ -1,6 +1,8 @@
 {
   "compilerOptions": {
+    "incremental": true, // ✅ enables tsBuildInfoFile support
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
+
     "target": "ES2023",
     "lib": ["ES2023"],
     "module": "ESNext",
@@ -18,9 +20,12 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "erasableSyntaxOnly": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noFallthroughCasesInSwitch": true
+
+    /* removed unsupported options:
+      - "erasableSyntaxOnly"
+      - "noUncheckedSideEffectImports"
+    */
   },
   "include": ["vite.config.ts"]
 }
