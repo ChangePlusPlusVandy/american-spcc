@@ -1,29 +1,29 @@
 .socialButton {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    border: none;
-    background-color: white;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition:
-      transform 0.2s ease,
-      box-shadow 0.2s ease;
-  }
-  
-  .socialButton:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  }
-  
-  .socialButton:active {
-    transform: translateY(0);
-  }
-  
-  .icon {
-    width: 32px;
-    height: 32px;
-  }
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: none;
+  background-color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.socialButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.socialButton:active {
+  transform: translateY(0);
+}
+
+.icon {
+  width: 32px;
+  height: 32px;
+}

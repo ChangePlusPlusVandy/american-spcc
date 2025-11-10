@@ -1,39 +1,39 @@
 .button {
-    padding: 1.5vh 3vw;
-    font-size: clamp(0.85rem, 1vw, 1rem);
-    font-weight: 700;
-    border: none;
-    border-radius: 50px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    outline: none;
-    font-family: 'Lato', sans-serif;
-    width: 100%;
-  }
-  
-  .button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-  
-  .regular {
-    min-width: 120px;
-  }
-  
-  .grey {
-    background-color: #718096;
-    color: white;
-  }
-  
-  .grey:hover:not(:disabled) {
-    background-color: #5a6c7d;
-  }
-  
-  .darkBlue {
-    background-color: #5a6c7d;
-    color: white;
-  }
-  
-  .darkBlue:hover:not(:disabled) {
-    background-color: #4a5568;
-  }
+  padding: 1.5vh 3vw;
+  font-size: clamp(0.85rem, 1vw, 1rem);
+  font-weight: 700;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  outline: none;
+  font-family: 'Lato', sans-serif;
+  width: 100%;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.regular {
+  min-width: 120px;
+}
+
+.grey {
+  background-color: #718096;
+  color: white;
+}
+
+.grey:hover:not(:disabled) {
+  background-color: #5a6c7d;
+}
+
+.darkBlue {
+  background-color: #5a6c7d;
+  color: white;
+}
+
+.darkBlue:hover:not(:disabled) {
+  background-color: #4a5568;
+}

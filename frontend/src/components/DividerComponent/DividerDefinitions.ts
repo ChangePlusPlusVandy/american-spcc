@@ -1,3 +1,3 @@
 export interface DividerProps {
-    text?: string;
-  }
+  text?: string;
+}
