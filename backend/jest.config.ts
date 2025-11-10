@@ -11,7 +11,7 @@ const config: Config = {
     '^.+\\.ts$': ['ts-jest', { isolatedModules: true }],
   },
   setupFilesAfterEnv: ['<rootDir>/tests/setup/prismaMock.setup.ts'],
-  testPathIgnorePatterns: ['/node_modules/', '/tests/setup/prismaMock.setup.ts'], 
+  testPathIgnorePatterns: ['/node_modules/', '/tests/setup/prismaMock.setup.ts'],
 };
 
 export default config;

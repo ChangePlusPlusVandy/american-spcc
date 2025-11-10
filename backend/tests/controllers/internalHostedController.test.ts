@@ -43,7 +43,9 @@ describe('InternalHostedResourceController', () => {
         labels: [{ label: { id: 'cklbl5678efgh', label_name: 'Co-Parenting' } }],
       };
 
-      prismaMock.internalHostedResources.create.mockResolvedValue(mockInternalHostedResource as any);
+      prismaMock.internalHostedResources.create.mockResolvedValue(
+        mockInternalHostedResource as any
+      );
 
       const req = mockReq({
         body: {
