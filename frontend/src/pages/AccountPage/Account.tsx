@@ -1,4 +1,4 @@
-import { UserProfile } from "@clerk/clerk-react";
+import { UserProfile } from '@clerk/clerk-react';
 
 export default function AccountPage() {
   return (
@@ -6,9 +6,9 @@ export default function AccountPage() {
       <UserProfile
         appearance={{
           elements: {
-            rootBox: "shadow-xl rounded-2xl border border-gray-200 bg-white",
-            card: "p-6",
-            navbar: "hidden", // hides Clerk’s left sidebar if you want
+            rootBox: 'shadow-xl rounded-2xl border border-gray-200 bg-white',
+            card: 'p-6',
+            navbar: 'hidden', // hides Clerk’s left sidebar if you want
           },
         }}
       />
