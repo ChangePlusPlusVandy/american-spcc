@@ -73,6 +73,7 @@ model Resource {
   labels        ResourceLabel[]
   externalResources ExternalResources?
   bookmarks     Bookmarks[]
+  internalResource InternalHostedResources?
   @@map("resource")
 }
 
@@ -121,6 +122,24 @@ model Bookmarks {
   created_at  DateTime @default(now())
   @@unique([user_fk, resource_fk])
   @@map("bookmarks")
+}
+
+model InternalHostedResources {
+  id           String   @id @default(cuid())
+  resource_fk  String   @unique
+  s3_key       String
+  resource     Resource @relation(fields: [resource_fk], references: [id])
+  @@map("internalHostedResources")
+}
+
+model AdminLog {
+  id          String   @id @default(cuid())
+  admin_fk    String
+  admin       User     @relation(fields: [admin_fk], references: [id], onDelete: Cascade)
+  action      String
+  details     String?
+  created_at  DateTime @default(now())
+  @@map("adminlog")
 }
 
 model ResourceView {
