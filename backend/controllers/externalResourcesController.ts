@@ -34,7 +34,7 @@ export const getExternalResourcesById = async (req: Request, res: Response) => {
     const id = req.params.id as string;
     const externalResources = await prisma.externalResources.findUnique({
       where: { id },
-      include: { resources: true },
+      include: { resource: true },
     });
 
     if (!externalResources) return res.status(404).json({ error: 'externalResources not found' });
