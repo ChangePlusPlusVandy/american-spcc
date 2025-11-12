@@ -5,6 +5,7 @@ import categoryLabelRoutes from './routes/categoryLabelsRoutes';
 import externalResourcesRoutes from './routes/externalResourcesRoutes';
 import userRoutes from './routes/userRoutes';
 import bookmarkRoutes from './routes/bookmarkRoutes';
+import resourceViewRoutes from './routes/resourceViewRoutes';
 import internalHostedResourceRoutes from './routes/internalHostedResourcesRoutes';
 import adminLogsRoutes from './routes/adminLogsRoutes';
 
@@ -18,6 +19,7 @@ app.use('/api/labels', categoryLabelRoutes);
 app.use('/api/externalResources', externalResourcesRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/bookmarks', bookmarkRoutes);
+app.use('/resourceViews', resourceViewRoutes);
 app.use('/api/internalHostedResources', internalHostedResourceRoutes);
 app.use('/api/admin-logs', adminLogsRoutes);
 
