@@ -37,10 +37,11 @@ enum CATEGORY_TYPE {
 
 enum AGE_GROUP {
   AGE_0_3
-  AGE_4_7
-  AGE_8_12
-  TEEN
-  OTHER
+  AGE_4_6
+  AGE_7_10
+  AGE_10_13
+  AGE_14_18
+  AGE_18_ABOVE
 }
 
 enum LANGUAGE {
@@ -52,7 +53,7 @@ enum LANGUAGE {
 
 model CategoryLabel {
   id          String         @id @default(cuid())
-  label_name  String
+  label_name  String         @unique
   category    CATEGORY_TYPE
   resources   ResourceLabel[]
   @@map("categorylabel")
@@ -60,12 +61,12 @@ model CategoryLabel {
 
 model Resource {
   id          String         @id @default(cuid())
-  title         String
+  title         String         @unique
   description   String?
   resource_type RESOURCE_TYPE
   hosting_type  HOSTING_TYPE
   category      CATEGORY_TYPE
-  age_group     AGE_GROUP
+  age_groups    AGE_GROUP[]
   language      LANGUAGE
   time_to_read  Int
   created_at    DateTime @default(now())
@@ -110,6 +111,7 @@ model User {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
   bookmarks  Bookmarks[]
+  adminLogs AdminLog[]
   @@map("user")
 }
 
