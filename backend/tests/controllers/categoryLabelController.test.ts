@@ -7,6 +7,7 @@ import {
   getLabelById,
   updateLabel,
   deleteLabel,
+  searchLabels,
 } from '../../controllers/categoryLabelController';
 
 const mockReq = (overrides: any = {}): any => ({
@@ -231,6 +232,98 @@ describe('CategoryLabelController', () => {
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({ error: 'Failed to delete label' })
+      );
+    });
+  });
+
+  describe('searchLabels', () => {
+    it('should return labels matching the search query (case-insensitive)', async () => {
+      const matchingLabels = [
+        {
+          id: 'cktest7777',
+          label_name: 'Parenting Styles & Strategies',
+          category: CATEGORY_TYPE.PARENTING_SKILLS_RELATIONSHIPS,
+        },
+        {
+          id: 'cktest8888',
+          label_name: 'Parent Mental Wellness',
+          category: CATEGORY_TYPE.MENTAL_EMOTIONAL_HEALTH,
+        },
+        {
+          id: 'cktest9999',
+          label_name: 'Parenting Groups & Networks',
+          category: CATEGORY_TYPE.FAMILY_SUPPORT_COMMUNITY,
+        },
+      ];
+
+      prismaMock.categoryLabel.findMany.mockResolvedValue(matchingLabels as any);
+
+      const req = mockReq({ query: { q: 'pa' } });
+      const res = mockRes();
+
+      await searchLabels(req, res);
+
+      expect(prismaMock.categoryLabel.findMany).toHaveBeenCalledWith({
+        where: {
+          label_name: {
+            contains: 'pa',
+            mode: 'insensitive',
+          },
+        },
+        orderBy: { label_name: 'asc' },
+      });
+      expect(res.json).toHaveBeenCalledWith(matchingLabels);
+    });
+
+    it('should return empty array when no labels match', async () => {
+      prismaMock.categoryLabel.findMany.mockResolvedValue([]);
+
+      const req = mockReq({ query: { q: 'xyz' } });
+      const res = mockRes();
+
+      await searchLabels(req, res);
+
+      expect(prismaMock.categoryLabel.findMany).toHaveBeenCalled();
+      expect(res.json).toHaveBeenCalledWith([]);
+    });
+
+    it('should return 400 if query parameter "q" is missing', async () => {
+      const req = mockReq({ query: {} });
+      const res = mockRes();
+
+      await searchLabels(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({ error: 'Query parameter "q" is required' })
+      );
+      expect(prismaMock.categoryLabel.findMany).not.toHaveBeenCalled();
+    });
+
+    it('should return 400 if query parameter "q" is not a string', async () => {
+      const req = mockReq({ query: { q: 123 } });
+      const res = mockRes();
+
+      await searchLabels(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({ error: 'Query parameter "q" is required' })
+      );
+      expect(prismaMock.categoryLabel.findMany).not.toHaveBeenCalled();
+    });
+
+    it('should handle database errors gracefully', async () => {
+      prismaMock.categoryLabel.findMany.mockRejectedValue(new Error('Database error'));
+
+      const req = mockReq({ query: { q: 'test' } });
+      const res = mockRes();
+
+      await searchLabels(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({ error: 'Failed to search labels' })
       );
     });
   });

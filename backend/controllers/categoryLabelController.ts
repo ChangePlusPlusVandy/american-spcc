@@ -86,3 +86,28 @@ export const deleteLabel = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Failed to delete label' });
   }
 };
+
+export const searchLabels = async (req: Request, res: Response) => {
+  try {
+    const { q } = req.query;
+
+    if (!q || typeof q !== 'string') {
+      return res.status(400).json({ error: 'Query parameter "q" is required' });
+    }
+
+    const labels = await prisma.categoryLabel.findMany({
+      where: {
+        label_name: {
+          contains: q,
+          mode: 'insensitive',
+        },
+      },
+      orderBy: { label_name: 'asc' },
+    });
+
+    res.json(labels);
+  } catch (error) {
+    console.error('Error searching labels:', error);
+    res.status(500).json({ error: 'Failed to search labels' });
+  }
+};
