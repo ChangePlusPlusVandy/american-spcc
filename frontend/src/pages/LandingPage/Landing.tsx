@@ -5,43 +5,46 @@ import homepageBackground from '../../assets/SPCC - Homepage.png';
 import searchIcon from '../../assets/search_icon.png';
 import NavBar from '../../components/NavBarComponent/NavBar.tsx';
 
-interface CategoryLabel {
+interface Resource {
   id: string;
-  label_name: string;
-  category: string;
+  title: string;
+  description?: string;
 }
 
 function Landing() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<CategoryLabel[]>([]);
+  const [searchResults, setSearchResults] = useState<Resource[]>([]);
   const [isSearching, setIsSearching] = useState(false);
 
-  // API call to search category labels
-  const searchLabels = async (query: string) => {
-    if (!query.trim()) {
-      setSearchResults([]);
-      return;
-    }
 
-    setIsSearching(true);
-    try {
-      const response = await fetch(
-        `http://localhost:8000/api/labels/search?q=${encodeURIComponent(query)}`
-      );
-      const data = await response.json();
-      setSearchResults(data);
-    } catch (error) {
-      console.error('Search error:', error);
-      setSearchResults([]);
-    } finally {
-      setIsSearching(false);
-    }
-  };
+// API call to search resource titles
+const searchResources = async (query: string) => {
+  if (!query.trim()) {
+    setSearchResults([]);
+    return;
+  }
+
+  setIsSearching(true);
+  try {
+    const response = await fetch(
+      `http://localhost:8000/api/resources/search?q=${encodeURIComponent(query)}`
+    );
+    const data = await response.json();
+    setSearchResults(data);
+  } catch (error) {
+    console.error('Search error:', error);
+    setSearchResults([]);
+  } finally {
+    setIsSearching(false);
+  }
+};
+
 
   // Debounced search effect
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      searchLabels(searchQuery);
+      searchResources(searchQuery);
+
     }, 300); // 300ms debounce delay
 
     // Cleanup function to cancel the previous timeout
@@ -106,37 +109,38 @@ function Landing() {
             {searchQuery && searchResults.length > 0 && (
               <div className="absolute left-0 right-0 mt-2 z-50">
                 <div className="rounded-lg shadow-lg border-2 border-[#C8DC59] overflow-hidden" style={{ backgroundColor: '#FFFFFF' }}>
-                  {searchResults.map((label, index) => (
-                    <div key={label.id}>
-                      <button
-                        onClick={() => {
-                          console.log('Selected:', label);
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = '#F3F4F6';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = '#FFFFFF';
-                        }}
-                        style={{
-                          backgroundColor: '#FFFFFF',
-                          fontFamily: 'Open Sans, sans-serif',
-                          color: '#566273',
-                          paddingLeft: '35.5px',
-                          paddingRight: '35.5px',
-                          transition: 'background-color 0.2s',
-                          border: 'none',
-                          outline: 'none',
-                        }}
-                        className="w-full text-left py-3"
-                      >
-                        {label.label_name}
-                      </button>
-                      {index !== searchResults.length - 1 && (
-                        <div style={{ height: '2px', backgroundColor: '#C8DC59' }}></div>
-                      )}
-                    </div>
-                  ))}
+                {searchResults.map((resource, index) => (
+                  <div key={resource.id}>
+                    <button
+                      onClick={() => {
+                        console.log('Selected resource:', resource);
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#F3F4F6';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = '#FFFFFF';
+                      }}
+                      style={{
+                        backgroundColor: '#FFFFFF',
+                        fontFamily: 'Open Sans, sans-serif',
+                        color: '#566273',
+                        paddingLeft: '35.5px',
+                        paddingRight: '35.5px',
+                        transition: 'background-color 0.2s',
+                        border: 'none',
+                        outline: 'none',
+                      }}
+                      className="w-full text-left py-3"
+                    >
+                      {resource.title}
+                    </button>
+                    {index !== searchResults.length - 1 && (
+                      <div style={{ height: '2px', backgroundColor: '#C8DC59' }}></div>
+                    )}
+                  </div>
+                ))}
+
                 </div>
               </div>
             )}

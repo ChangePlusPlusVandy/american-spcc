@@ -9,7 +9,7 @@ export const createResource = async (req: Request, res: Response) => {
       resource_type,
       hosting_type,
       category,
-      age_group,
+      age_groups,
       language,
       time_to_read,
       label_ids,
@@ -22,7 +22,7 @@ export const createResource = async (req: Request, res: Response) => {
         resource_type,
         hosting_type,
         category,
-        age_group,
+        age_groups,
         language,
         time_to_read,
         labels: label_ids
@@ -91,7 +91,7 @@ export const updateResource = async (req: Request, res: Response) => {
       resource_type,
       hosting_type,
       category,
-      age_group,
+      age_groups,
       language,
       time_to_read,
       label_ids,
@@ -105,7 +105,7 @@ export const updateResource = async (req: Request, res: Response) => {
         resource_type,
         hosting_type,
         category,
-        age_group,
+        age_groups,
         language,
         time_to_read,
         ...(label_ids && {
@@ -135,5 +135,34 @@ export const deleteResource = async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error deleting resource:', error);
     res.status(500).json({ error: 'Failed to delete resource' });
+  }
+};
+
+export const searchResources = async (req: Request, res: Response) => {
+  try {
+    const query = req.query.q as string;
+    if (!query || query.trim() === '') {
+      return res.json([]); 
+    }
+
+    const resources = await prisma.resource.findMany({
+      where: {
+        title: {
+          contains: query,
+          mode: 'insensitive', 
+        },
+      },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+      },
+      take: 10, 
+    });
+
+    res.json(resources);
+  } catch (error) {
+    console.error('Error searching resources:', error);
+    res.status(500).json({ error: 'Failed to search resources' });
   }
 };
