@@ -1,51 +1,78 @@
-import React from "react";
-import { useState } from "react";
-import { FilterState } from "./FilterComponent";
+import React, { useState } from "react";
 import "./FilterComponent.css";
 
-interface FilterProps {
-  onChange?: (filters: FilterState) => void;
-}
+export default function FilterComponent() {
+  const topicInitial = [
+    "Parenting Skills & Relationships",
+    "Mental & Emotional Health",
+    "Life Skills & Independence",
+  ];
 
-export default function FilterComponent({ onChange }: FilterProps) {
-  const [category, setCategory] = useState("");
-  const [completedOnly, setCompletedOnly] = useState(false);
+  const topicFull = [
+    "Parenting Skills & Relationships",
+    "Mental & Emotional Health",
+    "Life Skills & Independence",
+    "Child Development",
+    "Education & Learning",
+    "Family Supports & Community",
+    "Health & Wellbeing",
+    "Safety & Protection",
+  ];
 
-  function updateFilters(next: FilterState) {
-    if (onChange) onChange(next);
-  }
+  const ageInitial = ["Infant (0–1)", "Preschool (3–6)", "Elementary (7–10)"];
+
+  const ageFull = [
+    "Infant (0–1)",
+    "Preschool (3–6)",
+    "Elementary (7–10)",
+    "Middle School (11–13)",
+    "High School (14–18)",
+    "University & Above (18+)",
+  ];
+
+  const [showAllTopics, setShowAllTopics] = useState(false);
+  const [showAllAges, setShowAllAges] = useState(false);
 
   return (
-    <div className="filter-container">
-      <div className="filter-section">
-        <label className="filter-label">Category</label>
-        <select
-          className="filter-dropdown"
-          value={category}
-          onChange={(e) => {
-            const val = e.target.value;
-            setCategory(val);
-            updateFilters({ category: val, completedOnly });
-          }}
-        >
-          <option value="">All</option>
-          <option value="math">Math</option>
-          <option value="reading">Reading</option>
-          <option value="science">Science</option>
-        </select>
+    <div className="filter-box">
+      <h3 className="filter-title">Filter</h3>
+
+      {/* TOPICS */}
+      <p className="filter-section-title">What Topic?</p>
+      <div className="chip-wrapper">
+        {(showAllTopics ? topicFull : topicInitial).map((t) => (
+          <button key={t} className="chip">
+            {t}
+          </button>
+        ))}
+
+        {!showAllTopics && (
+          <button
+            className="chip chip-more"
+            onClick={() => setShowAllTopics(true)}
+          >
+            More
+          </button>
+        )}
       </div>
 
-      <div className="filter-section">
-        <label className="filter-label">Completed Only</label>
-        <input
-          type="checkbox"
-          checked={completedOnly}
-          onChange={(e) => {
-            const val = e.target.checked;
-            setCompletedOnly(val);
-            updateFilters({ category, completedOnly: val });
-          }}
-        />
+      {/* AGE */}
+      <p className="filter-section-title">Child's Age</p>
+      <div className="chip-wrapper">
+        {(showAllAges ? ageFull : ageInitial).map((a) => (
+          <button key={a} className="chip">
+            {a}
+          </button>
+        ))}
+
+        {!showAllAges && (
+          <button
+            className="chip chip-more"
+            onClick={() => setShowAllAges(true)}
+          >
+            More
+          </button>
+        )}
       </div>
     </div>
   );
