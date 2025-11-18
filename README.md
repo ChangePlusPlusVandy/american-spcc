@@ -2,7 +2,7 @@
 
 Learning Management System (LMS) monorepo for [The American Society for the Positive Care of Children (American SPCC)](https://americanspcc.org/), a national nonprofit supporting parents, caregivers, and educators through evidence-based resources and interactive learning.
 
-IMPORTANT! Make sure you run git pull + npx prisma db push often! Also, remember to make a new branch everytime you execute a task. The branch name should be similar to the task name. After you have pushed your changes, make a PR so I (Sophie) can review it.
+IMPORTANT!! Make sure you run git pull + npx prisma db push often! Also, remember to make a new branch everytime you execute a task. The branch name should be similar to the task name. After you have pushed your changes, make a PR so I (Sophie) can review it.
 
 ### 1. Install dependencies
 
