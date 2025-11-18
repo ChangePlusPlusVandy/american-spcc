@@ -1,0 +1,37 @@
+.filter-box {
+  background-color: #cde47f;
+  border-radius: 18px;
+  padding: 20px;
+  width: 260px;
+}
+
+.filter-title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.filter-section-title {
+  margin-top: 12px;
+  margin-bottom: 6px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.chip-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  padding: 6px 10px;
+  background: white;
+  border: 1px solid #7a7a7a;
+  border-radius: 20px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.chip-more {
+  background-color: #e0e0e0;
+}
