@@ -1,75 +1,79 @@
 import { Request, Response } from 'express';
 import prisma from '../config/prisma';
 
-export const createResourceView = async (req: Request, res: Response) => {
+export const recordResourceView = async (req: Request, res: Response) => {
   try {
-    const { user_fk, resource_fk, viewed_at, view_count } = req.body;
+    const { user_fk, resource_fk } = req.body;
 
-    const resourceView = await prisma.resourceView.create({
-      data: {
+    if (!user_fk || !resource_fk) {
+      return res.status(400).json({ error: 'user_fk and resource_fk are required' });
+    }
+
+    const resourceView = await prisma.resourceView.upsert({
+      where: {
+        user_fk_resource_fk: {
+          user_fk,
+          resource_fk,
+        },
+      },
+      update: {
+        view_count: { increment: 1 },   
+        viewed_at: new Date(),         
+      },
+      create: {
         user_fk,
         resource_fk,
-        viewed_at,
-        view_count,
+        view_count: 1,
+        viewed_at: new Date(),
       },
     });
 
-    res.status(201).json(resourceView);
+    res.status(200).json(resourceView);
   } catch (error) {
-    console.error('Error creating resource view:', error);
-    res.status(500).json({ error: 'Failed to create resource view' });
+    console.error('Error recording resource view:', error);
+    res.status(500).json({ error: 'Failed to record resource view' });
   }
 };
 
 export const getAllResourceViews = async (req: Request, res: Response) => {
   try {
-    const allResourceViews = await prisma.resourceView.findMany();
-    res.json(allResourceViews);
-  } catch (error) {
-    console.error('Error fetching resources view:', error);
-    res.status(500).json({ error: 'Failed to fetch resourceView' });
-  }
-};
-
-export const getResourceViewById = async (req: Request, res: Response) => {
-  try {
-    const id = req.params.id as string;
-    const resourceViews = await prisma.resourceView.findUnique({
-      where: { id },
+    const all = await prisma.resourceView.findMany({
+      include: { user: true, resource: true }
     });
-
-    if (!resourceViews) return res.status(404).json({ error: 'resourceView not found' });
-    res.json(resourceViews);
+    res.json(all);
   } catch (error) {
     console.error('Error fetching resource views:', error);
     res.status(500).json({ error: 'Failed to fetch resource views' });
   }
 };
 
-export const updateResourceView = async (req: Request, res: Response) => {
+export const getResourceViewById = async (req: Request, res: Response) => {
   try {
-    const id = req.params.id as string;
-    const { user_fk, resource_fk, viewed_at, view_count } = req.body;
+    const id = req.params.id;
 
-    const updated = await prisma.resourceView.update({
+    const view = await prisma.resourceView.findUnique({
       where: { id },
-      data: { user_fk, resource_fk, viewed_at, view_count },
+      include: { user: true, resource: true }
     });
 
-    res.json(updated);
+    if (!view) return res.status(404).json({ error: 'ResourceView not found' });
+
+    res.json(view);
   } catch (error) {
-    console.error('Error updating resource views:', error);
-    res.status(500).json({ error: 'Failed to update resource views' });
+    console.error('Error fetching resource view:', error);
+    res.status(500).json({ error: 'Failed to fetch resource view' });
   }
 };
 
 export const deleteResourceView = async (req: Request, res: Response) => {
   try {
-    const id = req.params.id as string;
+    const id = req.params.id;
+
     await prisma.resourceView.delete({ where: { id } });
+
     res.json({ message: 'ResourceView deleted successfully' });
   } catch (error) {
-    console.error('Error deleting resourceView:', error);
-    res.status(500).json({ error: 'Failed to delete resourceView' });
+    console.error('Error deleting resource view:', error);
+    res.status(500).json({ error: 'Failed to delete resource view' });
   }
 };

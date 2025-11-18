@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+/*import { Request, Response } from 'express';
 import prisma from '../config/prisma';
 
 export const createBookmark = async (req: Request, res: Response) => {
@@ -172,3 +172,4 @@ export const checkBookmarkStatus = async (req: Request, res: Response) => {
     return res.status(500).json({ error: 'Failed to check bookmark' });
   }
 };
+*/

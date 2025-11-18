@@ -1,4 +1,4 @@
-import express from 'express';
+/*import express from 'express';
 import {
   createBookmark,
   removeBookmark,
@@ -13,4 +13,4 @@ router.get('/', getBookmarks);
 router.post('/check', checkBookmarkStatus);
 router.delete('/', removeBookmark);
 
-export default router;
+export default router;*/

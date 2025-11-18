@@ -18,11 +18,11 @@ export const createResource = async (req: Request, res: Response) => {
     const resource = await prisma.resource.create({
       data: {
         title,
-        description,
+        description: description ?? null,
         resource_type,
         hosting_type,
         category,
-        age_groups,
+        age_groups: age_groups ?? [],
         language,
         time_to_read,
         labels: label_ids
@@ -50,7 +50,10 @@ export const getAllResources = async (req: Request, res: Response) => {
     const { category, label_id } = req.query;
     const where: any = {};
     if (category) where.category = category;
-    if (label_id) where.labels = { some: { label_id: label_id as string } };
+    if (label_id)
+      where.labels = {
+        some: { label_id: label_id as string },
+      };
 
     const resources = await prisma.resource.findMany({
       where,
@@ -69,10 +72,14 @@ export const getAllResources = async (req: Request, res: Response) => {
 
 export const getResourceById = async (req: Request, res: Response) => {
   try {
-    const id = req.params.id as string;
+    const id = req.params.id;
     const resource = await prisma.resource.findUnique({
       where: { id },
-      include: { labels: { include: { label: true } } },
+      include: {
+        labels: { include: { label: true } },
+        collectionItems: true,
+        resourceViews: true,
+      },
     });
     if (!resource) return res.status(404).json({ error: 'Resource not found' });
     res.json(resource);
@@ -84,7 +91,8 @@ export const getResourceById = async (req: Request, res: Response) => {
 
 export const updateResource = async (req: Request, res: Response) => {
   try {
-    const id = req.params.id as string;
+    const id = req.params.id;
+
     const {
       title,
       description,
@@ -100,17 +108,17 @@ export const updateResource = async (req: Request, res: Response) => {
     const updated = await prisma.resource.update({
       where: { id },
       data: {
-        title,
-        description,
-        resource_type,
-        hosting_type,
-        category,
-        age_groups,
-        language,
-        time_to_read,
+        title: title ?? undefined,
+        description: description ?? undefined,
+        resource_type: resource_type ?? undefined,
+        hosting_type: hosting_type ?? undefined,
+        category: category ?? undefined,
+        age_groups: age_groups ?? undefined,
+        language: language ?? undefined,
+        time_to_read: time_to_read ?? undefined,
         ...(label_ids && {
           labels: {
-            deleteMany: {},
+            deleteMany: {}, 
             create: label_ids.map((labelId: string) => ({
               label: { connect: { id: labelId } },
             })),
@@ -129,7 +137,8 @@ export const updateResource = async (req: Request, res: Response) => {
 
 export const deleteResource = async (req: Request, res: Response) => {
   try {
-    const id = req.params.id as string;
+    const id = req.params.id;
+
     await prisma.resource.delete({ where: { id } });
     res.json({ message: 'Resource deleted successfully' });
   } catch (error) {
@@ -142,14 +151,14 @@ export const searchResources = async (req: Request, res: Response) => {
   try {
     const query = req.query.q as string;
     if (!query || query.trim() === '') {
-      return res.json([]); 
+      return res.json([]);
     }
 
     const resources = await prisma.resource.findMany({
       where: {
         title: {
           contains: query,
-          mode: 'insensitive', 
+          mode: 'insensitive',
         },
       },
       select: {
@@ -157,7 +166,7 @@ export const searchResources = async (req: Request, res: Response) => {
         title: true,
         description: true,
       },
-      take: 10, 
+      take: 10,
     });
 
     res.json(resources);
