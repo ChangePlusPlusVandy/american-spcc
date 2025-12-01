@@ -1,35 +1,44 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { SignedIn, SignedOut, UserButton } from '@clerk/clerk-react';
 import homepageBackground from '../../assets/SPCC - Homepage.png';
 import searchIcon from '../../assets/search_icon.png';
 import NavBar from '../../components/NavBarComponent/NavBar.tsx';
 
-interface Resource {
+interface CategoryLabel {
   id: string;
-  title: string;
-  description?: string;
+  label_name: string;
+  category: string;
 }
 
 function Landing() {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<Resource[]>([]);
+  const [searchResults, setSearchResults] = useState<CategoryLabel[]>([]);
   const [isSearching, setIsSearching] = useState(false);
 
 
 // API call to search resource titles
 const searchResources = async (query: string) => {
+  console.log('searchResources called with query:', query);
+
   if (!query.trim()) {
+    console.log('Empty query, clearing results');
     setSearchResults([]);
     return;
   }
 
   setIsSearching(true);
   try {
-    const response = await fetch(
-      `http://localhost:8000/api/resources/search?q=${encodeURIComponent(query)}`
-    );
+    const url = `http://localhost:8000/api/labels/search?q=${encodeURIComponent(query)}`;
+    console.log('Fetching from:', url);
+
+    const response = await fetch(url);
     const data = await response.json();
+
+    console.log('API Response:', data);
+    console.log('Number of results:', data.length);
+
     setSearchResults(data);
   } catch (error) {
     console.error('Search error:', error);
@@ -50,6 +59,13 @@ const searchResources = async (query: string) => {
     // Cleanup function to cancel the previous timeout
     return () => clearTimeout(timeoutId);
   }, [searchQuery]);
+
+  // Debug effect to log state changes
+  useEffect(() => {
+    console.log('State updated - searchQuery:', searchQuery);
+    console.log('State updated - searchResults:', searchResults);
+    console.log('State updated - isSearching:', isSearching);
+  }, [searchQuery, searchResults, isSearching]);
 
   return (
     <div className="min-w-screen relative min-h-screen overflow-y-auto bg-[#6EC6C5]">
@@ -77,7 +93,14 @@ const searchResources = async (query: string) => {
       <div className="relative p-2 z-40">
         <div className="w-57/100 -mt-12 mx-auto px-4">
           <div className="relative">
-            <form onSubmit={(e) => e.preventDefault()}>
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              if (searchQuery.trim()) {
+                navigate(`/filter?q=${encodeURIComponent(searchQuery)}`);
+                setSearchQuery('');
+                setSearchResults([]);
+              }
+            }}>
               <div className="relative">
                 <input
                   type="text"
@@ -106,14 +129,24 @@ const searchResources = async (query: string) => {
             </form>
 
             {/* Search Results */}
-            {searchQuery && searchResults.length > 0 && (
+            {(() => {
+              const shouldShow = searchQuery && searchResults.length > 0;
+              console.log('Dropdown condition check:', {
+                searchQuery,
+                resultsLength: searchResults.length,
+                shouldShow
+              });
+              return shouldShow;
+            })() && (
               <div className="absolute left-0 right-0 mt-2 z-50">
                 <div className="rounded-lg shadow-lg border-2 border-[#C8DC59] overflow-hidden" style={{ backgroundColor: '#FFFFFF' }}>
-                {searchResults.map((resource, index) => (
-                  <div key={resource.id}>
+                {searchResults.map((label, index) => (
+                  <div key={label.id}>
                     <button
                       onClick={() => {
-                        console.log('Selected resource:', resource);
+                        navigate(`/filter?label_id=${label.id}`);
+                        setSearchQuery('');
+                        setSearchResults([]);
                       }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.backgroundColor = '#F3F4F6';
@@ -133,7 +166,7 @@ const searchResources = async (query: string) => {
                       }}
                       className="w-full text-left py-3"
                     >
-                      {resource.title}
+                      {label.label_name}
                     </button>
                     {index !== searchResults.length - 1 && (
                       <div style={{ height: '2px', backgroundColor: '#C8DC59' }}></div>

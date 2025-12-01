@@ -156,9 +156,15 @@ export const searchResources = async (req: Request, res: Response) => {
 
     const resources = await prisma.resource.findMany({
       where: {
-        title: {
-          contains: query,
-          mode: 'insensitive',
+        labels: {
+          some: {
+            label: {
+              label_name: {
+                contains: query,
+                mode: 'insensitive',
+              },
+            },
+          },
         },
       },
       select: {

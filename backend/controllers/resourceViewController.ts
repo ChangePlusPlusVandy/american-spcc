@@ -9,24 +9,31 @@ export const recordResourceView = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'user_fk and resource_fk are required' });
     }
 
-    const resourceView = await prisma.resourceView.upsert({
+    const existingView = await prisma.resourceView.findUnique({
       where: {
         user_fk_resource_fk: {
           user_fk,
           resource_fk,
         },
       },
-      update: {
-        view_count: { increment: 1 },   
-        viewed_at: new Date(),         
-      },
-      create: {
-        user_fk,
-        resource_fk,
-        view_count: 1,
-        viewed_at: new Date(),
-      },
     });
+
+    const resourceView = existingView
+      ? await prisma.resourceView.update({
+          where: { id: existingView.id },
+          data: {
+            view_count: existingView.view_count + 1,
+            viewed_at: new Date(),
+          },
+        })
+      : await prisma.resourceView.create({
+          data: {
+            user_fk,
+            resource_fk,
+            view_count: 1,
+            viewed_at: new Date(),
+          },
+        });
 
     res.status(200).json(resourceView);
   } catch (error) {
@@ -35,11 +42,9 @@ export const recordResourceView = async (req: Request, res: Response) => {
   }
 };
 
-export const getAllResourceViews = async (req: Request, res: Response) => {
+export const getAllResourceViews = async (_req: Request, res: Response) => {
   try {
-    const all = await prisma.resourceView.findMany({
-      include: { user: true, resource: true }
-    });
+    const all = await prisma.resourceView.findMany();
     res.json(all);
   } catch (error) {
     console.error('Error fetching resource views:', error);
@@ -52,8 +57,7 @@ export const getResourceViewById = async (req: Request, res: Response) => {
     const id = req.params.id;
 
     const view = await prisma.resourceView.findUnique({
-      where: { id },
-      include: { user: true, resource: true }
+      where: { id }
     });
 
     if (!view) return res.status(404).json({ error: 'ResourceView not found' });

@@ -1,7 +1,19 @@
 import React, { useState } from "react";
 import "./FilterComponent.css";
 
-export default function FilterComponent() {
+interface FilterComponentProps {
+  selectedTopics?: string[];
+  selectedAges?: string[];
+  onTopicChange?: (topics: string[]) => void;
+  onAgeChange?: (ages: string[]) => void;
+}
+
+export default function FilterComponent({
+  selectedTopics = [],
+  selectedAges = [],
+  onTopicChange,
+  onAgeChange,
+}: FilterComponentProps) {
   const topicInitial = [
     "Parenting Skills & Relationships",
     "Mental & Emotional Health",
@@ -33,6 +45,26 @@ export default function FilterComponent() {
   const [showAllTopics, setShowAllTopics] = useState(false);
   const [showAllAges, setShowAllAges] = useState(false);
 
+  const handleTopicClick = (topic: string) => {
+    if (!onTopicChange) return;
+
+    if (selectedTopics.includes(topic)) {
+      onTopicChange(selectedTopics.filter(t => t !== topic));
+    } else {
+      onTopicChange([...selectedTopics, topic]);
+    }
+  };
+
+  const handleAgeClick = (age: string) => {
+    if (!onAgeChange) return;
+
+    if (selectedAges.includes(age)) {
+      onAgeChange(selectedAges.filter(a => a !== age));
+    } else {
+      onAgeChange([...selectedAges, age]);
+    }
+  };
+
   return (
     <div className="filter-box">
       <h3 className="filter-title">Filter</h3>
@@ -41,7 +73,11 @@ export default function FilterComponent() {
       <p className="filter-section-title">What Topic?</p>
       <div className="chip-wrapper">
         {(showAllTopics ? topicFull : topicInitial).map((t) => (
-          <button key={t} className="chip">
+          <button
+            key={t}
+            className={`chip ${selectedTopics.includes(t) ? 'chip-selected' : ''}`}
+            onClick={() => handleTopicClick(t)}
+          >
             {t}
           </button>
         ))}
@@ -60,7 +96,11 @@ export default function FilterComponent() {
       <p className="filter-section-title">Child's Age</p>
       <div className="chip-wrapper">
         {(showAllAges ? ageFull : ageInitial).map((a) => (
-          <button key={a} className="chip">
+          <button
+            key={a}
+            className={`chip ${selectedAges.includes(a) ? 'chip-selected' : ''}`}
+            onClick={() => handleAgeClick(a)}
+          >
             {a}
           </button>
         ))}
