@@ -6,7 +6,7 @@ import {
   renameCollection,
   deleteCollection,
   addResourceToCollection,
-  removeResourceFromCollection
+  removeResourceFromCollection,
 } from '../controllers/collectionController';
 
 const router = Router();

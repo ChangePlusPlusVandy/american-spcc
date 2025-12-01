@@ -118,7 +118,7 @@ export const updateResource = async (req: Request, res: Response) => {
         time_to_read: time_to_read ?? undefined,
         ...(label_ids && {
           labels: {
-            deleteMany: {}, 
+            deleteMany: {},
             create: label_ids.map((labelId: string) => ({
               label: { connect: { id: labelId } },
             })),
@@ -156,9 +156,15 @@ export const searchResources = async (req: Request, res: Response) => {
 
     const resources = await prisma.resource.findMany({
       where: {
-        title: {
-          contains: query,
-          mode: 'insensitive',
+        labels: {
+          some: {
+            label: {
+              label_name: {
+                contains: query,
+                mode: 'insensitive',
+              },
+            },
+          },
         },
       },
       select: {
