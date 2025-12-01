@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import "./FilterComponent.css";
+import React, { useState } from 'react';
+import './FilterComponent.css';
 
 interface FilterComponentProps {
   selectedTopics?: string[];
@@ -15,31 +15,31 @@ export default function FilterComponent({
   onAgeChange,
 }: FilterComponentProps) {
   const topicInitial = [
-    "Parenting Skills & Relationships",
-    "Mental & Emotional Health",
-    "Life Skills & Independence",
+    'Parenting Skills & Relationships',
+    'Mental & Emotional Health',
+    'Life Skills & Independence',
   ];
 
   const topicFull = [
-    "Parenting Skills & Relationships",
-    "Mental & Emotional Health",
-    "Life Skills & Independence",
-    "Child Development",
-    "Education & Learning",
-    "Family Supports & Community",
-    "Health & Wellbeing",
-    "Safety & Protection",
+    'Parenting Skills & Relationships',
+    'Mental & Emotional Health',
+    'Life Skills & Independence',
+    'Child Development',
+    'Education & Learning',
+    'Family Supports & Community',
+    'Health & Wellbeing',
+    'Safety & Protection',
   ];
 
-  const ageInitial = ["Infant (0–1)", "Preschool (3–6)", "Elementary (7–10)"];
+  const ageInitial = ['Infant (0–1)', 'Preschool (3–6)', 'Elementary (7–10)'];
 
   const ageFull = [
-    "Infant (0–1)",
-    "Preschool (3–6)",
-    "Elementary (7–10)",
-    "Middle School (11–13)",
-    "High School (14–18)",
-    "University & Above (18+)",
+    'Infant (0–1)',
+    'Preschool (3–6)',
+    'Elementary (7–10)',
+    'Middle School (11–13)',
+    'High School (14–18)',
+    'University & Above (18+)',
   ];
 
   const [showAllTopics, setShowAllTopics] = useState(false);
@@ -49,7 +49,7 @@ export default function FilterComponent({
     if (!onTopicChange) return;
 
     if (selectedTopics.includes(topic)) {
-      onTopicChange(selectedTopics.filter(t => t !== topic));
+      onTopicChange(selectedTopics.filter((t) => t !== topic));
     } else {
       onTopicChange([...selectedTopics, topic]);
     }
@@ -59,7 +59,7 @@ export default function FilterComponent({
     if (!onAgeChange) return;
 
     if (selectedAges.includes(age)) {
-      onAgeChange(selectedAges.filter(a => a !== age));
+      onAgeChange(selectedAges.filter((a) => a !== age));
     } else {
       onAgeChange([...selectedAges, age]);
     }
@@ -83,10 +83,7 @@ export default function FilterComponent({
         ))}
 
         {!showAllTopics && (
-          <button
-            className="chip chip-more"
-            onClick={() => setShowAllTopics(true)}
-          >
+          <button className="chip chip-more" onClick={() => setShowAllTopics(true)}>
             More
           </button>
         )}
@@ -106,10 +103,7 @@ export default function FilterComponent({
         ))}
 
         {!showAllAges && (
-          <button
-            className="chip chip-more"
-            onClick={() => setShowAllAges(true)}
-          >
+          <button className="chip chip-more" onClick={() => setShowAllAges(true)}>
             More
           </button>
         )}

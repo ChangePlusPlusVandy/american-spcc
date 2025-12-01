@@ -48,7 +48,9 @@ function FilterPage() {
 
   // State for filters
   const [searchQuery, setSearchQuery] = useState('');
-  const [labelSearchResults, setLabelSearchResults] = useState<Array<{id: string, label_name: string, category: string}>>([]);
+  const [labelSearchResults, setLabelSearchResults] = useState<
+    Array<{ id: string; label_name: string; category: string }>
+  >([]);
   const [isSearching, setIsSearching] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
@@ -162,22 +164,23 @@ function FilterPage() {
 
         // Priority 1: Fetch by label_id if present (from landing page)
         if (labelIdParam) {
-          const response = await fetch(`http://localhost:8000/api/resources?label_id=${labelIdParam}`);
+          const response = await fetch(
+            `http://localhost:8000/api/resources?label_id=${labelIdParam}`
+          );
           if (!response.ok) throw new Error('Failed to fetch resources');
           allResources = await response.json();
         }
         // Priority 2: Fetch by selected topics (from sidebar)
         else if (selectedTopics.length > 0) {
           const categories = selectedTopics
-            .map(topic => TOPIC_TO_CATEGORY[topic])
+            .map((topic) => TOPIC_TO_CATEGORY[topic])
             .filter(Boolean);
 
-          const promises = categories.map(cat =>
-            fetch(`http://localhost:8000/api/resources?category=${cat}`)
-              .then(res => {
-                if (!res.ok) throw new Error('Failed to fetch resources');
-                return res.json();
-              })
+          const promises = categories.map((cat) =>
+            fetch(`http://localhost:8000/api/resources?category=${cat}`).then((res) => {
+              if (!res.ok) throw new Error('Failed to fetch resources');
+              return res.json();
+            })
           );
 
           const results = await Promise.all(promises);
@@ -204,7 +207,7 @@ function FilterPage() {
 
   // Client-side filtering
   const filteredResources = useMemo(() => {
-    return resources.filter(resource => {
+    return resources.filter((resource) => {
       // Search filter
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
@@ -226,7 +229,7 @@ function FilterPage() {
       // Time-to-Read filter (UPDATED: now array-based with new logic)
       if (selectedTimeRanges.length > 0) {
         const time = resource.time_to_read;
-        const matchesAnyRange = selectedTimeRanges.some(range => {
+        const matchesAnyRange = selectedTimeRanges.some((range) => {
           if (range === 'SHORT' && time < 5) return true;
           if (range === 'MEDIUM' && time >= 5 && time <= 15) return true;
           if (range === 'LONG' && time > 15) return true;
@@ -237,10 +240,8 @@ function FilterPage() {
 
       // Age filter
       if (selectedAges.length > 0) {
-        const ageEnums = selectedAges.map(age => AGE_TO_ENUM[age]).filter(Boolean);
-        const hasMatchingAge = ageEnums.some(ageEnum =>
-          resource.age_groups.includes(ageEnum)
-        );
+        const ageEnums = selectedAges.map((age) => AGE_TO_ENUM[age]).filter(Boolean);
+        const hasMatchingAge = ageEnums.some((ageEnum) => resource.age_groups.includes(ageEnum));
         if (!hasMatchingAge) return false;
       }
 
@@ -346,7 +347,9 @@ function FilterPage() {
               />
               <FilterDropdown
                 label="Format"
-                icon={<img src={formatIcon} alt="Format" style={{ width: '24px', height: '24px' }} />}
+                icon={
+                  <img src={formatIcon} alt="Format" style={{ width: '24px', height: '24px' }} />
+                }
                 options={formatOptions}
                 selected={selectedFormats}
                 onChange={(value) => setSelectedFormats(value as string[])}
@@ -410,12 +413,12 @@ function FilterPage() {
               <>
                 {viewMode === 'list' ? (
                   <div className="space-y-4">
-                    {filteredResources.map(resource => (
+                    {filteredResources.map((resource) => (
                       <ResourceListCard
                         key={resource.id}
                         title={resource.title}
                         description={resource.description || 'No description available'}
-                        tags={resource.labels?.map(l => l.label.label_name) || []}
+                        tags={resource.labels?.map((l) => l.label.label_name) || []}
                         imageUrl="https://placehold.co/600x400/4db8a8/ffffff?text=Resource"
                         onLearnMore={() => handleLearnMore(resource.id)}
                       />
@@ -423,11 +426,11 @@ function FilterPage() {
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 gap-4">
-                    {filteredResources.map(resource => (
+                    {filteredResources.map((resource) => (
                       <ResourceGridCard
                         key={resource.id}
                         title={resource.title}
-                        tags={resource.labels?.map(l => l.label.label_name) || []}
+                        tags={resource.labels?.map((l) => l.label.label_name) || []}
                         imageUrl="https://placehold.co/600x400/4db8a8/ffffff?text=Resource"
                         onLearnMore={() => handleLearnMore(resource.id)}
                       />

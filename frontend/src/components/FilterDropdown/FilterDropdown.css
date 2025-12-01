@@ -4,7 +4,7 @@
 }
 
 .dropdownButton {
-  background-color: #C8DC59;
+  background-color: #c8dc59;
   border: 1px solid #000000;
   border-radius: 8px;
   padding: 6px 16px;
@@ -47,12 +47,12 @@
   top: 100%;
   left: 0;
   margin-top: 4px;
-  background-color: #FFFFFF;
-  border: 2px solid #C8DC59;
+  background-color: #ffffff;
+  border: 2px solid #c8dc59;
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  min-width: 100%;  /* Match button width */
-  width: 100%;      /* Match button width */
+  min-width: 100%; /* Match button width */
+  width: 100%; /* Match button width */
   z-index: 1000;
   overflow: hidden;
 }
@@ -61,7 +61,7 @@
   width: 100%;
   padding: 10px 16px;
   text-align: left;
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   border: none;
   cursor: pointer;
   font-size: 13px;
@@ -75,21 +75,21 @@
 }
 
 .dropdownItem:hover {
-  background-color: #F3F4F6;
+  background-color: #f3f4f6;
 }
 
 .dropdownItem.selected {
-  background-color: #FFFFFF;  /* Changed from #C8DC59 */
+  background-color: #ffffff; /* Changed from #C8DC59 */
   font-weight: 600;
 }
 
 .dropdownItem:not(:last-child) {
-  border-bottom: 2px solid #C8DC59;
-  border-radius: 0;  /* Ensure straight borders */
+  border-bottom: 2px solid #c8dc59;
+  border-radius: 0; /* Ensure straight borders */
 }
 
 .selectionIndicator {
-  color: #C8DC59;
+  color: #c8dc59;
   font-size: 14px;
   line-height: 1;
   width: 14px;
@@ -129,7 +129,7 @@
 }
 
 .checkbox {
-  color: #C8DC59;
+  color: #c8dc59;
   font-size: 18px;
   line-height: 1;
   width: 18px;

@@ -17,43 +17,40 @@ function Landing() {
   const [searchResults, setSearchResults] = useState<CategoryLabel[]>([]);
   const [isSearching, setIsSearching] = useState(false);
 
+  // API call to search resource titles
+  const searchResources = async (query: string) => {
+    console.log('searchResources called with query:', query);
 
-// API call to search resource titles
-const searchResources = async (query: string) => {
-  console.log('searchResources called with query:', query);
+    if (!query.trim()) {
+      console.log('Empty query, clearing results');
+      setSearchResults([]);
+      return;
+    }
 
-  if (!query.trim()) {
-    console.log('Empty query, clearing results');
-    setSearchResults([]);
-    return;
-  }
+    setIsSearching(true);
+    try {
+      const url = `http://localhost:8000/api/labels/search?q=${encodeURIComponent(query)}`;
+      console.log('Fetching from:', url);
 
-  setIsSearching(true);
-  try {
-    const url = `http://localhost:8000/api/labels/search?q=${encodeURIComponent(query)}`;
-    console.log('Fetching from:', url);
+      const response = await fetch(url);
+      const data = await response.json();
 
-    const response = await fetch(url);
-    const data = await response.json();
+      console.log('API Response:', data);
+      console.log('Number of results:', data.length);
 
-    console.log('API Response:', data);
-    console.log('Number of results:', data.length);
-
-    setSearchResults(data);
-  } catch (error) {
-    console.error('Search error:', error);
-    setSearchResults([]);
-  } finally {
-    setIsSearching(false);
-  }
-};
-
+      setSearchResults(data);
+    } catch (error) {
+      console.error('Search error:', error);
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  };
 
   // Debounced search effect
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       searchResources(searchQuery);
-
     }, 300); // 300ms debounce delay
 
     // Cleanup function to cancel the previous timeout
@@ -93,14 +90,16 @@ const searchResources = async (query: string) => {
       <div className="relative p-2 z-40">
         <div className="w-57/100 -mt-12 mx-auto px-4">
           <div className="relative">
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              if (searchQuery.trim()) {
-                navigate(`/filter?q=${encodeURIComponent(searchQuery)}`);
-                setSearchQuery('');
-                setSearchResults([]);
-              }
-            }}>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (searchQuery.trim()) {
+                  navigate(`/filter?q=${encodeURIComponent(searchQuery)}`);
+                  setSearchQuery('');
+                  setSearchResults([]);
+                }
+              }}
+            >
               <div className="relative">
                 <input
                   type="text"
@@ -134,46 +133,48 @@ const searchResources = async (query: string) => {
               console.log('Dropdown condition check:', {
                 searchQuery,
                 resultsLength: searchResults.length,
-                shouldShow
+                shouldShow,
               });
               return shouldShow;
             })() && (
               <div className="absolute left-0 right-0 mt-2 z-50">
-                <div className="rounded-lg shadow-lg border-2 border-[#C8DC59] overflow-hidden" style={{ backgroundColor: '#FFFFFF' }}>
-                {searchResults.map((label, index) => (
-                  <div key={label.id}>
-                    <button
-                      onClick={() => {
-                        navigate(`/filter?label_id=${label.id}`);
-                        setSearchQuery('');
-                        setSearchResults([]);
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#F3F4F6';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = '#FFFFFF';
-                      }}
-                      style={{
-                        backgroundColor: '#FFFFFF',
-                        fontFamily: 'Open Sans, sans-serif',
-                        color: '#566273',
-                        paddingLeft: '35.5px',
-                        paddingRight: '35.5px',
-                        transition: 'background-color 0.2s',
-                        border: 'none',
-                        outline: 'none',
-                      }}
-                      className="w-full text-left py-3"
-                    >
-                      {label.label_name}
-                    </button>
-                    {index !== searchResults.length - 1 && (
-                      <div style={{ height: '2px', backgroundColor: '#C8DC59' }}></div>
-                    )}
-                  </div>
-                ))}
-
+                <div
+                  className="rounded-lg shadow-lg border-2 border-[#C8DC59] overflow-hidden"
+                  style={{ backgroundColor: '#FFFFFF' }}
+                >
+                  {searchResults.map((label, index) => (
+                    <div key={label.id}>
+                      <button
+                        onClick={() => {
+                          navigate(`/filter?label_id=${label.id}`);
+                          setSearchQuery('');
+                          setSearchResults([]);
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = '#F3F4F6';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = '#FFFFFF';
+                        }}
+                        style={{
+                          backgroundColor: '#FFFFFF',
+                          fontFamily: 'Open Sans, sans-serif',
+                          color: '#566273',
+                          paddingLeft: '35.5px',
+                          paddingRight: '35.5px',
+                          transition: 'background-color 0.2s',
+                          border: 'none',
+                          outline: 'none',
+                        }}
+                        className="w-full text-left py-3"
+                      >
+                        {label.label_name}
+                      </button>
+                      {index !== searchResults.length - 1 && (
+                        <div style={{ height: '2px', backgroundColor: '#C8DC59' }}></div>
+                      )}
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
