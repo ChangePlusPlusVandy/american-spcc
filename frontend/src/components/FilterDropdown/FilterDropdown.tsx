@@ -14,6 +14,7 @@ interface FilterDropdownProps {
   selected: string | string[] | null;
   onChange: (value: string | string[]) => void;
   multiSelect?: boolean;  // Enable multi-select mode
+  style?: React.CSSProperties;  // Optional custom styles
 }
 
 function FilterDropdown({
@@ -22,7 +23,8 @@ function FilterDropdown({
   options,
   selected,
   onChange,
-  multiSelect = false
+  multiSelect = false,
+  style
 }: FilterDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -69,14 +71,21 @@ function FilterDropdown({
   const displayLabel = label;
 
   return (
-    <div className="dropdown" ref={dropdownRef}>
+    <div className="dropdown" ref={dropdownRef} style={style}>
       <button
         className="dropdownButton"
         onClick={() => setIsOpen(!isOpen)}
         type="button"
+        style={{
+          paddingTop: '10px',
+          paddingBottom: '10px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
       >
         {icon && <span className="icon">{icon}</span>}
-        <span>{displayLabel}</span>
+        <span style={{ fontWeight: '700' }}>{displayLabel}</span>
         <img
           src={dropdownArrow}
           alt="dropdown arrow"

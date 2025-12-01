@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import NavBar from '../../components/NavBarComponent/NavBar';
 import SearchBar from '../../components/SearchBar/SearchBar';
 import FilterDropdown from '../../components/FilterDropdown/FilterDropdown';
@@ -44,10 +44,14 @@ const GridIcon = () => (
 
 function FilterPage() {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   // State for filters
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedTopics, setSelectedTopics] = useState<string[]>(['Parenting Skills & Relationships']);
+  const [labelSearchResults, setLabelSearchResults] = useState<Array<{id: string, label_name: string, category: string}>>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+  const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [selectedAges, setSelectedAges] = useState<string[]>([]);
 
   // Single-select states (string | null)
@@ -93,8 +97,57 @@ function FilterPage() {
     const queryParam = searchParams.get('q');
     if (queryParam) {
       setSearchQuery(queryParam);
+      setIsTyping(false);
     }
   }, [searchParams]);
+
+  // API call to search category labels
+  const searchLabels = async (query: string) => {
+    if (!query.trim()) {
+      setLabelSearchResults([]);
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      const url = `http://localhost:8000/api/labels/search?q=${encodeURIComponent(query)}`;
+      const response = await fetch(url);
+      const data = await response.json();
+      setLabelSearchResults(data);
+    } catch (error) {
+      console.error('Label search error:', error);
+      setLabelSearchResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  // Debounced search effect
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      searchLabels(searchQuery);
+    }, 300); // 300ms debounce delay
+
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery]);
+
+  // Handle clicking a label in the dropdown
+  const handleLabelClick = async (labelId: string) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(`http://localhost:8000/api/resources?label_id=${labelId}`);
+      if (!response.ok) throw new Error('Failed to fetch resources');
+      const data = await response.json();
+      setResources(data);
+    } catch (err) {
+      setError('Failed to fetch resources for this label.');
+      console.error('Error fetching resources by label:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Fetch resources when topics change OR when label_id is in URL
   useEffect(() => {
@@ -129,6 +182,12 @@ function FilterPage() {
 
           const results = await Promise.all(promises);
           allResources = results.flat();
+        }
+        // Priority 3: Fetch ALL resources if no topics selected
+        else {
+          const response = await fetch(`http://localhost:8000/api/resources`);
+          if (!response.ok) throw new Error('Failed to fetch resources');
+          allResources = await response.json();
         }
 
         setResources(allResources);
@@ -201,53 +260,115 @@ function FilterPage() {
       <div className="container mx-auto px-4 py-6 max-w-7xl">
         {/* Search Bar */}
         <div className="mb-6 w-4/5 mx-auto">
-          <SearchBar
-            value={searchQuery}
-            onChange={setSearchQuery}
-            placeholder="Search..."
-            size="small"
-            borderColor="#000000"
-            borderWidth="1px"
-            backgroundColor="#00a0a0"
-            fontSize="14px"
-          />
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (searchQuery.trim()) {
+                // Navigate with search query (same as landing page)
+                navigate(`/filter?q=${encodeURIComponent(searchQuery)}`);
+                setLabelSearchResults([]);
+                setIsTyping(false);
+              }
+            }}
+            className="relative"
+          >
+            <SearchBar
+              value={searchQuery}
+              onChange={(value) => {
+                setSearchQuery(value);
+                setIsTyping(true);
+              }}
+              placeholder="Search..."
+              size="small"
+              borderColor="#000000"
+              borderWidth="1px"
+              backgroundColor="#00a0a0"
+              fontSize="14px"
+              textColor="#000000"
+            />
+
+            {/* Search Results Dropdown */}
+            {searchQuery && labelSearchResults.length > 0 && isTyping && (
+              <div className="absolute left-0 right-0 mt-2 z-50">
+                <div className="rounded-lg shadow-lg border-2 border-[#C8DC59] overflow-hidden bg-white">
+                  {labelSearchResults.map((label, index) => (
+                    <div key={label.id}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          handleLabelClick(label.id);
+                          setSearchQuery('');
+                          setLabelSearchResults([]);
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = '#F3F4F6';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = '#FFFFFF';
+                        }}
+                        style={{
+                          backgroundColor: '#FFFFFF',
+                          fontFamily: 'Open Sans, sans-serif',
+                          color: '#566273',
+                          paddingLeft: '20px',
+                          paddingRight: '20px',
+                          transition: 'background-color 0.2s',
+                          border: 'none',
+                          outline: 'none',
+                        }}
+                        className="w-full text-left py-3"
+                      >
+                        {label.label_name}
+                      </button>
+                      {index !== labelSearchResults.length - 1 && (
+                        <div style={{ height: '2px', backgroundColor: '#C8DC59' }}></div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </form>
         </div>
 
         {/* Filter Action Bar */}
-        <div className="flex justify-center mb-6">
-          <div className="flex gap-3 justify-center">
-            <FilterDropdown
-              label="View"
-              icon={<img src={viewIcon} alt="View" />}
-              options={viewOptions}
-              selected={viewMode}
-              onChange={(value) => setViewMode(value as 'list' | 'grid')}
-              multiSelect={false}
-            />
-            <FilterDropdown
-              label="Format"
-              icon={<img src={formatIcon} alt="Format" />}
-              options={formatOptions}
-              selected={selectedFormats}
-              onChange={(value) => setSelectedFormats(value as string[])}
-              multiSelect={true}
-            />
-            <FilterDropdown
-              label="Language"
-              icon={<img src={languageIcon} alt="Language" />}
-              options={languageOptions}
-              selected={selectedLanguage}
-              onChange={(value) => setSelectedLanguage(value as string)}
-              multiSelect={false}
-            />
-            <FilterDropdown
-              label="Time-to-Read"
-              icon={<img src={timeIcon} alt="Time to Read" />}
-              options={timeOptions}
-              selected={selectedTimeRanges}
-              onChange={(value) => setSelectedTimeRanges(value as string[])}
-              multiSelect={true}
-            />
+        <div className="flex gap-6 mb-6">
+          <div className="flex-shrink-0 mr-4" style={{ width: '300px' }}></div>
+          <div className="flex-1">
+            <div className="flex gap-3">
+              <FilterDropdown
+                label="View"
+                icon={<img src={viewIcon} alt="View" style={{ width: '24px', height: '24px' }} />}
+                options={viewOptions}
+                selected={viewMode}
+                onChange={(value) => setViewMode(value as 'list' | 'grid')}
+                multiSelect={false}
+              />
+              <FilterDropdown
+                label="Format"
+                icon={<img src={formatIcon} alt="Format" style={{ width: '24px', height: '24px' }} />}
+                options={formatOptions}
+                selected={selectedFormats}
+                onChange={(value) => setSelectedFormats(value as string[])}
+                multiSelect={true}
+              />
+              <FilterDropdown
+                label="Language"
+                icon={<img src={languageIcon} alt="Language" />}
+                options={languageOptions}
+                selected={selectedLanguage}
+                onChange={(value) => setSelectedLanguage(value as string)}
+                multiSelect={false}
+              />
+              <FilterDropdown
+                label="Time-to-Read"
+                icon={<img src={timeIcon} alt="Time to Read" />}
+                options={timeOptions}
+                selected={selectedTimeRanges}
+                onChange={(value) => setSelectedTimeRanges(value as string[])}
+                multiSelect={true}
+              />
+            </div>
           </div>
         </div>
 
