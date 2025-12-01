@@ -57,7 +57,7 @@ export const getResourceViewById = async (req: Request, res: Response) => {
     const id = req.params.id;
 
     const view = await prisma.resourceView.findUnique({
-      where: { id }
+      where: { id },
     });
 
     if (!view) return res.status(404).json({ error: 'ResourceView not found' });

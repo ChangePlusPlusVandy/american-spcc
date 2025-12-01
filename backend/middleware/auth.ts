@@ -38,7 +38,7 @@ export const syncUserWithDB = async (
 
     // STEP 2: Look up user in `users` table by clerk_id (via Prisma)
     let user = await prisma.user.findUnique({
-      where: { clerk_id: clerkId }
+      where: { clerk_id: clerkId },
     });
 
     // If not found, fetch from Clerk and create a new user (default role: "PARENT")
@@ -51,8 +51,8 @@ export const syncUserWithDB = async (
           first_name: clerkUser.firstName || '',
           last_name: clerkUser.lastName || '',
           email: clerkUser.emailAddresses[0]?.emailAddress || '',
-          role: 'PARENT'
-        }
+          role: 'PARENT',
+        },
       });
     }
 

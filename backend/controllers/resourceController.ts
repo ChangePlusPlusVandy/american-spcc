@@ -118,7 +118,7 @@ export const updateResource = async (req: Request, res: Response) => {
         time_to_read: time_to_read ?? undefined,
         ...(label_ids && {
           labels: {
-            deleteMany: {}, 
+            deleteMany: {},
             create: label_ids.map((labelId: string) => ({
               label: { connect: { id: labelId } },
             })),

@@ -14,7 +14,7 @@ export const createUser = async (req: Request, res: Response) => {
       household_type,
       topics_of_interest,
       kids_age_groups,
-      subscribed_newsletter
+      subscribed_newsletter,
     } = req.body;
 
     const user = await prisma.user.create({
@@ -96,7 +96,7 @@ export const updateUser = async (req: Request, res: Response) => {
       household_type,
       topics_of_interest,
       kids_age_groups,
-      subscribed_newsletter
+      subscribed_newsletter,
     } = req.body;
 
     const updated = await prisma.user.update({
