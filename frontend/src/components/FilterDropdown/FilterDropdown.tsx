@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './FilterDropdown.css';
+import dropdownArrow from '../../assets/dropdown_arrow.png';
 
 interface FilterDropdownProps {
   label: string;
@@ -76,7 +77,16 @@ function FilterDropdown({
       >
         {icon && <span className="icon">{icon}</span>}
         <span>{displayLabel}</span>
-        <span className="chevron">{isOpen ? '▲' : '▼'}</span>
+        <img
+          src={dropdownArrow}
+          alt="dropdown arrow"
+          className="chevron"
+          style={{
+            transform: isOpen ? 'scaleY(-1)' : 'scaleY(1)',
+            width: '16px',
+            height: '16px'
+          }}
+        />
       </button>
 
       {isOpen && (
