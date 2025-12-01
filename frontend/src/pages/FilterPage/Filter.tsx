@@ -70,6 +70,7 @@ function FilterPage() {
   ];
 
   const formatOptions = [
+    { value: 'WEBPAGE', label: 'Webpage' },
     { value: 'PDF', label: 'PDF' },
     { value: 'VIDEO', label: 'Video' },
     { value: 'WEBINAR', label: 'Webinar' },
@@ -95,32 +96,40 @@ function FilterPage() {
     }
   }, [searchParams]);
 
-  // Fetch resources when topics change
+  // Fetch resources when topics change OR when label_id is in URL
   useEffect(() => {
-    const fetchResources = async () => {
-      if (selectedTopics.length === 0) {
-        setResources([]);
-        return;
-      }
+    const labelIdParam = searchParams.get('label_id');
 
+    const fetchResources = async () => {
       setLoading(true);
       setError(null);
 
       try {
-        const categories = selectedTopics
-          .map(topic => TOPIC_TO_CATEGORY[topic])
-          .filter(Boolean);
+        let allResources: Resource[] = [];
 
-        const promises = categories.map(cat =>
-          fetch(`http://localhost:8000/api/resources?category=${cat}`)
-            .then(res => {
-              if (!res.ok) throw new Error('Failed to fetch resources');
-              return res.json();
-            })
-        );
+        // Priority 1: Fetch by label_id if present (from landing page)
+        if (labelIdParam) {
+          const response = await fetch(`http://localhost:8000/api/resources?label_id=${labelIdParam}`);
+          if (!response.ok) throw new Error('Failed to fetch resources');
+          allResources = await response.json();
+        }
+        // Priority 2: Fetch by selected topics (from sidebar)
+        else if (selectedTopics.length > 0) {
+          const categories = selectedTopics
+            .map(topic => TOPIC_TO_CATEGORY[topic])
+            .filter(Boolean);
 
-        const results = await Promise.all(promises);
-        const allResources = results.flat();
+          const promises = categories.map(cat =>
+            fetch(`http://localhost:8000/api/resources?category=${cat}`)
+              .then(res => {
+                if (!res.ok) throw new Error('Failed to fetch resources');
+                return res.json();
+              })
+          );
+
+          const results = await Promise.all(promises);
+          allResources = results.flat();
+        }
 
         setResources(allResources);
       } catch (err) {
@@ -132,7 +141,7 @@ function FilterPage() {
     };
 
     fetchResources();
-  }, [selectedTopics]);
+  }, [selectedTopics, searchParams]);
 
   // Client-side filtering
   const filteredResources = useMemo(() => {

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import styles from './FilterDropdown.module.css';
+import './FilterDropdown.css';
 
 interface FilterDropdownProps {
   label: string;
@@ -68,36 +68,36 @@ function FilterDropdown({
   const displayLabel = label;
 
   return (
-    <div className={styles.dropdown} ref={dropdownRef}>
+    <div className="dropdown" ref={dropdownRef}>
       <button
-        className={styles.dropdownButton}
+        className="dropdownButton"
         onClick={() => setIsOpen(!isOpen)}
         type="button"
       >
-        {icon && <span className={styles.icon}>{icon}</span>}
+        {icon && <span className="icon">{icon}</span>}
         <span>{displayLabel}</span>
-        <span className={styles.chevron}>{isOpen ? '▲' : '▼'}</span>
+        <span className="chevron">{isOpen ? '▲' : '▼'}</span>
       </button>
 
       {isOpen && (
-        <div className={styles.dropdownMenu}>
+        <div className="dropdownMenu">
           {options.map((option) => {
             const itemSelected = isSelected(option.value);
 
             return (
               <button
                 key={option.value}
-                className={`${styles.dropdownItem} ${itemSelected ? styles.selected : ''}`}
+                className={`dropdownItem ${itemSelected ? 'selected' : ''}`}
                 onClick={() => handleSelect(option.value)}
                 type="button"
               >
                 {!multiSelect && (
-                  <span className={`${styles.selectionIndicator} ${itemSelected ? styles.visible : styles.hidden}`}>●</span>
+                  <span className={`selectionIndicator ${itemSelected ? 'visible' : 'hidden'}`}>●</span>
                 )}
-                {option.icon && <span className={styles.optionIcon}>{option.icon}</span>}
-                <span className={styles.optionLabel}>{option.label}</span>
+                {option.icon && <span className="optionIcon">{option.icon}</span>}
+                <span className="optionLabel">{option.label}</span>
                 {multiSelect && (
-                  <span className={styles.checkbox}>
+                  <span className="checkbox">
                     {itemSelected ? '☑' : '☐'}
                   </span>
                 )}
