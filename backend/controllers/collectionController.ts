@@ -71,7 +71,6 @@ export const getCollectionById = async (req: Request, res: Response) => {
   }
 };
 
-
 export const renameCollection = async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
@@ -151,4 +150,3 @@ export const removeResourceFromCollection = async (req: Request, res: Response) 
     res.status(500).json({ error: 'Failed to remove item' });
   }
 };
-
