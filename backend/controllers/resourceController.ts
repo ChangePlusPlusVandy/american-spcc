@@ -150,27 +150,35 @@ export const deleteResource = async (req: Request, res: Response) => {
 export const searchResources = async (req: Request, res: Response) => {
   try {
     const query = req.query.q as string;
+
     if (!query || query.trim() === '') {
       return res.json([]);
     }
 
     const resources = await prisma.resource.findMany({
       where: {
-        labels: {
-          some: {
-            label: {
-              label_name: {
-                contains: query,
-                mode: 'insensitive',
-              },
+        OR: [
+          {
+            title: {
+              contains: query,
+              mode: 'insensitive',
             },
           },
-        },
+          {
+            description: {
+              contains: query,
+              mode: 'insensitive',
+            },
+          },
+        ],
       },
       select: {
         id: true,
         title: true,
         description: true,
+      },
+      orderBy: {
+        updated_at: 'desc',
       },
       take: 10,
     });
