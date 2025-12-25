@@ -1,6 +1,17 @@
 import React, { useState } from 'react';
 import './FilterComponent.css';
 
+const TOPICS = [
+  { label: 'Parenting Skills & Relationships', value: 'PARENTING_SKILLS_RELATIONSHIPS' },
+  { label: 'Mental & Emotional Health', value: 'MENTAL_EMOTIONAL_HEALTH' },
+  { label: 'Life Skills & Independence', value: 'LIFE_SKILLS_INDEPENDENCE' },
+  { label: 'Child Development', value: 'CHILD_DEVELOPMENT' },
+  { label: 'Education & Learning', value: 'EDUCATION_LEARNING' },
+  { label: 'Family Supports & Community', value: 'FAMILY_SUPPORT_COMMUNITY' },
+  { label: 'Health & Wellbeing', value: 'HEALTH_WELLBEING' },
+  { label: 'Safety & Protection', value: 'SAFETY_PROTECTION' },
+];
+
 interface FilterComponentProps {
   selectedTopics?: string[];
   selectedAges?: string[];
@@ -14,22 +25,9 @@ export default function FilterComponent({
   onTopicChange,
   onAgeChange,
 }: FilterComponentProps) {
-  const topicInitial = [
-    'Parenting Skills & Relationships',
-    'Mental & Emotional Health',
-    'Life Skills & Independence',
-  ];
-
-  const topicFull = [
-    'Parenting Skills & Relationships',
-    'Mental & Emotional Health',
-    'Life Skills & Independence',
-    'Child Development',
-    'Education & Learning',
-    'Family Supports & Community',
-    'Health & Wellbeing',
-    'Safety & Protection',
-  ];
+  const topicInitial = TOPICS.slice(0, 3);
+  const topicFull = TOPICS;
+  
 
   const ageInitial = ['Infant (0–1)', 'Preschool (3–6)', 'Elementary (7–10)'];
 
@@ -45,15 +43,16 @@ export default function FilterComponent({
   const [showAllTopics, setShowAllTopics] = useState(false);
   const [showAllAges, setShowAllAges] = useState(false);
 
-  const handleTopicClick = (topic: string) => {
+  const handleTopicClick = (value: string) => {
     if (!onTopicChange) return;
-
-    if (selectedTopics.includes(topic)) {
-      onTopicChange(selectedTopics.filter((t) => t !== topic));
+  
+    if (selectedTopics.includes(value)) {
+      onTopicChange(selectedTopics.filter((t) => t !== value));
     } else {
-      onTopicChange([...selectedTopics, topic]);
+      onTopicChange([...selectedTopics, value]);
     }
   };
+  
 
   const handleAgeClick = (age: string) => {
     if (!onAgeChange) return;
@@ -72,15 +71,16 @@ export default function FilterComponent({
       {/* TOPICS */}
       <p className="filter-section-title">What Topic?</p>
       <div className="chip-wrapper">
-        {(showAllTopics ? topicFull : topicInitial).map((t) => (
-          <button
-            key={t}
-            className={`chip ${selectedTopics.includes(t) ? 'chip-selected' : ''}`}
-            onClick={() => handleTopicClick(t)}
-          >
-            {t}
-          </button>
-        ))}
+      {(showAllTopics ? topicFull : topicInitial).map(({ label, value }) => (
+        <button
+          key={value}
+          className={`chip ${selectedTopics.includes(value) ? 'chip-selected' : ''}`}
+          onClick={() => handleTopicClick(value)}
+        >
+          {label}
+        </button>
+      ))}
+
 
         {!showAllTopics && (
           <button className="chip chip-more" onClick={() => setShowAllTopics(true)}>

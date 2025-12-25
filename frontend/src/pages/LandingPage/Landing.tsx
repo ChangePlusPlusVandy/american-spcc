@@ -4,16 +4,20 @@ import homepageBackground from '../../assets/SPCC - Homepage.png';
 import searchIcon from '../../assets/search_icon.png';
 import NavBar from '../../components/NavBarComponent/NavBar.tsx';
 
-interface CategoryLabel {
+interface Resource {
   id: string;
-  label_name: string;
-  category: string;
+  title: string;
+  description?: string | null;
+  hosting_type: 'EXTERNAL' | 'INTERNAL' | 'OTHER';
+  externalResources?: { external_url: string } | null;
 }
+
+
 
 function Landing() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<CategoryLabel[]>([]);
+  const [searchResults, setSearchResults] = useState<Resource[]>([]);
   const [isSearching, setIsSearching] = useState(false);
 
   // API call to search resource titles
@@ -28,7 +32,7 @@ function Landing() {
 
     setIsSearching(true);
     try {
-      const url = `http://localhost:8000/api/labels/search?q=${encodeURIComponent(query)}`;
+      const url = `http://localhost:8000/api/resources/search?q=${encodeURIComponent(query)}`;
       console.log('Fetching from:', url);
 
       const response = await fetch(url);
@@ -64,7 +68,8 @@ function Landing() {
   }, [searchQuery, searchResults, isSearching]);
 
   return (
-    <div className="min-w-screen relative min-h-screen overflow-y-auto bg-[#6EC6C5]">
+    <div className="min-w-screen relative min-h-screen bg-[#6EC6C5]">
+
       <NavBar />
       {/* Image background */}
       <div
@@ -106,7 +111,7 @@ function Landing() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="[box-shadow:0px_4px_4px_0px_#00000040] mx-auto w-full border-[5px] h-[10vh] p-[35.5px] shadow rounded-full text-[#566273] border-[#55C3C0] bg-[#FFF9F0] focus:outline-none placeholder-[#566273] text-[20px]"
-                  placeholder="Type your question here..."
+                  placeholder="Type a topic here..."
                 />
                 <button
                   type="submit"
@@ -141,39 +146,56 @@ function Landing() {
                   className="rounded-lg shadow-lg border-2 border-[#C8DC59] overflow-hidden"
                   style={{ backgroundColor: '#FFFFFF' }}
                 >
-                  {searchResults.map((label, index) => (
-                    <div key={label.id}>
-                      <button
-                        onClick={() => {
-                          navigate(`/filter?label_id=${label.id}`);
-                          setSearchQuery('');
-                          setSearchResults([]);
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = '#F3F4F6';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = '#FFFFFF';
-                        }}
-                        style={{
-                          backgroundColor: '#FFFFFF',
-                          fontFamily: 'Open Sans, sans-serif',
-                          color: '#566273',
-                          paddingLeft: '35.5px',
-                          paddingRight: '35.5px',
-                          transition: 'background-color 0.2s',
-                          border: 'none',
-                          outline: 'none',
-                        }}
-                        className="w-full text-left py-3"
-                      >
-                        {label.label_name}
-                      </button>
-                      {index !== searchResults.length - 1 && (
-                        <div style={{ height: '2px', backgroundColor: '#C8DC59' }}></div>
-                      )}
-                    </div>
-                  ))}
+                    {searchResults.map((resource, index) => (
+                      <div key={resource.id}>
+                        <button
+                        type="button"
+                          onClick={() => {
+                            if (resource.hosting_type === 'EXTERNAL') {
+                              const url = resource.externalResources?.external_url;
+                              if (!url) return;
+                            
+                              window.open(url, '_blank', 'noopener,noreferrer');
+                            }
+                             else {
+                              navigate(`/resource/${resource.id}`);
+                            }
+
+                            setSearchQuery('');
+                            setSearchResults([]);
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = '#F3F4F6';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = '#FFFFFF';
+                          }}
+                          style={{
+                            backgroundColor: '#FFFFFF',
+                            fontFamily: 'Open Sans, sans-serif',
+                            color: '#566273',
+                            paddingLeft: '35.5px',
+                            paddingRight: '35.5px',
+                            transition: 'background-color 0.2s',
+                            border: 'none',
+                            outline: 'none',
+                          }}
+                          className="w-full text-left py-3"
+                        >
+                          <div className="font-semibold">{resource.title}</div>
+                          {resource.description && (
+                            <div className="text-sm text-gray-500 truncate">
+                              {resource.description}
+                            </div>
+                          )}
+                        </button>
+
+                        {index !== searchResults.length - 1 && (
+                          <div style={{ height: '2px', backgroundColor: '#C8DC59' }} />
+                        )}
+                      </div>
+                    ))}
+
                 </div>
               </div>
             )}

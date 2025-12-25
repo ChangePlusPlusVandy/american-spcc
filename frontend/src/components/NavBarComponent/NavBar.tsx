@@ -21,8 +21,9 @@ export default function DefaultNav() {
     <>
       <Sidebar isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
       <nav
-        className={'relative z-50 w-full bg-[#FFF9F0] px-4 py-4 flex items-center justify-between'}
-      >
+          className="sticky top-0 z-50 w-full bg-[#FFF9F0] px-4 py-4 flex items-center justify-between"
+        >
+
         <div className="flex items-center gap-x-10">
           {/* Left: Hamburger */}
           <button
@@ -56,13 +57,15 @@ export default function DefaultNav() {
         </div>
 
         {/* Center: Navigation Links */}
+        {/* Center: Navigation Links */}
         <div className="flex items-center gap-x-6 font-semibold text-sm">
           <a href="#" className="!text-[#566273] hover:text-[#566273]">
             Programs
           </a>
-          <div className="relative group">
+          <div className="relative group inline-block">
+            {/* About button */}
             <button
-              className="flex items-center !text-[#566273] hover:text-[#566273]"
+              className="flex items-center !text-[#566273]"
               style={{
                 background: 'transparent',
                 border: 'none',
@@ -75,44 +78,98 @@ export default function DefaultNav() {
             >
               About <img src={chevron} alt="" className="ml-1 mt-1 h-3 w-3 inline-block" />
             </button>
-            {/* Dropdown*/}
-            <div className="absolute hidden group-hover:block bg-white shadow-md rounded-md mt-2">
-              <a href="#" className="block px-4 py-2 !text-[#566273] hover:text-[#566273]">
-                Example 1
-              </a>
-              <a href="#" className="block px-4 py-2 !text-[#566273] hover:text-[#566273]">
-                Example 2
-              </a>
-            </div>
-          </div>
-          <div className="relative group">
-            <button
-              className="flex items-center !text-[#566273] hover:text-[#566273]"
-              style={{
-                background: 'transparent',
-                border: 'none',
-                padding: 0,
-                margin: 0,
-                boxShadow: 'none',
-                appearance: 'none',
-                outline: 'none',
-              }}
+
+            {/* Invisible hover buffer (THIS is what you were missing) */}
+            <div className="absolute left-0 top-full h-2 w-full"></div>
+
+            {/* Dropdown */}
+            <div
+              className="
+                absolute left-0 top-[calc(100%+8px)]
+                w-64
+                rounded-xl bg-white
+                shadow-[0_10px_30px_rgba(0,0,0,0.08)]
+                border border-gray-100
+                py-3
+                z-50
+                opacity-0 invisible
+                group-hover:opacity-100 group-hover:visible
+                transition-opacity duration-150
+              "
             >
-              Get Involved <img src={chevron} alt="" className="ml-1 mt-1 h-3 w-3 inline-block" />
-            </button>
-            <div className="absolute hidden group-hover:block bg-white shadow-md rounded-md mt-2">
-              <a href="#" className="block px-4 py-2 !text-[#566273] hover:text-[#566273]">
-                Example 1
+              <a
+                href="https://americanspcc.org/about/#what"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block px-4 py-2 !text-[#566273] hover:bg-gray-100"
+              >
+                What We Do
               </a>
-              <a href="#" className="block px-4 py-2 !text-[#566273] hover:text-[#566273]">
-                Example 2
+
+              <a
+                href="https://americanspcc.org/about/#impact"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block px-4 py-2 !text-[#566273] hover:bg-gray-100"
+              >
+                Our Reach
+              </a>
+
+              <a
+                href="https://americanspcc.org/about/#team"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block px-4 py-2 !text-[#566273] hover:bg-gray-100"
+              >
+                Our Team
+              </a>
+
+              <a
+                href="https://americanspcc.org/about/#partners"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block px-4 py-2 !text-[#566273] hover:bg-gray-100"
+              >
+                Parents & Sponsors
+              </a>
+
+              <a
+                href="https://americanspcc.org/our-impact/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block px-4 py-2 !text-[#566273] hover:bg-gray-100"
+              >
+                Our Impact
+              </a>
+
+              <a
+                href="https://americanspcc.org/in-the-media/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block px-4 py-2 !text-[#566273] hover:bg-gray-100"
+              >
+                In the Media
+              </a>
+
+              <a
+                href="https://americanspcc.org/championforchildrenawards/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block px-4 py-2 !text-[#566273] hover:bg-gray-100"
+              >
+                Champion for Children Award
               </a>
             </div>
           </div>
 
+
+
           {/* Right: Donate button and logo */}
           <div className="flex items-center">
-            <button
+            <a
+              href="https://americanspcc.org/championforchildrenaward/?form=FUNHJFZUBKZ"
+              target="_blank"
+              rel="noopener noreferrer"
               style={{
                 background: 'transparent',
                 border: 'none',
@@ -121,12 +178,13 @@ export default function DefaultNav() {
                 boxShadow: 'none',
                 appearance: 'none',
                 outline: 'none',
+                display: 'inline-block',
               }}
-              onClick={() => { }}
             >
-              <img src={donateButton} alt="donate" className="relative h-7" />
-            </button>
+              <img src={donateButton} alt="donate" className="relative h-7 cursor-pointer" />
+            </a>
           </div>
+
           <SignedOut>
             <button
               className="flex items-center !text-[#566273] hover:text-[#566273]"

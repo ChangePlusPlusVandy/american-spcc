@@ -17,12 +17,15 @@ interface Resource {
   title: string;
   description?: string;
   resource_type: string;
+  hosting_type: 'EXTERNAL' | 'INTERNAL' | 'OTHER';
   category: string;
   age_groups: string[];
   language: string;
   time_to_read: number;
   labels?: Array<{ label: { label_name: string } }>;
+  externalResources?: { external_url: string } | null;
 }
+
 
 // SVG Icons for View dropdown options
 const ListIcon = () => (
@@ -48,10 +51,11 @@ function FilterPage() {
 
   // State for filters
   const [searchQuery, setSearchQuery] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
   const [labelSearchResults, setLabelSearchResults] = useState<
     Array<{ id: string; label_name: string; category: string }>
   >([]);
-  const [isSearching, setIsSearching] = useState(false);
+  const [resourceSearchResults, setResourceSearchResults] = useState<Resource[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [selectedAges, setSelectedAges] = useState<string[]>([]);
@@ -103,35 +107,46 @@ function FilterPage() {
     }
   }, [searchParams]);
 
+  useEffect(() => {
+    const categoryParam = searchParams.get('category');
+    if (categoryParam) {
+      setSelectedTopics([categoryParam]);
+    }
+  }, [searchParams]);
+  
+
   // API call to search category labels
-  const searchLabels = async (query: string) => {
+  const searchResources = async (query: string) => {
     if (!query.trim()) {
-      setLabelSearchResults([]);
+      setResourceSearchResults([]);
       return;
     }
-
+  
     setIsSearching(true);
     try {
-      const url = `http://localhost:8000/api/labels/search?q=${encodeURIComponent(query)}`;
-      const response = await fetch(url);
+      const response = await fetch(
+        `http://localhost:8000/api/resources/search?q=${encodeURIComponent(query)}`
+      );
       const data = await response.json();
-      setLabelSearchResults(data);
+      setResourceSearchResults(data);
     } catch (error) {
-      console.error('Label search error:', error);
-      setLabelSearchResults([]);
+      console.error('Resource search error:', error);
+      setResourceSearchResults([]);
     } finally {
       setIsSearching(false);
     }
   };
+  
 
   // Debounced search effect
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      searchLabels(searchQuery);
-    }, 300); // 300ms debounce delay
-
+      searchResources(searchQuery);
+    }, 300);
+  
     return () => clearTimeout(timeoutId);
   }, [searchQuery]);
+  
 
   // Handle clicking a label in the dropdown
   const handleLabelClick = async (labelId: string) => {
@@ -172,20 +187,17 @@ function FilterPage() {
         }
         // Priority 2: Fetch by selected topics (from sidebar)
         else if (selectedTopics.length > 0) {
-          const categories = selectedTopics
-            .map((topic) => TOPIC_TO_CATEGORY[topic])
-            .filter(Boolean);
-
-          const promises = categories.map((cat) =>
-            fetch(`http://localhost:8000/api/resources?category=${cat}`).then((res) => {
+          const promises = selectedTopics.map((category) =>
+            fetch(`http://localhost:8000/api/resources?category=${category}`).then((res) => {
               if (!res.ok) throw new Error('Failed to fetch resources');
               return res.json();
             })
           );
-
+        
           const results = await Promise.all(promises);
           allResources = results.flat();
         }
+        
         // Priority 3: Fetch ALL resources if no topics selected
         else {
           const response = await fetch(`http://localhost:8000/api/resources`);
@@ -249,10 +261,17 @@ function FilterPage() {
     });
   }, [resources, searchQuery, selectedFormats, selectedLanguage, selectedTimeRanges, selectedAges]);
 
-  const handleLearnMore = (id: string) => {
-    console.log('Navigate to resource:', id);
-    // TODO: Navigate to resource detail page
+  const handleLearnMore = (resource: Resource) => {
+    if (resource.hosting_type !== 'EXTERNAL') {
+      return; // INTERNAL → no-op (for now)
+    }
+  
+    const url = resource.externalResources?.external_url;
+    if (!url) return;
+  
+    window.open(url, '_blank', 'noopener,noreferrer');
   };
+  
 
   return (
     <div className="min-h-screen bg-[#FFF9F0]">
@@ -267,7 +286,7 @@ function FilterPage() {
               if (searchQuery.trim()) {
                 // Navigate with search query (same as landing page)
                 navigate(`/filter?q=${encodeURIComponent(searchQuery)}`);
-                setLabelSearchResults([]);
+                setResourceSearchResults([]);
                 setIsTyping(false);
               }
             }}
@@ -289,43 +308,39 @@ function FilterPage() {
             />
 
             {/* Search Results Dropdown */}
-            {searchQuery && labelSearchResults.length > 0 && isTyping && (
+            {searchQuery && resourceSearchResults.length > 0 && isTyping && (
               <div className="absolute left-0 right-0 mt-2 z-50">
                 <div className="rounded-lg shadow-lg border-2 border-[#C8DC59] overflow-hidden bg-white">
-                  {labelSearchResults.map((label, index) => (
-                    <div key={label.id}>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          handleLabelClick(label.id);
-                          setSearchQuery('');
-                          setLabelSearchResults([]);
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = '#F3F4F6';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = '#FFFFFF';
-                        }}
-                        style={{
-                          backgroundColor: '#FFFFFF',
-                          fontFamily: 'Open Sans, sans-serif',
-                          color: '#566273',
-                          paddingLeft: '20px',
-                          paddingRight: '20px',
-                          transition: 'background-color 0.2s',
-                          border: 'none',
-                          outline: 'none',
-                        }}
-                        className="w-full text-left py-3"
-                      >
-                        {label.label_name}
-                      </button>
-                      {index !== labelSearchResults.length - 1 && (
-                        <div style={{ height: '2px', backgroundColor: '#C8DC59' }}></div>
+                {resourceSearchResults.map((resource, index) => (
+                  <div key={resource.id}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (resource.hosting_type !== 'EXTERNAL') return;
+
+                        const url = resource.externalResources?.external_url;
+                        if (!url) return;
+
+                        window.open(url, '_blank', 'noopener,noreferrer');
+                        setSearchQuery('');
+                        setResourceSearchResults([]);
+                      }}
+                      className="w-full text-left py-3 px-5 hover:bg-gray-100"
+                    >
+                      <div className="font-semibold">{resource.title}</div>
+                      {resource.description && (
+                        <div className="text-sm text-gray-500 truncate">
+                          {resource.description}
+                        </div>
                       )}
-                    </div>
-                  ))}
+                    </button>
+
+                    {index !== resourceSearchResults.length - 1 && (
+                      <div style={{ height: '2px', backgroundColor: '#C8DC59' }} />
+                    )}
+                  </div>
+                ))}
+
                 </div>
               </div>
             )}
@@ -420,7 +435,7 @@ function FilterPage() {
                         description={resource.description || 'No description available'}
                         tags={resource.labels?.map((l) => l.label.label_name) || []}
                         imageUrl="https://placehold.co/600x400/4db8a8/ffffff?text=Resource"
-                        onLearnMore={() => handleLearnMore(resource.id)}
+                        onLearnMore={() => handleLearnMore(resource)}
                       />
                     ))}
                   </div>
@@ -432,7 +447,7 @@ function FilterPage() {
                         title={resource.title}
                         tags={resource.labels?.map((l) => l.label.label_name) || []}
                         imageUrl="https://placehold.co/600x400/4db8a8/ffffff?text=Resource"
-                        onLearnMore={() => handleLearnMore(resource.id)}
+                        onLearnMore={() => handleLearnMore(resource)}
                       />
                     ))}
                   </div>

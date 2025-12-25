@@ -1,0 +1,18 @@
+/* src/styles/global.css */
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  overflow-x: hidden;
+  overscroll-behavior: none;
+}
+
+
+#root {
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+.page-content {
+  padding-top: 72px;
+}
