@@ -55,13 +55,14 @@ export const getAllResources = async (req: Request, res: Response) => {
         some: { label_id: label_id as string },
       };
 
-    const resources = await prisma.resource.findMany({
-      where,
-      include: {
-        labels: { include: { label: true } },
-      },
-      orderBy: { updated_at: 'desc' },
-    });
+      const resources = await prisma.resource.findMany({
+        where,
+        include: {
+          labels: { include: { label: true } },
+          externalResources: true, 
+        },
+      });
+      
 
     res.json(resources);
   } catch (error) {
@@ -151,34 +152,27 @@ export const searchResources = async (req: Request, res: Response) => {
   try {
     const query = req.query.q as string;
 
-    if (!query || query.trim() === '') {
+    if (!query?.trim()) {
       return res.json([]);
     }
 
     const resources = await prisma.resource.findMany({
       where: {
         OR: [
-          {
-            title: {
-              contains: query,
-              mode: 'insensitive',
-            },
-          },
-          {
-            description: {
-              contains: query,
-              mode: 'insensitive',
-            },
-          },
+          { title: { contains: query, mode: 'insensitive' } },
+          { description: { contains: query, mode: 'insensitive' } },
         ],
       },
       select: {
         id: true,
         title: true,
         description: true,
-      },
-      orderBy: {
-        updated_at: 'desc',
+        hosting_type: true,
+        externalResources: {
+          select: {
+            external_url: true,
+          },
+        },
       },
       take: 10,
     });
