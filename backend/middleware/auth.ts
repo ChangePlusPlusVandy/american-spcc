@@ -1,8 +1,7 @@
-import { Response, NextFunction } from 'express';
-import { ClerkExpressWithAuth, clerkClient } from '@clerk/clerk-sdk-node';
-import type { WithAuthProp } from '@clerk/clerk-sdk-node';
-import type { Request } from 'express';
+import { Request, Response, NextFunction } from 'express';
+import { ClerkExpressWithAuth } from '@clerk/clerk-sdk-node';
 import prisma from '../config/prisma';
+import { clerkClient } from '@clerk/clerk-sdk-node';
 
 /**
  * AUTHENTICATION & AUTHORIZATION TEMPLATE
@@ -13,50 +12,46 @@ import prisma from '../config/prisma';
  *  2. Sync user with database (if needed)
  *  3. Enforce role-based access control
  */
-
-export const authenticateUser = (req: WithAuthProp<Request>, res: Response, next: NextFunction) => {
-  ClerkExpressWithAuth({})(req as any, res as any, async () => {
-    if (!req.auth || !req.auth.userId) {
-      return res.status(401).json({ error: 'Unauthorized: No valid session' });
+export const authenticateUser = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  ClerkExpressWithAuth({})(req as any, res as any, () => {
+    if (!(req as any).auth?.userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
     }
     next();
   });
 };
 
 export const syncUserWithDB = async (
-  req: WithAuthProp<Request>,
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    // STEP 1: Get Clerk user ID (maps to `clerk_id` in DB)
-    const clerkId = req.auth?.userId;
-
+    const clerkId = (req as any).auth?.userId;
     if (!clerkId) {
       return res.status(401).json({ error: 'No Clerk user ID found' });
     }
 
-    // STEP 2: Look up user in `users` table by clerk_id (via Prisma)
     let user = await prisma.user.findUnique({
       where: { clerk_id: clerkId },
     });
 
-    // If not found, fetch from Clerk and create a new user (default role: "PARENT")
     if (!user) {
       const clerkUser = await clerkClient.users.getUser(clerkId);
 
       user = await prisma.user.create({
         data: {
           clerk_id: clerkId,
-          first_name: clerkUser.firstName || '',
-          last_name: clerkUser.lastName || '',
-          email: clerkUser.emailAddresses[0]?.emailAddress || '',
+          email: clerkUser.emailAddresses[0]?.emailAddress ?? '',
           role: 'PARENT',
         },
       });
     }
 
-    // STEP 3: Attach user record to req for role-based middleware
     (req as any).user = user;
     next();
   } catch (error) {
@@ -65,8 +60,9 @@ export const syncUserWithDB = async (
   }
 };
 
-export const requireParent = async (
-  req: WithAuthProp<Request>,
+
+export const requireParent = (
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {
@@ -79,12 +75,14 @@ export const requireParent = async (
   if (user.role === 'PARENT' || user.role === 'ADMIN') {
     next();
   } else {
-    return res.status(403).json({ error: 'Forbidden: Requires PARENT or ADMIN role' });
+    return res.status(403).json({
+      error: 'Forbidden: Requires PARENT or ADMIN role',
+    });
   }
 };
 
-export const requireAdmin = async (
-  req: WithAuthProp<Request>,
+export const requireAdmin = (
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {
@@ -97,6 +95,8 @@ export const requireAdmin = async (
   if (user.role === 'ADMIN') {
     next();
   } else {
-    return res.status(403).json({ error: 'Forbidden: Requires ADMIN role' });
+    return res.status(403).json({
+      error: 'Forbidden: Requires ADMIN role',
+    });
   }
 };

@@ -1,44 +1,43 @@
 import { Request, Response } from 'express';
 import prisma from '../config/prisma';
+import { clerkClient } from '@clerk/clerk-sdk-node';
+import { getAuth } from '@clerk/express';
+
 
 // Create a new user
 export const createUser = async (req: Request, res: Response) => {
-  try {
-    const {
-      clerk_id,
-      first_name,
-      last_name,
-      email,
-      role,
-      relationship,
-      household_type,
-      topics_of_interest,
-      kids_age_groups,
-      subscribed_newsletter,
-    } = req.body;
-
-    const user = await prisma.user.create({
-      data: {
-        clerk_id,
-        first_name,
-        last_name,
-        email,
-        role: role || 'PARENT',
-        relationship: relationship ?? null,
-        household_type: household_type ?? null,
-        topics_of_interest: topics_of_interest ?? [],
-        kids_age_groups: kids_age_groups ?? [],
-        subscribed_newsletter: subscribed_newsletter ?? false,
-      },
-    });
-
-    res.status(201).json(user);
-  } catch (error) {
-    console.error('Error creating user:', error);
-    res.status(500).json({ error: 'Failed to create user' });
+  const { userId } = getAuth(req);
+  if (!userId) {
+    return res.status(401).json({ error: 'Unauthorized' });
   }
-};
 
+  const clerkUser = await clerkClient.users.getUser(userId);
+
+  const firstName = clerkUser.firstName || undefined;
+  const lastName = clerkUser.lastName || undefined;
+
+  const email =
+    clerkUser.emailAddresses[0]?.emailAddress ??
+    undefined;
+
+  const user = await prisma.user.upsert({
+    where: { clerk_id: userId },
+    update: {
+      // only set names if DB doesn't already have them
+      first_name: firstName,
+      last_name: lastName,
+    },
+    create: {
+      clerk_id: userId,
+      email,
+      first_name: firstName,
+      last_name: lastName,
+      role: 'PARENT',
+    },
+  });
+
+  res.json(user);
+};
 // Get all users
 export const getAllUsers = async (req: Request, res: Response) => {
   try {
@@ -131,5 +130,44 @@ export const deleteUser = async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error deleting user:', error);
     res.status(500).json({ error: 'Failed to delete user' });
+  }
+};
+
+
+
+
+export const updateCurrentUser = async (req: Request, res: Response) => {
+  try {
+    const { userId } = getAuth(req);
+
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const {
+      relationship,
+      household_type,
+      topics_of_interest,
+      kids_age_groups,
+      subscribed_newsletter,
+      onboarding_complete,
+    } = req.body;
+
+    const updatedUser = await prisma.user.update({
+      where: { clerk_id: userId },
+      data: {
+        relationship,
+        household_type,
+        topics_of_interest,
+        kids_age_groups,
+        subscribed_newsletter,
+        onboarding_complete,
+      },
+    });
+
+    res.json(updatedUser);
+  } catch (err) {
+    console.error('updateCurrentUser error:', err);
+    res.status(500).json({ error: 'Failed to update user' });
   }
 };
