@@ -83,14 +83,14 @@ async function main() {
 
   const childrensMentalDisorders = await prisma.resource.upsert({
     where: {
-      title: "Children's Mental Disorders – American SPCC",
+      title: "Children's Mental Disorders",
     },
     update: {},
     create: {
       title: "Children's Mental Disorders – American SPCC",
       description:
         'A comprehensive overview of common childhood mental disorders, including symptoms, risk factors, diagnosis, and early intervention strategies to support children’s emotional and behavioral wellbeing.',
-
+      image_s3_key: 'childrens_mental_disorders.jpeg',
       resource_type: RESOURCE_TYPE.WEBPAGE,
       hosting_type: HOSTING_TYPE.EXTERNAL,
       category: CATEGORY_TYPE.MENTAL_EMOTIONAL_HEALTH,
@@ -139,14 +139,14 @@ async function main() {
 
   const childrensMentalHealth = await prisma.resource.upsert({
     where: {
-      title: "Children's Mental Health – American SPCC",
+      title: "Children's Mental Health",
     },
     update: {},
     create: {
       title: "Children's Mental Health – American SPCC",
       description:
         'An overview of children’s mental health, including common emotional and behavioral challenges, early warning signs, resilience building, and how parents can support healthy emotional development.',
-
+      image_s3_key: 'childrens_mental_health.jpeg',
       resource_type: RESOURCE_TYPE.WEBPAGE,
       hosting_type: HOSTING_TYPE.EXTERNAL,
       category: CATEGORY_TYPE.MENTAL_EMOTIONAL_HEALTH,
@@ -195,14 +195,14 @@ async function main() {
 
   const digitalSafetyResource = await prisma.resource.upsert({
     where: {
-      title: 'Family Digital Safety Toolkit – American SPCC',
+      title: 'Family Digital Safety Toolkit',
     },
     update: {},
     create: {
       title: 'Family Digital Safety Toolkit – American SPCC',
       description:
         'A comprehensive toolkit by American SPCC to help parents and caregivers keep children safe online. It provides guidance on screen time, app usage, social media boundaries, and fostering open communication about digital habits.',
-
+      image_s3_key: 'family_digital_safety_toolkit.jpg',
       resource_type: RESOURCE_TYPE.PDF,
       hosting_type: HOSTING_TYPE.EXTERNAL,
       category: CATEGORY_TYPE.SAFETY_PROTECTION,

@@ -92,19 +92,17 @@
 }
 
 .imageContainer {
-  flex-shrink: 0;
-  width: 200px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 300px;
+  height: 200px;
+  overflow: hidden;
+  border-radius: 8px; /* optional */
 }
 
 .image {
   width: 100%;
-  height: auto;
-  max-height: 200px;
+  height: 100%;
   object-fit: cover;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  display: block;
 }
 
 /* Responsive design */
@@ -124,4 +122,16 @@
   .title {
     font-size: 1.5rem;
   }
+}
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.categoryIcon {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  flex-shrink: 0;
 }

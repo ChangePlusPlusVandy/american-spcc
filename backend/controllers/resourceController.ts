@@ -1,5 +1,19 @@
 import { Request, Response } from 'express';
 import prisma from '../config/prisma';
+import { GetObjectCommand } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { s3 } from '../config/s3';
+
+const getSignedImageUrl = async (key: string) => {
+  const command = new GetObjectCommand({
+    Bucket: process.env.S3_BUCKET_NAME!,
+    Key: key,
+  });
+
+  return getSignedUrl(s3, command, {
+    expiresIn: 60 * 5, // 5 minutes
+  });
+};
 
 export const createResource = async (req: Request, res: Response) => {
   try {
@@ -49,22 +63,49 @@ export const getAllResources = async (req: Request, res: Response) => {
   try {
     const { category, label_id } = req.query;
     const where: any = {};
-    if (category) where.category = category;
-    if (label_id)
+
+    if (category) {
+      where.category = category;
+    }
+
+    if (label_id) {
       where.labels = {
         some: { label_id: label_id as string },
       };
+    }
 
-      const resources = await prisma.resource.findMany({
-        where,
-        include: {
-          labels: { include: { label: true } },
-          externalResources: true, 
-        },
-      });
-      
+    const resources = await prisma.resource.findMany({
+      where,
+      include: {
+        labels: { include: { label: true } },
+        externalResources: true,
+      },
+    });
 
-    res.json(resources);
+    // Attach signed S3 image URLs (if present)
+    const resourcesWithImages = await Promise.all(
+      resources.map(async (resource) => {
+        let imageUrl: string | null = null;
+
+        if (resource.image_s3_key) {
+          const command = new GetObjectCommand({
+            Bucket: process.env.S3_BUCKET_NAME!,
+            Key: resource.image_s3_key,
+          });
+
+          imageUrl = await getSignedUrl(s3, command, {
+            expiresIn: 60 * 5, // 5 minutes
+          });
+        }
+
+        return {
+          ...resource,
+          imageUrl,
+        };
+      })
+    );
+
+    res.json(resourcesWithImages);
   } catch (error) {
     console.error('Error fetching resources:', error);
     res.status(500).json({ error: 'Failed to fetch resources' });

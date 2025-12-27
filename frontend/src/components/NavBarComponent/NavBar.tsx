@@ -20,10 +20,7 @@ export default function DefaultNav() {
   return (
     <>
       <Sidebar isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
-      <nav
-          className="sticky top-0 z-50 w-full bg-[#FFF9F0] px-4 py-4 flex items-center justify-between"
-        >
-
+      <nav className="sticky top-0 z-50 w-full bg-[#FFF9F0] px-4 py-4 flex items-center justify-between">
         <div className="flex items-center gap-x-10">
           {/* Left: Hamburger */}
           <button
@@ -161,8 +158,6 @@ export default function DefaultNav() {
               </a>
             </div>
           </div>
-
-
 
           {/* Right: Donate button and logo */}
           <div className="flex items-center">

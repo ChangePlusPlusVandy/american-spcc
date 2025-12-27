@@ -12,8 +12,6 @@ interface Resource {
   externalResources?: { external_url: string } | null;
 }
 
-
-
 function Landing() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
@@ -69,7 +67,6 @@ function Landing() {
 
   return (
     <div className="min-w-screen relative min-h-screen bg-[#6EC6C5]">
-
       <NavBar />
       {/* Image background */}
       <div
@@ -146,56 +143,54 @@ function Landing() {
                   className="rounded-lg shadow-lg border-2 border-[#C8DC59] overflow-hidden"
                   style={{ backgroundColor: '#FFFFFF' }}
                 >
-                    {searchResults.map((resource, index) => (
-                      <div key={resource.id}>
-                        <button
+                  {searchResults.map((resource, index) => (
+                    <div key={resource.id}>
+                      <button
                         type="button"
-                          onClick={() => {
-                            if (resource.hosting_type === 'EXTERNAL') {
-                              const url = resource.externalResources?.external_url;
-                              if (!url) return;
-                            
-                              window.open(url, '_blank', 'noopener,noreferrer');
-                            }
-                             else {
-                              navigate(`/resource/${resource.id}`);
-                            }
+                        onClick={() => {
+                          if (resource.hosting_type === 'EXTERNAL') {
+                            const url = resource.externalResources?.external_url;
+                            if (!url) return;
 
-                            setSearchQuery('');
-                            setSearchResults([]);
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = '#F3F4F6';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = '#FFFFFF';
-                          }}
-                          style={{
-                            backgroundColor: '#FFFFFF',
-                            fontFamily: 'Open Sans, sans-serif',
-                            color: '#566273',
-                            paddingLeft: '35.5px',
-                            paddingRight: '35.5px',
-                            transition: 'background-color 0.2s',
-                            border: 'none',
-                            outline: 'none',
-                          }}
-                          className="w-full text-left py-3"
-                        >
-                          <div className="font-semibold">{resource.title}</div>
-                          {resource.description && (
-                            <div className="text-sm text-gray-500 truncate">
-                              {resource.description}
-                            </div>
-                          )}
-                        </button>
+                            window.open(url, '_blank', 'noopener,noreferrer');
+                          } else {
+                            navigate(`/resource/${resource.id}`);
+                          }
 
-                        {index !== searchResults.length - 1 && (
-                          <div style={{ height: '2px', backgroundColor: '#C8DC59' }} />
+                          setSearchQuery('');
+                          setSearchResults([]);
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = '#F3F4F6';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = '#FFFFFF';
+                        }}
+                        style={{
+                          backgroundColor: '#FFFFFF',
+                          fontFamily: 'Open Sans, sans-serif',
+                          color: '#566273',
+                          paddingLeft: '35.5px',
+                          paddingRight: '35.5px',
+                          transition: 'background-color 0.2s',
+                          border: 'none',
+                          outline: 'none',
+                        }}
+                        className="w-full text-left py-3"
+                      >
+                        <div className="font-semibold">{resource.title}</div>
+                        {resource.description && (
+                          <div className="text-sm text-gray-500 truncate">
+                            {resource.description}
+                          </div>
                         )}
-                      </div>
-                    ))}
+                      </button>
 
+                      {index !== searchResults.length - 1 && (
+                        <div style={{ height: '2px', backgroundColor: '#C8DC59' }} />
+                      )}
+                    </div>
+                  ))}
                 </div>
               </div>
             )}

@@ -11,8 +11,8 @@ import {
 
 const router = express.Router();
 
-router.post('/', createUser);      
-router.patch('/me', updateCurrentUser); 
+router.post('/', createUser);
+router.patch('/me', updateCurrentUser);
 router.get('/', getAllUsers);
 router.get('/clerk/:clerkId', getUserByClerkId);
 router.get('/:id', getUserById);

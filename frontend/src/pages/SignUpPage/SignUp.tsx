@@ -4,9 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import SignupForm from '@/components/SignupFormComponent/SignupForm';
 import { useEffect } from 'react';
 
-
 type Step = 1 | 2 | 3;
-
 
 const RELATIONSHIP_OPTIONS = [
   { label: 'Mother', value: 'MOTHER' },
@@ -33,11 +31,9 @@ export default function SignUp() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-
   const stepParam = Number(searchParams.get('step'));
   const initialStep: Step = stepParam === 2 || stepParam === 3 ? stepParam : 1;
   const [step, setStep] = useState<Step>(initialStep);
-
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -53,26 +49,23 @@ export default function SignUp() {
     navigate(`/sign-up?step=${next}`, { replace: true });
   };
 
-useEffect(() => {
-  if (!user || hasSynced) return;
+  useEffect(() => {
+    if (!user || hasSynced) return;
 
-  const syncUser = async () => {
-    try {
-      await fetch('http://localhost:8000/api/users', {
-        method: 'POST',
-        credentials: 'include',
-      });
-      setHasSynced(true);
-    } catch (err) {
-      console.error('Failed to sync user to DB', err);
-    }
-  };
+    const syncUser = async () => {
+      try {
+        await fetch('http://localhost:8000/api/users', {
+          method: 'POST',
+          credentials: 'include',
+        });
+        setHasSynced(true);
+      } catch (err) {
+        console.error('Failed to sync user to DB', err);
+      }
+    };
 
-  syncUser();
-}, [user, hasSynced]);
-
-
-
+    syncUser();
+  }, [user, hasSynced]);
 
   const handleEmailSignup = async () => {
     if (!isLoaded || !signUp) return;
@@ -133,7 +126,6 @@ useEffect(() => {
 
     navigate('/');
   };
-
 
   return (
     <SignupForm

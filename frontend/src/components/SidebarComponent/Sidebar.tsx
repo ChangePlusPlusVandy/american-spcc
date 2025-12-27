@@ -1,17 +1,14 @@
 import React from 'react';
-import {
-  X,
-  Brain,
-  HeartHandshake,
-  User,
-  BookOpen,
-  Users,
-  Sprout,
-  Activity,
-  ShieldCheck,
-  Heart,
-} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import parentingIcon from '@/assets/parenting_skills_relationships_icon.png';
+import childDevIcon from '@/assets/child_development_icon.png';
+import mentalHealthIcon from '@/assets/mental_emotional_health_icon.png';
+import safetyIcon from '@/assets/safety_protection_icon.png';
+import educationIcon from '@/assets/education_learning.png';
+import wellbeingIcon from '@/assets/health_wellbeing_icon.png';
+import lifeSkillsIcon from '@/assets/life_skills_independence_icon.png';
+import familySupportIcon from '@/assets/family_support_community_icon.png';
+import { X, Heart } from 'lucide-react';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -23,47 +20,47 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
   const menuItems = [
     {
-      icon: Brain,
+      icon: mentalHealthIcon,
       label: 'Mental & Emotional Health',
       category: 'MENTAL_EMOTIONAL_HEALTH',
     },
     {
-      icon: HeartHandshake,
+      icon: parentingIcon,
       label: 'Parenting Skills & Relationships',
       category: 'PARENTING_SKILLS_RELATIONSHIPS',
     },
     {
-      icon: User,
+      icon: lifeSkillsIcon,
       label: 'Life Skills & Independence',
       category: 'LIFE_SKILLS_INDEPENDENCE',
     },
     {
-      icon: BookOpen,
+      icon: educationIcon,
       label: 'Education & Learning',
       category: 'EDUCATION_LEARNING',
     },
     {
-      icon: Users,
+      icon: familySupportIcon,
       label: 'Family Support & Community',
       category: 'FAMILY_SUPPORT_COMMUNITY',
     },
     {
-      icon: Sprout,
+      icon: childDevIcon,
       label: 'Child Development',
       category: 'CHILD_DEVELOPMENT',
     },
     {
-      icon: Activity,
+      icon: wellbeingIcon,
       label: 'Health & Wellbeing',
       category: 'HEALTH_WELLBEING',
     },
     {
-      icon: ShieldCheck,
+      icon: safetyIcon,
       label: 'Safety & Protection',
       category: 'SAFETY_PROTECTION',
     },
   ];
-  
+
   return (
     <>
       {/* Overlay */}
@@ -91,13 +88,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       >
         {/* Header */}
         <div className="p-6 pb-2 flex justify-between items-start">
-          <h2 className="text-[#55C3C0] text-2xl font-bold font-['Suez_One']">
-            Parenting Topics
-          </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 transition-colors"
-          >
+          <h2 className="text-[#55C3C0] text-2xl font-bold font-['Suez_One']">Parenting Topics</h2>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-700 transition-colors">
             <X size={24} />
           </button>
         </div>
@@ -124,10 +116,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                   !rounded-none
                 `}
               >
-                <item.icon
-                  size={24}
-                  className={`${isTeal ? 'text-white' : 'text-[#566273]'} stroke-[1.5]`}
+                <img
+                  src={item.icon}
+                  alt={item.label}
+                  className={`w-5 h-5 object-contain ${isTeal ? 'brightness-0 invert' : ''}`}
                 />
+
                 {item.label}
               </button>
             );
@@ -146,9 +140,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             Sign In
           </button>
 
-          <button
-            className="!bg-[#55C3C0] !text-white px-6 py-2 rounded-full font-bold flex items-center gap-2 hover:!bg-[#4ab0ad] transition-colors shadow-md"
-          >
+          <button className="!bg-[#55C3C0] !text-white px-6 py-2 rounded-full font-bold flex items-center gap-2 hover:!bg-[#4ab0ad] transition-colors shadow-md">
             Donate
             <Heart size={16} className="fill-red-400 text-red-400" />
           </button>

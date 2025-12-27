@@ -3,328 +3,327 @@
 ================================ */
 
 .loginContainer {
-    height: 100vh;
-    width: 100vw;
-    display: flex;
-    font-family: 'Lato', sans-serif;
-    background-color: white;
-    overflow: hidden;
-    margin: 0;
-    padding: 0;
-  }
-  
-  .leftSection {
-    width: 50%;
-    flex-shrink: 0;
-    display: flex;
-    align-items: stretch;
-    justify-content: stretch;
-    background-color: white;
-    overflow: hidden;
-    margin: 0;
-    padding: 0;
-  }
-  
-  .loginImage {
-    width: 100%;
-    height: 100vh;
-    object-fit: cover;
-    object-position: left center;
-    display: block;
-    margin: 0;
-    padding: 0;
-  }
-  
-  .rightSection {
-    width: 50%;
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 3vh 5vw;
-    background-color: white;
-    overflow-y: auto;
-  }
-  
-  .logo {
-    width: 18vw;
-    max-width: 280px;
-    min-width: 180px;
-    height: auto;
-    margin-bottom: 2vh;
-    flex-shrink: 0;
-  }
-  
-  .formCard {
-    width: 90%;
-    max-width: 450px;
-    display: flex;
-    flex-direction: column;
-    flex-shrink: 0;
-  }
-  
-  .title {
-    font-size: clamp(2rem, 3vw, 3rem);
-    font-weight: 400;
-    color: #5a6c7d;
-    text-align: center;
-    margin-bottom: 2vh;
-    font-family: 'Lato', sans-serif;
-  }
-  
-  .form {
-    display: flex;
-    flex-direction: column;
-    gap: 2vh; /* EXACT MATCH */
-  }
-  
-  /* ================================
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  font-family: 'Lato', sans-serif;
+  background-color: white;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+.leftSection {
+  width: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+  background-color: white;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+.loginImage {
+  width: 100%;
+  height: 100vh;
+  object-fit: cover;
+  object-position: left center;
+  display: block;
+  margin: 0;
+  padding: 0;
+}
+
+.rightSection {
+  width: 50%;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3vh 5vw;
+  background-color: white;
+  overflow-y: auto;
+}
+
+.logo {
+  width: 18vw;
+  max-width: 280px;
+  min-width: 180px;
+  height: auto;
+  margin-bottom: 2vh;
+  flex-shrink: 0;
+}
+
+.formCard {
+  width: 90%;
+  max-width: 450px;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.title {
+  font-size: clamp(2rem, 3vw, 3rem);
+  font-weight: 400;
+  color: #5a6c7d;
+  text-align: center;
+  margin-bottom: 2vh;
+  font-family: 'Lato', sans-serif;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 2vh; /* EXACT MATCH */
+}
+
+/* ================================
      STEPPER (ADDS, DOES NOT DISTURB)
   ================================ */
-  
-  .stepper {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    margin-bottom: 2vh; /* SAME vertical rhythm */
-  }
-  
-  .stepItem {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-width: 72px;
-  }
-  
-  .stepCircle {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    border: 2px solid #cbd5e0;
-    color: #a0aec0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    background-color: white;
-    margin-bottom: 4px;
-  }
-  
-  .stepLine {
-    width: 48px;
-    height: 2px;
-    border-top: 2px dashed #cbd5e0;
-    margin-top: 13px; /* aligns with circle center */
-  }
-  
-  .stepItem span {
-    font-size: clamp(0.75rem, 0.8vw, 0.85rem);
-    color: #a0aec0;
-    font-family: 'Lato', sans-serif;
-  }
-  
-  .active {
-    background-color: #5a6c7d;
-    border-color: #5a6c7d;
-    color: white;
-  }
-  
-  .activeLabel {
-    color: #5a6c7d;
-    font-weight: 600;
-  }
-  
-  /* ================================
+
+.stepper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  margin-bottom: 2vh; /* SAME vertical rhythm */
+}
+
+.stepItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 72px;
+}
+
+.stepCircle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid #cbd5e0;
+  color: #a0aec0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  background-color: white;
+  margin-bottom: 4px;
+}
+
+.stepLine {
+  width: 48px;
+  height: 2px;
+  border-top: 2px dashed #cbd5e0;
+  margin-top: 13px; /* aligns with circle center */
+}
+
+.stepItem span {
+  font-size: clamp(0.75rem, 0.8vw, 0.85rem);
+  color: #a0aec0;
+  font-family: 'Lato', sans-serif;
+}
+
+.active {
+  background-color: #5a6c7d;
+  border-color: #5a6c7d;
+  color: white;
+}
+
+.activeLabel {
+  color: #5a6c7d;
+  font-weight: 600;
+}
+
+/* ================================
      DIVIDER (IDENTICAL TO LOGIN)
   ================================ */
-  
-  .divider {
-    display: flex;
-    align-items: center;
-    gap: 2vw;
-    width: 100%;
-    margin: 2vh 0;
-  }
-  
-  .line {
-    flex: 1;
-    height: 1px;
-    background-color: #000000;
-  }
-  
-  .dividerText {
-    font-size: clamp(0.9rem, 1vw, 1.1rem);
-    font-weight: 700;
-    color: #000000;
-    font-family: 'Lato', sans-serif;
-  }
-  
-  /* ================================
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 2vw;
+  width: 100%;
+  margin: 2vh 0;
+}
+
+.line {
+  flex: 1;
+  height: 1px;
+  background-color: #000000;
+}
+
+.dividerText {
+  font-size: clamp(0.9rem, 1vw, 1.1rem);
+  font-weight: 700;
+  color: #000000;
+  font-family: 'Lato', sans-serif;
+}
+
+/* ================================
      GOOGLE (IDENTICAL SIZE + FEEL)
   ================================ */
-  
-  .googleButton {
-    width: clamp(45px, 4vw, 55px);
-    height: clamp(45px, 4vw, 55px);
-    border-radius: 50%;
-    border: none;
-    background-color: white;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto;
-    padding: 0;
-  }
-  
-  .googleButton:hover {
-    opacity: 0.8;
-  }
-  
-  .googleIcon {
-    width: 100%;
-    height: 100%;
-    max-width: 100%;
-    object-fit: contain;
-  }
-  
-  /* ================================
+
+.googleButton {
+  width: clamp(45px, 4vw, 55px);
+  height: clamp(45px, 4vw, 55px);
+  border-radius: 50%;
+  border: none;
+  background-color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.googleButton:hover {
+  opacity: 0.8;
+}
+
+.googleIcon {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+/* ================================
      FOOTER (IDENTICAL TO LOGIN)
   ================================ */
-  
-  .signUpSection {
-    text-align: center;
-    margin-top: 2vh;
-  }
-  
-  .signUpText {
-    color: #4a5568;
-    font-size: clamp(0.85rem, 1vw, 1rem);
-    font-family: 'Lato', sans-serif;
-  }
-  
-  .signUpLink {
-    background: none;
-    border: none;
-    color: #000000;
-    font-weight: 700;
-    font-size: clamp(0.85rem, 1vw, 1rem);
-    cursor: pointer;
-    padding: 0;
-    text-decoration: underline;
-    font-family: 'Lato', sans-serif;
-  }
-  
-  .signUpLink:hover {
-    opacity: 0.8;
-  }
-  
-  /* ================================
+
+.signUpSection {
+  text-align: center;
+  margin-top: 2vh;
+}
+
+.signUpText {
+  color: #4a5568;
+  font-size: clamp(0.85rem, 1vw, 1rem);
+  font-family: 'Lato', sans-serif;
+}
+
+.signUpLink {
+  background: none;
+  border: none;
+  color: #000000;
+  font-weight: 700;
+  font-size: clamp(0.85rem, 1vw, 1rem);
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  font-family: 'Lato', sans-serif;
+}
+
+.signUpLink:hover {
+  opacity: 0.8;
+}
+
+/* ================================
      MOBILE (IDENTICAL)
   ================================ */
-  
-  @media (max-width: 768px) {
-    .loginContainer {
-      flex-direction: column;
-    }
-  
-    .leftSection {
-      display: none;
-    }
-  
-    .rightSection {
-      width: 100%;
-      padding: 4vh 8vw;
-    }
-  
-    .logo {
-      width: 50vw;
-      max-width: 250px;
-    }
-  
-    .formCard {
-      width: 100%;
-    }
+
+@media (max-width: 768px) {
+  .loginContainer {
+    flex-direction: column;
   }
-  
-  .sectionTitle {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #4a5568;
-    margin-top: 1vh;
-    text-align: center;
+
+  .leftSection {
+    display: none;
   }
-  
-  .choiceGrid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-    justify-content: center;
-    margin-bottom: 1.5vh;
+
+  .rightSection {
+    width: 100%;
+    padding: 4vh 8vw;
   }
-  
-  .choiceButton {
-    padding: 0.4rem 0.9rem;
-    border-radius: 999px;
-    border: 1.5px solid #5a6c7d;
-    background-color: transparent;
-    color: #5a6c7d;
-    font-size: 0.85rem;
-    cursor: pointer;
-    transition: all 0.15s ease;
+
+  .logo {
+    width: 50vw;
+    max-width: 250px;
   }
-  
-  .choiceButton:hover {
-    background-color: #edf2f7;
+
+  .formCard {
+    width: 100%;
   }
-  
-  .selected {
-    background-color: #5a6c7d;
-    color: white;
+}
+
+.sectionTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #4a5568;
+  margin-top: 1vh;
+  text-align: center;
+}
+
+.choiceGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-bottom: 1.5vh;
+}
+
+.choiceButton {
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  border: 1.5px solid #5a6c7d;
+  background-color: transparent;
+  color: #5a6c7d;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.choiceButton:hover {
+  background-color: #edf2f7;
+}
+
+.selected {
+  background-color: #5a6c7d;
+  color: white;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2vh;
+}
+
+.skip {
+  background: none;
+  border: none;
+  color: #5a6c7d;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.checkboxRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
+  font-size: 0.85rem;
+  color: #4a5568;
+  margin-top: 1vh;
+}
+
+.checkboxRow input {
+  accent-color: #5a6c7d;
+}
+.spinner {
+  width: 26px;
+  height: 26px;
+  border: 3px solid #e2e8f0;
+  border-top: 3px solid #5a6c7d;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
-  
-  .actions {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 1rem;
-    margin-top: 2vh;
-  }
-  
-  .skip {
-    background: none;
-    border: none;
-    color: #5a6c7d;
-    font-weight: 600;
-    cursor: pointer;
-    text-decoration: underline;
-  }
-  .checkboxRow {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    justify-content: center;
-    font-size: 0.85rem;
-    color: #4a5568;
-    margin-top: 1vh;
-  }
-  
-  .checkboxRow input {
-    accent-color: #5a6c7d;
-  }
-  .spinner {
-    width: 26px;
-    height: 26px;
-    border: 3px solid #e2e8f0;
-    border-top: 3px solid #5a6c7d;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-  }
-  
-  @keyframes spin {
-    to {
-      transform: rotate(360deg);
-    }
-  }
-  
+}

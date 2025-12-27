@@ -9,7 +9,6 @@ import googleLogo from '@assets/GoogleLogo.png';
 
 import styles from './SignupForm.module.css';
 
-
 type SelectOption = {
   label: string;
   value: string;
@@ -91,7 +90,7 @@ export default function SignupForm({
 
           {/* STEP INDICATOR */}
           <div className={styles.stepper}>
-            {[1, 2, 3].map(n => (
+            {[1, 2, 3].map((n) => (
               <div key={n} className={styles.stepItem}>
                 <div className={`${styles.stepCircle} ${step >= n ? styles.active : ''}`}>{n}</div>
                 <span className={step >= n ? styles.activeLabel : ''}>
@@ -169,7 +168,7 @@ export default function SignupForm({
               <p className={styles.sectionTitle}>Which best describes you?</p>
 
               <div className={styles.choiceGrid}>
-                {relationshipOptions.map(opt => (
+                {relationshipOptions.map((opt) => (
                   <button
                     key={opt.value}
                     type="button"
@@ -186,7 +185,7 @@ export default function SignupForm({
               <p className={styles.sectionTitle}>Household Type</p>
 
               <div className={styles.choiceGrid}>
-                {householdOptions.map(opt => (
+                {householdOptions.map((opt) => (
                   <button
                     key={opt.value}
                     type="button"
@@ -229,8 +228,11 @@ export default function SignupForm({
                   { label: 'Mental & Emotional Health', value: 'MENTAL_EMOTIONAL_HEALTH' },
                   { label: 'Education & Learning', value: 'EDUCATION_LEARNING' },
                   { label: 'Family Support & Community', value: 'FAMILY_SUPPORT_COMMUNITY' },
-                  { label: 'Parenting Skills & Relationships', value: 'PARENTING_SKILLS_RELATIONSHIPS' },
-                ].map(opt => (
+                  {
+                    label: 'Parenting Skills & Relationships',
+                    value: 'PARENTING_SKILLS_RELATIONSHIPS',
+                  },
+                ].map((opt) => (
                   <button
                     key={opt.value}
                     type="button"
@@ -240,7 +242,7 @@ export default function SignupForm({
                     onClick={() =>
                       setTopics(
                         topics.includes(opt.value)
-                          ? topics.filter(t => t !== opt.value)
+                          ? topics.filter((t) => t !== opt.value)
                           : [...topics, opt.value]
                       )
                     }
@@ -260,7 +262,7 @@ export default function SignupForm({
                   { label: 'Ages 10–13', value: 'AGE_10_13' },
                   { label: 'Ages 14–18', value: 'AGE_14_18' },
                   { label: '18+', value: 'AGE_18_ABOVE' },
-                ].map(opt => (
+                ].map((opt) => (
                   <button
                     key={opt.value}
                     type="button"
@@ -270,7 +272,7 @@ export default function SignupForm({
                     onClick={() =>
                       setAgeGroups(
                         ageGroups.includes(opt.value)
-                          ? ageGroups.filter(a => a !== opt.value)
+                          ? ageGroups.filter((a) => a !== opt.value)
                           : [...ageGroups, opt.value]
                       )
                     }
@@ -284,7 +286,7 @@ export default function SignupForm({
                 <input
                   type="checkbox"
                   checked={subscribeNewsletter}
-                  onChange={e => setSubscribeNewsletter(e.target.checked)}
+                  onChange={(e) => setSubscribeNewsletter(e.target.checked)}
                 />
                 <span>Subscribe to Newsletter?</span>
               </label>

@@ -12,11 +12,7 @@ import { clerkClient } from '@clerk/clerk-sdk-node';
  *  2. Sync user with database (if needed)
  *  3. Enforce role-based access control
  */
-export const authenticateUser = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const authenticateUser = (req: Request, res: Response, next: NextFunction) => {
   ClerkExpressWithAuth({})(req as any, res as any, () => {
     if (!(req as any).auth?.userId) {
       return res.status(401).json({ error: 'Unauthorized' });
@@ -25,11 +21,7 @@ export const authenticateUser = (
   });
 };
 
-export const syncUserWithDB = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const syncUserWithDB = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const clerkId = (req as any).auth?.userId;
     if (!clerkId) {
@@ -60,12 +52,7 @@ export const syncUserWithDB = async (
   }
 };
 
-
-export const requireParent = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const requireParent = (req: Request, res: Response, next: NextFunction) => {
   const user = (req as any).user;
 
   if (!user) {
@@ -81,11 +68,7 @@ export const requireParent = (
   }
 };
 
-export const requireAdmin = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const requireAdmin = (req: Request, res: Response, next: NextFunction) => {
   const user = (req as any).user;
 
   if (!user) {

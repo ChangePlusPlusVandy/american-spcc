@@ -22,10 +22,10 @@ interface Resource {
   age_groups: string[];
   language: string;
   time_to_read: number;
+  imageUrl?: string | null; // ✅ ADD THIS
   labels?: Array<{ label: { label_name: string } }>;
   externalResources?: { external_url: string } | null;
 }
-
 
 // SVG Icons for View dropdown options
 const ListIcon = () => (
@@ -113,7 +113,6 @@ function FilterPage() {
       setSelectedTopics([categoryParam]);
     }
   }, [searchParams]);
-  
 
   // API call to search category labels
   const searchResources = async (query: string) => {
@@ -121,7 +120,7 @@ function FilterPage() {
       setResourceSearchResults([]);
       return;
     }
-  
+
     setIsSearching(true);
     try {
       const response = await fetch(
@@ -136,17 +135,15 @@ function FilterPage() {
       setIsSearching(false);
     }
   };
-  
 
   // Debounced search effect
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       searchResources(searchQuery);
     }, 300);
-  
+
     return () => clearTimeout(timeoutId);
   }, [searchQuery]);
-  
 
   // Handle clicking a label in the dropdown
   const handleLabelClick = async (labelId: string) => {
@@ -193,11 +190,11 @@ function FilterPage() {
               return res.json();
             })
           );
-        
+
           const results = await Promise.all(promises);
           allResources = results.flat();
         }
-        
+
         // Priority 3: Fetch ALL resources if no topics selected
         else {
           const response = await fetch(`http://localhost:8000/api/resources`);
@@ -265,13 +262,12 @@ function FilterPage() {
     if (resource.hosting_type !== 'EXTERNAL') {
       return; // INTERNAL → no-op (for now)
     }
-  
+
     const url = resource.externalResources?.external_url;
     if (!url) return;
-  
+
     window.open(url, '_blank', 'noopener,noreferrer');
   };
-  
 
   return (
     <div className="min-h-screen bg-[#FFF9F0]">
@@ -311,36 +307,35 @@ function FilterPage() {
             {searchQuery && resourceSearchResults.length > 0 && isTyping && (
               <div className="absolute left-0 right-0 mt-2 z-50">
                 <div className="rounded-lg shadow-lg border-2 border-[#C8DC59] overflow-hidden bg-white">
-                {resourceSearchResults.map((resource, index) => (
-                  <div key={resource.id}>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (resource.hosting_type !== 'EXTERNAL') return;
+                  {resourceSearchResults.map((resource, index) => (
+                    <div key={resource.id}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (resource.hosting_type !== 'EXTERNAL') return;
 
-                        const url = resource.externalResources?.external_url;
-                        if (!url) return;
+                          const url = resource.externalResources?.external_url;
+                          if (!url) return;
 
-                        window.open(url, '_blank', 'noopener,noreferrer');
-                        setSearchQuery('');
-                        setResourceSearchResults([]);
-                      }}
-                      className="w-full text-left py-3 px-5 hover:bg-gray-100"
-                    >
-                      <div className="font-semibold">{resource.title}</div>
-                      {resource.description && (
-                        <div className="text-sm text-gray-500 truncate">
-                          {resource.description}
-                        </div>
+                          window.open(url, '_blank', 'noopener,noreferrer');
+                          setSearchQuery('');
+                          setResourceSearchResults([]);
+                        }}
+                        className="w-full text-left py-3 px-5 hover:bg-gray-100"
+                      >
+                        <div className="font-semibold">{resource.title}</div>
+                        {resource.description && (
+                          <div className="text-sm text-gray-500 truncate">
+                            {resource.description}
+                          </div>
+                        )}
+                      </button>
+
+                      {index !== resourceSearchResults.length - 1 && (
+                        <div style={{ height: '2px', backgroundColor: '#C8DC59' }} />
                       )}
-                    </button>
-
-                    {index !== resourceSearchResults.length - 1 && (
-                      <div style={{ height: '2px', backgroundColor: '#C8DC59' }} />
-                    )}
-                  </div>
-                ))}
-
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
@@ -434,22 +429,29 @@ function FilterPage() {
                         title={resource.title}
                         description={resource.description || 'No description available'}
                         tags={resource.labels?.map((l) => l.label.label_name) || []}
-                        imageUrl="https://placehold.co/600x400/4db8a8/ffffff?text=Resource"
+                        category={resource.category} // 👈 ADD THIS
+                        imageUrl={resource.imageUrl ?? undefined}
                         onLearnMore={() => handleLearnMore(resource)}
                       />
                     ))}
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 gap-4">
-                    {filteredResources.map((resource) => (
-                      <ResourceGridCard
-                        key={resource.id}
-                        title={resource.title}
-                        tags={resource.labels?.map((l) => l.label.label_name) || []}
-                        imageUrl="https://placehold.co/600x400/4db8a8/ffffff?text=Resource"
-                        onLearnMore={() => handleLearnMore(resource)}
-                      />
-                    ))}
+                    {filteredResources.map((resource) => {
+                      console.log('RESOURCE:', resource);
+
+                      return (
+                        <ResourceGridCard
+                          key={resource.id}
+                          title={resource.title}
+                          description={resource.description || ''}
+                          tags={resource.labels?.map((l) => l.label.label_name) || []}
+                          category={resource.category}
+                          imageUrl={resource.imageUrl ?? undefined}
+                          onLearnMore={() => handleLearnMore(resource)}
+                        />
+                      );
+                    })}
                   </div>
                 )}
               </>

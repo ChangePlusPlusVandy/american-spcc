@@ -3,7 +3,6 @@ import prisma from '../config/prisma';
 import { clerkClient } from '@clerk/clerk-sdk-node';
 import { getAuth } from '@clerk/express';
 
-
 // Create a new user
 export const createUser = async (req: Request, res: Response) => {
   const { userId } = getAuth(req);
@@ -16,9 +15,7 @@ export const createUser = async (req: Request, res: Response) => {
   const firstName = clerkUser.firstName || undefined;
   const lastName = clerkUser.lastName || undefined;
 
-  const email =
-    clerkUser.emailAddresses[0]?.emailAddress ??
-    undefined;
+  const email = clerkUser.emailAddresses[0]?.emailAddress ?? undefined;
 
   const user = await prisma.user.upsert({
     where: { clerk_id: userId },
@@ -132,9 +129,6 @@ export const deleteUser = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Failed to delete user' });
   }
 };
-
-
-
 
 export const updateCurrentUser = async (req: Request, res: Response) => {
   try {

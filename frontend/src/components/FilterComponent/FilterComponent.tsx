@@ -27,7 +27,6 @@ export default function FilterComponent({
 }: FilterComponentProps) {
   const topicInitial = TOPICS.slice(0, 3);
   const topicFull = TOPICS;
-  
 
   const ageInitial = ['Infant (0–1)', 'Preschool (3–6)', 'Elementary (7–10)'];
 
@@ -45,14 +44,13 @@ export default function FilterComponent({
 
   const handleTopicClick = (value: string) => {
     if (!onTopicChange) return;
-  
+
     if (selectedTopics.includes(value)) {
       onTopicChange(selectedTopics.filter((t) => t !== value));
     } else {
       onTopicChange([...selectedTopics, value]);
     }
   };
-  
 
   const handleAgeClick = (age: string) => {
     if (!onAgeChange) return;
@@ -71,16 +69,15 @@ export default function FilterComponent({
       {/* TOPICS */}
       <p className="filter-section-title">What Topic?</p>
       <div className="chip-wrapper">
-      {(showAllTopics ? topicFull : topicInitial).map(({ label, value }) => (
-        <button
-          key={value}
-          className={`chip ${selectedTopics.includes(value) ? 'chip-selected' : ''}`}
-          onClick={() => handleTopicClick(value)}
-        >
-          {label}
-        </button>
-      ))}
-
+        {(showAllTopics ? topicFull : topicInitial).map(({ label, value }) => (
+          <button
+            key={value}
+            className={`chip ${selectedTopics.includes(value) ? 'chip-selected' : ''}`}
+            onClick={() => handleTopicClick(value)}
+          >
+            {label}
+          </button>
+        ))}
 
         {!showAllTopics && (
           <button className="chip chip-more" onClick={() => setShowAllTopics(true)}>
