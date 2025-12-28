@@ -8,6 +8,8 @@ import educationIcon from '@/assets/education_learning.png';
 import wellbeingIcon from '@/assets/health_wellbeing_icon.png';
 import lifeSkillsIcon from '@/assets/life_skills_independence_icon.png';
 import familySupportIcon from '@/assets/family_support_community_icon.png';
+import bookmarkIcon from '@/assets/bookmark.png'
+
 const CATEGORY_ICON_MAP: Record<string, string> = {
   PARENTING_SKILLS_RELATIONSHIPS: parentingIcon,
   CHILD_DEVELOPMENT: childDevIcon,
@@ -31,6 +33,15 @@ function ResourceListCard({
 
   return (
     <div className={styles.card}>
+      {/* BOOKMARK — here */}
+      <button className={styles.bookmark}>
+        <img
+          src={bookmarkIcon}
+          alt="Save"
+          className={styles.bookmarkIcon}
+        />
+      </button>
+
       <div className={styles.content}>
         <div className={styles.titleRow}>
           {categoryIcon && (
@@ -52,14 +63,14 @@ function ResourceListCard({
         <button className={styles.learnMoreButton} onClick={onLearnMore}>
           Learn More
         </button>
-      </div>
-
-      {imageUrl && (
-        <div className={styles.imageContainer}>
-          <img src={imageUrl} alt={title} className={styles.image} />
         </div>
-      )}
-    </div>
+
+        {imageUrl && (
+          <div className={styles.imageContainer}>
+            <img src={imageUrl} alt={title} className={styles.image} />
+          </div>
+        )}
+        </div>
   );
 }
 
