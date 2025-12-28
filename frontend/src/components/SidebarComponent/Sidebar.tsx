@@ -92,15 +92,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         {/* Header */}
         <div className="p-6 pb-2 flex justify-between items-start">
         <h2
-          className="text-[#6EC6BF] text-[1.6rem]"
+          className="text-[#6EC6BF] text-[1.4rem]"
           style={{
-            fontFamily: 'Lato, sans-serif',
+            fontFamily: 'Poppins, sans-serif',
             fontWeight: 900,
           }}
         >
           Parenting Topics
         </h2>
-
 
 
 
@@ -125,15 +124,19 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                 w-full flex items-center gap-4 px-6 py-4 text-left
                 ${isTeal ? '!bg-[#55C3C0]' : '!bg-[#FFF9F0]'}
                 ${isTeal ? 'text-white' : 'text-[#566273]'}
-                text-sm
+                font-normal text-sm tracking-normal
                 transition-colors hover:opacity-90
                 focus-visible:outline-none
                 !rounded-none
               `}
               style={{
                 fontFamily: 'Lato, sans-serif',
-                fontWeight: 700,
+                fontWeight: 700, // change to 300, 500, 600, etc.
               }}
+              
+              
+              
+              
               
               
             >
