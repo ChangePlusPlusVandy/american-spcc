@@ -1,13 +1,16 @@
 import { useState } from 'react';
 
 import navSidebar from '../../assets/nav_sidebar_button.png';
-import donateButton from '../../assets/donate_button.png';
+import donateButton from '../../assets/heart.png';
 import aspccLogoTurqoise from '../../assets/aspcc_logo_turqois.png';
 import chevron from '../../assets/chevron.png';
 import { useNavigate } from 'react-router-dom';
+import { Heart } from 'lucide-react';
 
 import { SignedIn, SignedOut, UserButton } from '@clerk/clerk-react';
 import Sidebar from '../SidebarComponent/Sidebar';
+import Button from '../ButtonComponent/Button';
+import { ButtonColor, ButtonVariant } from '../ButtonComponent/ButtonDefinitions';
 
 export default function DefaultNav() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -56,9 +59,6 @@ export default function DefaultNav() {
         {/* Center: Navigation Links */}
         {/* Center: Navigation Links */}
         <div className="flex items-center gap-x-6 font-semibold text-sm">
-          <a href="#" className="!text-[#566273] hover:text-[#566273]">
-            Programs
-          </a>
           <div className="relative group inline-block">
             {/* About button */}
             <button
@@ -83,10 +83,10 @@ export default function DefaultNav() {
             <div
               className="
                 absolute left-0 top-[calc(100%+8px)]
-                w-64
-                rounded-xl bg-white
-                shadow-[0_10px_30px_rgba(0,0,0,0.08)]
-                border border-gray-100
+                w-72
+                rounded-none
+                bg-[#FFF9F0]
+                shadow-[0_8px_24px_rgba(0,0,0,0.12)]
                 py-3
                 z-50
                 opacity-0 invisible
@@ -94,6 +94,7 @@ export default function DefaultNav() {
                 transition-opacity duration-150
               "
             >
+
               <a
                 href="https://americanspcc.org/about/#what"
                 target="_blank"
@@ -158,27 +159,123 @@ export default function DefaultNav() {
               </a>
             </div>
           </div>
+                  <div className="relative group inline-block">
+          {/* Get Involved button */}
+          <button
+            className="flex items-center !text-[#566273]"
+            style={{
+              background: 'transparent',
+              border: 'none',
+              padding: 0,
+              margin: 0,
+              boxShadow: 'none',
+              appearance: 'none',
+              outline: 'none',
+            }}
+          >
+            Get Involved
+            <img src={chevron} alt="" className="ml-1 mt-1 h-3 w-3 inline-block" />
+          </button>
 
-          {/* Right: Donate button and logo */}
-          <div className="flex items-center">
+          {/* Invisible hover buffer */}
+          <div className="absolute left-0 top-full h-2 w-full"></div>
+
+          {/* Dropdown */}
+          <div
+            className="
+              absolute left-0 top-[calc(100%+8px)]
+              w-72
+              rounded-none
+              bg-[#FFF9F0]
+              shadow-[0_8px_24px_rgba(0,0,0,0.12)]
+              py-3
+              z-50
+              opacity-0 invisible
+              group-hover:opacity-100 group-hover:visible
+              transition-opacity duration-150
+            "
+          >
+
             <a
-              href="https://americanspcc.org/championforchildrenaward/?form=FUNHJFZUBKZ"
+              href="https://americanspcc.org/community/"
               target="_blank"
               rel="noopener noreferrer"
-              style={{
-                background: 'transparent',
-                border: 'none',
-                padding: 0,
-                margin: 0,
-                boxShadow: 'none',
-                appearance: 'none',
-                outline: 'none',
-                display: 'inline-block',
-              }}
+              className="block px-4 py-2 !text-[#566273] hover:bg-gray-100"
             >
-              <img src={donateButton} alt="donate" className="relative h-7 cursor-pointer" />
+              Community
+            </a>
+
+            <a
+              href="https://americanspcc.org/donate/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block px-4 py-2 !text-[#566273] hover:bg-gray-100"
+            >
+              Take Action
+            </a>
+
+            <a
+              href="https://americanspcc.org/parentcoaching/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block px-4 py-2 !text-[#566273] hover:bg-gray-100"
+            >
+              Support Peaceful Discipline
+            </a>
+
+            <a
+              href="https://americanspcc.org/advocacy/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block px-4 py-2 !text-[#566273] hover:bg-gray-100"
+            >
+              Advocate
+            </a>
+
+            <a
+              href="https://americanspcc.org/virtual-volunteer-application/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block px-4 py-2 !text-[#566273] hover:bg-gray-100"
+            >
+              Virtual Volunteer
+            </a>
+
+            <a
+              href="https://americanspcc.org/national-child-abuse-prevention-month/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block px-4 py-2 !text-[#566273] hover:bg-gray-100"
+            >
+              Child Abuse Prevention Month
             </a>
           </div>
+        </div>
+
+
+
+          {/* Right: Donate button and logo */}
+          <div className="w-auto">
+            <Button
+              variant={ButtonVariant.Small}
+              color={ButtonColor.Teal}
+              onClick={() =>
+                window.open(
+                  'https://americanspcc.org/championforchildrenaward/?form=FUNHJFZUBKZ',
+                  '_blank'
+                )
+              }
+            >
+              <span className="flex items-center gap-2">
+                Donate
+                <Heart size={16} className="fill-red-400 text-red-400" />
+              </span>
+            </Button>
+          </div>
+
+
+
+
 
           <SignedOut>
             <button

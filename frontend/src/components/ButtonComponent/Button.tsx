@@ -3,6 +3,7 @@ import { type ButtonProps, ButtonVariant, ButtonColor } from './ButtonDefinition
 
 function Button({
   text,
+  children,
   variant = ButtonVariant.Regular,
   color = ButtonColor.Grey,
   onClick,
@@ -12,10 +13,16 @@ function Button({
   const buttonClassName = `${styles.button} ${styles[variant]} ${styles[color]}`;
 
   return (
-    <button className={buttonClassName} onClick={onClick} type={type} disabled={disabled}>
-      {text}
+    <button
+      className={buttonClassName}
+      onClick={onClick}
+      type={type}
+      disabled={disabled}
+    >
+      {children ?? text}
     </button>
   );
 }
+
 
 export default Button;

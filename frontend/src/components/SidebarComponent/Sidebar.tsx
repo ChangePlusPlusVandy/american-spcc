@@ -9,6 +9,9 @@ import wellbeingIcon from '@/assets/health_wellbeing_icon.png';
 import lifeSkillsIcon from '@/assets/life_skills_independence_icon.png';
 import familySupportIcon from '@/assets/family_support_community_icon.png';
 import { X, Heart } from 'lucide-react';
+import Button from '../ButtonComponent/Button';
+import { ButtonColor, ButtonVariant } from '../ButtonComponent/ButtonDefinitions';
+
 
 interface SidebarProps {
   isOpen: boolean;
@@ -88,7 +91,19 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       >
         {/* Header */}
         <div className="p-6 pb-2 flex justify-between items-start">
-          <h2 className="text-[#55C3C0] text-2xl font-bold font-['Suez_One']">Parenting Topics</h2>
+        <h2
+          className="text-[#6EC6BF] text-[1.6rem]"
+          style={{
+            fontFamily: 'Lato, sans-serif',
+            fontWeight: 900,
+          }}
+        >
+          Parenting Topics
+        </h2>
+
+
+
+
           <button onClick={onClose} className="text-gray-500 hover:text-gray-700 transition-colors">
             <X size={24} />
           </button>
@@ -100,22 +115,29 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             const isTeal = index % 2 === 0;
 
             return (
-              <button
-                key={item.category}
-                onClick={() => {
-                  navigate(`/filter?category=${item.category}`);
-                  onClose();
-                }}
-                className={`
-                  w-full flex items-center gap-4 px-6 py-4 text-left
-                  ${isTeal ? '!bg-[#55C3C0]' : '!bg-[#FFF9F0]'}
-                  ${isTeal ? 'text-white' : 'text-[#566273]'}
-                  font-bold text-sm font-['Open_Sans']
-                  transition-colors hover:opacity-90
-                  focus-visible:outline-none
-                  !rounded-none
-                `}
-              >
+            <button
+              key={item.category}
+              onClick={() => {
+                navigate(`/filter?category=${item.category}`);
+                onClose();
+              }}
+              className={`
+                w-full flex items-center gap-4 px-6 py-4 text-left
+                ${isTeal ? '!bg-[#55C3C0]' : '!bg-[#FFF9F0]'}
+                ${isTeal ? 'text-white' : 'text-[#566273]'}
+                text-sm
+                transition-colors hover:opacity-90
+                focus-visible:outline-none
+                !rounded-none
+              `}
+              style={{
+                fontFamily: 'Lato, sans-serif',
+                fontWeight: 700,
+              }}
+              
+              
+            >
+
                 <img
                   src={item.icon}
                   alt={item.label}
@@ -129,21 +151,27 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         </div>
 
         {/* Footer */}
-        <div className="p-6 bg-[#FFF9F0] flex justify-between items-center border-t border-gray-100">
-          <button
-            onClick={() => {
-              navigate('/sign-in');
-              onClose();
-            }}
-            className="!bg-[#55C3C0] !text-white px-6 py-2 rounded-full font-bold hover:!bg-[#4ab0ad] transition-colors shadow-md"
-          >
-            Sign In
-          </button>
+        <div className="p-6 bg-[#FFF9F0] flex justify-end items-center">
 
-          <button className="!bg-[#55C3C0] !text-white px-6 py-2 rounded-full font-bold flex items-center gap-2 hover:!bg-[#4ab0ad] transition-colors shadow-md">
-            Donate
-            <Heart size={16} className="fill-red-400 text-red-400" />
-          </button>
+
+        <div className="w-auto">
+          <Button
+            variant={ButtonVariant.Small}
+            color={ButtonColor.Teal}
+            onClick={() =>
+              window.open(
+                'https://americanspcc.org/championforchildrenaward/?form=FUNHJFZUBKZ',
+                '_blank'
+              )
+            }
+          >
+            <span className="flex items-center gap-2">
+              Donate
+              <Heart size={16} className="fill-red-400 text-red-400" />
+            </span>
+          </Button>
+        </div>
+
         </div>
       </div>
     </>

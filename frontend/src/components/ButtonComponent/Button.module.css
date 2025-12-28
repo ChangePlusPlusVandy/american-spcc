@@ -37,3 +37,18 @@
 .darkBlue:hover:not(:disabled) {
   background-color: #4a5568;
 }
+
+.teal {
+  background-color: #6EC6BF;
+  color: white;
+}
+
+.teal:hover:not(:disabled) {
+  background-color: #5AB7AF;
+}
+
+.small {
+  padding: 0.4rem 1rem;
+  font-size: 0.9rem;
+  min-width: unset;
+}
