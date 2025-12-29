@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import homepageBackground from '../../assets/SPCC - Homepage.png';
 import searchIcon from '../../assets/search_icon.png';
-import NavBar from '../../components/NavBarComponent/NavBar.tsx';
 
 interface Resource {
   id: string;
@@ -67,7 +66,6 @@ function Landing() {
 
   return (
     <div className="min-w-screen relative min-h-screen bg-[#6EC6C5]">
-      <NavBar />
       {/* Image background */}
       <div
         className="relative h-[370px] bg-cover w-full [background-position:50%_20%]"

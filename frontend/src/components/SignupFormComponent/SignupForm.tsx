@@ -1,5 +1,4 @@
-import InputField from '@components/InputFieldComponent/InputField';
-import { InputType } from '@components/InputFieldComponent/InputFieldDefinitions';
+import InputField, { InputType } from '@components/InputFieldComponent/InputField';
 import Button from '@components/ButtonComponent/Button';
 import { ButtonColor, ButtonVariant } from '@components/ButtonComponent/ButtonDefinitions';
 

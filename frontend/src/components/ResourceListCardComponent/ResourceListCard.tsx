@@ -1,6 +1,4 @@
 import styles from './ResourceListCard.module.css';
-import { type ResourceListCardProps } from './ResourceListCardDefinitions';
-
 import parentingIcon from '@/assets/parenting_skills_relationships_icon.png';
 import childDevIcon from '@/assets/child_development_icon.png';
 import mentalHealthIcon from '@/assets/mental_emotional_health_icon.png';
@@ -13,6 +11,23 @@ import bookmarkIcon from '@/assets/bookmark.png';
 
 import { useState, useRef, useEffect } from 'react';
 import SaveResource from '@/components/SaveResourceComponent/SaveResource';
+interface ResourceListCardProps {
+  id: string;
+  title: string;
+  description: string;
+  tags: string[];
+  category: string;
+  imageUrl?: string;
+  onLearnMore?: () => void;
+  onSaved?: (payload: {
+    collectionName: string;
+    imageUrl?: string;
+    undo: () => void;
+  }) => void;
+
+  onCreateCollection?: (imageUrl?: string, resourceId?: string) => void;
+
+}
 
 const CATEGORY_ICON_MAP: Record<string, string> = {
   PARENTING_SKILLS_RELATIONSHIPS: parentingIcon,

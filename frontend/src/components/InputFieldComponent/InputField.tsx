@@ -1,8 +1,25 @@
 import { useState } from 'react';
 import styles from './InputField.module.css';
-import { type InputFieldProps, InputType } from './InputFieldDefinitions';
 import eyeIcon from '@assets/eye.png';
 import eyeOpenIcon from '@assets/eye-open.svg';
+
+export interface InputFieldProps {
+  label: string;
+  type: InputType;
+  placeholder: string;
+  value: string;
+  onChange: (value: string) => void;
+  name: string;
+  required?: boolean;
+  showPasswordToggle?: boolean;
+}
+
+export enum InputType {
+  Text = 'text',
+  Email = 'email',
+  Password = 'password',
+}
+
 
 function InputField({
   label,

@@ -1,13 +1,17 @@
 import { useState } from 'react';
 import styles from './LoginForm.module.css';
-import { type LoginFormProps } from './LoginFormDefinitions';
-import InputField from '@components/InputFieldComponent/InputField';
-import { InputType } from '@components/InputFieldComponent/InputFieldDefinitions';
+import InputField, { InputType } from '@components/InputFieldComponent/InputField';
 import Button from '@components/ButtonComponent/Button';
 import { ButtonColor, ButtonVariant } from '@components/ButtonComponent/ButtonDefinitions';
 import americanSPCCLogo from '@assets/AmericanSPCCLogo.png';
 import googleLogo from '@assets/GoogleLogo.png';
 import loginPageImage from '@assets/SPCC - Login Page.png';
+
+interface LoginFormProps {
+  onSubmit: (email: string, password: string) => void;
+  onGoogleLogin: () => void;
+  onSignUpClick: () => void;
+}
 
 function LoginForm({ onSubmit, onGoogleLogin, onSignUpClick }: LoginFormProps) {
   const [email, setEmail] = useState('');

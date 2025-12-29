@@ -1,5 +1,13 @@
 import styles from './SocialLoginButton.module.css';
-import { type SocialLoginButtonProps, SocialProvider } from './SocialLoginButtonDefinitions';
+interface SocialLoginButtonProps {
+  provider: SocialProvider;
+  onClick: () => void;
+}
+
+export enum SocialProvider {
+  Google = 'google',
+  Facebook = 'facebook',
+}
 
 function SocialLoginButton({ provider, onClick }: SocialLoginButtonProps) {
   const getProviderIcon = () => {

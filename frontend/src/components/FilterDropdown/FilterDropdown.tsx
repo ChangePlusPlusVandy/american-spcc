@@ -16,7 +16,6 @@ interface FilterDropdownProps {
   multiSelect?: boolean; // Enable multi-select mode
   style?: React.CSSProperties; // Optional custom styles
 }
-
 function FilterDropdown({
   label,
   icon,
