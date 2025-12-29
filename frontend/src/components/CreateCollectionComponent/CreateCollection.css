@@ -1,0 +1,93 @@
+.create-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(4px);
+  
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  
+    z-index: 9999;
+  }
+  
+  .create-modal {
+    width: 520px;
+    max-width: 90%;
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+  
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+  }
+  
+  .create-image {
+    width: 180px;
+    height: 120px;
+    overflow: hidden;
+    border-radius: 12px;
+    flex-shrink: 0;
+  }
+  
+  .create-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .create-content {
+    flex: 1;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .create-content h2 {
+    margin: 0;
+    font-size: 20px;
+  }
+  
+  .create-content label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 14px;
+  }
+  
+  .create-content input {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+  }
+  
+  .create-actions {
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .create-actions button {
+    padding: 8px 16px;
+    border-radius: 8px;
+  }
+  
+  .create-actions .cancel {
+    background: transparent;
+  }
+  
+  .create-actions .create {
+    background: #e60023;
+    color: white;
+  }
+  
+  .create-actions .create:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+  

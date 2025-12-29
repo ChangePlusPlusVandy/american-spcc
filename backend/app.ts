@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import 'dotenv/config';
 import { clerkMiddleware } from '@clerk/express';
+import collectionRoutes from './routes/collectionRoutes';
 
 import resourceRoutes from './routes/resourceRoutes';
 import categoryLabelRoutes from './routes/categoryLabelsRoutes';
@@ -40,6 +41,7 @@ app.use('/resourceViews', resourceViewRoutes);
 app.use('/api/internalHostedResources', internalHostedResourceRoutes);
 app.use('/api/admin-logs', adminLogsRoutes);
 app.use('/api/test', testS3Routes);
+app.use('/api/collections', collectionRoutes);
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok' });

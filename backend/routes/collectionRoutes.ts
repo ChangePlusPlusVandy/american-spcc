@@ -12,7 +12,7 @@ import {
 const router = Router();
 
 router.post('/', createCollection);
-router.get('/user/:userId', getCollectionsByUser);
+router.get('/', getCollectionsByUser);
 router.get('/:id', getCollectionById);
 router.patch('/:id', renameCollection);
 router.delete('/:id', deleteCollection);

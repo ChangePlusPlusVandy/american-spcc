@@ -1,16 +1,33 @@
 import { Request, Response } from 'express';
+import { getAuth } from '@clerk/express';
 import prisma from '../config/prisma';
 
 export const createCollection = async (req: Request, res: Response) => {
   try {
-    const { user_fk, name } = req.body;
+    const { userId: clerkId } = getAuth(req);
 
-    if (!user_fk || !name) {
-      return res.status(400).json({ error: 'user_fk and name are required.' });
+    if (!clerkId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const { name } = req.body;
+    if (!name) {
+      return res.status(400).json({ error: 'name is required.' });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { clerk_id: clerkId },
+    });
+
+    if (!user) {
+      return res.status(401).json({ error: 'Unauthorized' });
     }
 
     const collection = await prisma.collection.create({
-      data: { user_fk, name },
+      data: {
+        user_fk: user.id,
+        name,
+      },
     });
 
     res.status(201).json(collection);
@@ -26,16 +43,20 @@ export const createCollection = async (req: Request, res: Response) => {
 
 export const getCollectionsByUser = async (req: Request, res: Response) => {
   try {
-    const user_fk = req.params.userId;
+    const { userId: clerkId } = getAuth(req);
+    if (!clerkId) return res.status(401).json({ error: 'Unauthorized' });
+
+    const user = await prisma.user.findUnique({
+      where: { clerk_id: clerkId },
+    });
+    if (!user) return res.status(401).json({ error: 'Unauthorized' });
 
     const collections = await prisma.collection.findMany({
-      where: { user_fk },
+      where: { user_fk: user.id },
       orderBy: { created_at: 'desc' },
       include: {
         items: {
-          include: {
-            resource: true,
-          },
+          select: { resource_fk: true },
         },
       },
     });
@@ -49,7 +70,14 @@ export const getCollectionsByUser = async (req: Request, res: Response) => {
 
 export const getCollectionById = async (req: Request, res: Response) => {
   try {
-    const id = req.params.id;
+    const { userId: clerkId } = getAuth(req);
+    const { id } = req.params;
+
+    if (!clerkId) return res.status(401).json({ error: 'Unauthorized' });
+
+    const user = await prisma.user.findUnique({
+      where: { clerk_id: clerkId },
+    });
 
     const collection = await prisma.collection.findUnique({
       where: { id },
@@ -60,8 +88,8 @@ export const getCollectionById = async (req: Request, res: Response) => {
       },
     });
 
-    if (!collection) {
-      return res.status(404).json({ error: 'Collection not found' });
+    if (!user || !collection || collection.user_fk !== user.id) {
+      return res.status(403).json({ error: 'Forbidden' });
     }
 
     res.json(collection);
@@ -73,10 +101,24 @@ export const getCollectionById = async (req: Request, res: Response) => {
 
 export const renameCollection = async (req: Request, res: Response) => {
   try {
-    const id = req.params.id;
+    const { userId: clerkId } = getAuth(req);
+    const { id } = req.params;
     const { name } = req.body;
 
+    if (!clerkId) return res.status(401).json({ error: 'Unauthorized' });
     if (!name) return res.status(400).json({ error: 'New name is required.' });
+
+    const user = await prisma.user.findUnique({
+      where: { clerk_id: clerkId },
+    });
+
+    const collection = await prisma.collection.findUnique({
+      where: { id },
+    });
+
+    if (!user || !collection || collection.user_fk !== user.id) {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
 
     const updated = await prisma.collection.update({
       where: { id },
@@ -96,11 +138,24 @@ export const renameCollection = async (req: Request, res: Response) => {
 
 export const deleteCollection = async (req: Request, res: Response) => {
   try {
-    const id = req.params.id;
+    const { userId: clerkId } = getAuth(req);
+    const { id } = req.params;
 
-    await prisma.collection.delete({
+    if (!clerkId) return res.status(401).json({ error: 'Unauthorized' });
+
+    const user = await prisma.user.findUnique({
+      where: { clerk_id: clerkId },
+    });
+
+    const collection = await prisma.collection.findUnique({
       where: { id },
     });
+
+    if (!user || !collection || collection.user_fk !== user.id) {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
+
+    await prisma.collection.delete({ where: { id } });
 
     res.json({ message: 'Collection deleted successfully' });
   } catch (error) {
@@ -111,16 +166,28 @@ export const deleteCollection = async (req: Request, res: Response) => {
 
 export const addResourceToCollection = async (req: Request, res: Response) => {
   try {
-    const collection_fk = req.params.collectionId;
+    const { userId: clerkId } = getAuth(req);
+    const { collectionId } = req.params;
     const { resource_fk } = req.body;
 
-    if (!resource_fk) {
-      return res.status(400).json({ error: 'resource_fk is required' });
+    if (!clerkId) return res.status(401).json({ error: 'Unauthorized' });
+    if (!resource_fk) return res.status(400).json({ error: 'resource_fk is required' });
+
+    const user = await prisma.user.findUnique({
+      where: { clerk_id: clerkId },
+    });
+
+    const collection = await prisma.collection.findUnique({
+      where: { id: collectionId },
+    });
+
+    if (!user || !collection || collection.user_fk !== user.id) {
+      return res.status(403).json({ error: 'Forbidden' });
     }
 
     const item = await prisma.collectionItem.create({
       data: {
-        collection_fk,
+        collection_fk: collectionId,
         resource_fk,
       },
     });
@@ -138,7 +205,25 @@ export const addResourceToCollection = async (req: Request, res: Response) => {
 
 export const removeResourceFromCollection = async (req: Request, res: Response) => {
   try {
-    const itemId = req.params.itemId;
+    const { userId: clerkId } = getAuth(req);
+    const { itemId } = req.params;
+
+    if (!clerkId) return res.status(401).json({ error: 'Unauthorized' });
+
+    const user = await prisma.user.findUnique({
+      where: { clerk_id: clerkId },
+    });
+
+    const item = await prisma.collectionItem.findUnique({
+      where: { id: itemId },
+      include: {
+        collection: true,
+      },
+    });
+
+    if (!user || !item || item.collection.user_fk !== user.id) {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
 
     await prisma.collectionItem.delete({
       where: { id: itemId },

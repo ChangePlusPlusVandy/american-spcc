@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import './FilterComponent.css';
 
 const TOPICS = [
@@ -66,7 +66,6 @@ export default function FilterComponent({
     <div className="filter-box">
       <h3 className="filter-title">Filter</h3>
 
-      {/* TOPICS */}
       <p className="filter-section-title">What Topic?</p>
       <div className="chip-wrapper">
         {(showAllTopics ? topicFull : topicInitial).map(({ label, value }) => (
@@ -86,7 +85,6 @@ export default function FilterComponent({
         )}
       </div>
 
-      {/* AGE */}
       <p className="filter-section-title">Child's Age</p>
       <div className="chip-wrapper">
         {(showAllAges ? ageFull : ageInitial).map((a) => (

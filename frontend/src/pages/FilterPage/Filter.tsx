@@ -11,6 +11,8 @@ import viewIcon from '../../assets/view_dropdown.png';
 import formatIcon from '../../assets/format_dropdown.png';
 import languageIcon from '../../assets/language_dropdown.png';
 import timeIcon from '../../assets/time_dropdown.png';
+import CreateCollection from '@/components/CreateCollectionComponent/CreateCollection';
+
 
 interface Resource {
   id: string;
@@ -27,7 +29,6 @@ interface Resource {
   externalResources?: { external_url: string } | null;
 }
 
-// SVG Icons for View dropdown options
 const ListIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="#566273">
     <rect x="4" y="6" width="16" height="2" rx="1" />
@@ -48,8 +49,6 @@ const GridIcon = () => (
 function FilterPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-
-  // State for filters
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [labelSearchResults, setLabelSearchResults] = useState<
@@ -59,25 +58,29 @@ function FilterPage() {
   const [isTyping, setIsTyping] = useState(false);
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [selectedAges, setSelectedAges] = useState<string[]>([]);
-
-  // Single-select states (string | null)
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
   const [selectedLanguage, setSelectedLanguage] = useState<string | null>('ENGLISH');
-
-  // Multi-select states (string[])
   const [selectedFormats, setSelectedFormats] = useState<string[]>([]);
   const [selectedTimeRanges, setSelectedTimeRanges] = useState<string[]>([]);
-
-  // State for resources
   const [resources, setResources] = useState<Resource[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // Dropdown options
   const viewOptions = [
     { value: 'list', label: 'List', icon: <ListIcon /> },
     { value: 'grid', label: 'Grid', icon: <GridIcon /> },
   ];
+  const [saveToast, setSaveToast] = useState<{
+    collectionName: string;
+    imageUrl?: string;
+    undo: () => void;
+  } | null>(null);
+    const [showCreateCollection, setShowCreateCollection] = useState(false);
+    const [createCollectionImage, setCreateCollectionImage] = useState<string | undefined>();
+    const [createCollectionResourceId, setCreateCollectionResourceId] = useState<string | null>(null);
+    const [toastClosing, setToastClosing] = useState(false);
+  
+  
+
 
   const formatOptions = [
     { value: 'WEBPAGE', label: 'Webpage' },
@@ -98,7 +101,6 @@ function FilterPage() {
     { value: 'LONG', label: 'Long >15 min' },
   ];
 
-  // Read query parameter from URL on mount
   useEffect(() => {
     const queryParam = searchParams.get('q');
     if (queryParam) {
@@ -114,7 +116,6 @@ function FilterPage() {
     }
   }, [searchParams]);
 
-  // API call to search category labels
   const searchResources = async (query: string) => {
     if (!query.trim()) {
       setResourceSearchResults([]);
@@ -136,7 +137,6 @@ function FilterPage() {
     }
   };
 
-  // Debounced search effect
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       searchResources(searchQuery);
@@ -145,7 +145,6 @@ function FilterPage() {
     return () => clearTimeout(timeoutId);
   }, [searchQuery]);
 
-  // Handle clicking a label in the dropdown
   const handleLabelClick = async (labelId: string) => {
     setLoading(true);
     setError(null);
@@ -163,7 +162,6 @@ function FilterPage() {
     }
   };
 
-  // Fetch resources when topics change OR when label_id is in URL
   useEffect(() => {
     const labelIdParam = searchParams.get('label_id');
 
@@ -174,7 +172,6 @@ function FilterPage() {
       try {
         let allResources: Resource[] = [];
 
-        // Priority 1: Fetch by label_id if present (from landing page)
         if (labelIdParam) {
           const response = await fetch(
             `http://localhost:8000/api/resources?label_id=${labelIdParam}`
@@ -182,7 +179,6 @@ function FilterPage() {
           if (!response.ok) throw new Error('Failed to fetch resources');
           allResources = await response.json();
         }
-        // Priority 2: Fetch by selected topics (from sidebar)
         else if (selectedTopics.length > 0) {
           const promises = selectedTopics.map((category) =>
             fetch(`http://localhost:8000/api/resources?category=${category}`).then((res) => {
@@ -195,7 +191,6 @@ function FilterPage() {
           allResources = results.flat();
         }
 
-        // Priority 3: Fetch ALL resources if no topics selected
         else {
           const response = await fetch(`http://localhost:8000/api/resources`);
           if (!response.ok) throw new Error('Failed to fetch resources');
@@ -214,10 +209,8 @@ function FilterPage() {
     fetchResources();
   }, [selectedTopics, searchParams]);
 
-  // Client-side filtering
   const filteredResources = useMemo(() => {
     return resources.filter((resource) => {
-      // Search filter
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         const matchesTitle = resource.title.toLowerCase().includes(query);
@@ -225,17 +218,14 @@ function FilterPage() {
         if (!matchesTitle && !matchesDesc) return false;
       }
 
-      // Format filter (UPDATED: now array-based)
       if (selectedFormats.length > 0 && !selectedFormats.includes(resource.resource_type)) {
         return false;
       }
 
-      // Language filter (unchanged)
       if (selectedLanguage && resource.language !== selectedLanguage) {
         return false;
       }
 
-      // Time-to-Read filter (UPDATED: now array-based with new logic)
       if (selectedTimeRanges.length > 0) {
         const time = resource.time_to_read;
         const matchesAnyRange = selectedTimeRanges.some((range) => {
@@ -247,7 +237,6 @@ function FilterPage() {
         if (!matchesAnyRange) return false;
       }
 
-      // Age filter
       if (selectedAges.length > 0) {
         const ageEnums = selectedAges.map((age) => AGE_TO_ENUM[age]).filter(Boolean);
         const hasMatchingAge = ageEnums.some((ageEnum) => resource.age_groups.includes(ageEnum));
@@ -260,7 +249,7 @@ function FilterPage() {
 
   const handleLearnMore = (resource: Resource) => {
     if (resource.hosting_type !== 'EXTERNAL') {
-      return; // INTERNAL → no-op (for now)
+      return;
     }
 
     const url = resource.externalResources?.external_url;
@@ -269,18 +258,40 @@ function FilterPage() {
     window.open(url, '_blank', 'noopener,noreferrer');
   };
 
+  const handleResourceSaved = ({
+    collectionName,
+    imageUrl,
+    undo,
+  }: {
+    collectionName: string;
+    imageUrl?: string;
+    undo: () => void;
+  }) => {
+    setSaveToast({ collectionName, imageUrl, undo });
+  
+    setTimeout(() => {
+      setToastClosing(true);
+    
+      setTimeout(() => {
+        setSaveToast(null);
+        setToastClosing(false);
+      }, 200);
+    }, 3000);
+    
+  };
+  
+  
+
   return (
     <div className="min-h-screen bg-[#FFF9F0]">
       <NavBar />
 
       <div className="container mx-auto px-4 py-6 max-w-7xl">
-        {/* Search Bar */}
         <div className="mb-6 w-4/5 mx-auto">
           <form
             onSubmit={(e) => {
               e.preventDefault();
               if (searchQuery.trim()) {
-                // Navigate with search query (same as landing page)
                 navigate(`/filter?q=${encodeURIComponent(searchQuery)}`);
                 setResourceSearchResults([]);
                 setIsTyping(false);
@@ -302,8 +313,6 @@ function FilterPage() {
               fontSize="14px"
               textColor="#000000"
             />
-
-            {/* Search Results Dropdown */}
             {searchQuery && resourceSearchResults.length > 0 && isTyping && (
               <div className="absolute left-0 right-0 mt-2 z-50">
                 <div className="rounded-lg shadow-lg border-2 border-[#C8DC59] overflow-hidden bg-white">
@@ -341,8 +350,6 @@ function FilterPage() {
             )}
           </form>
         </div>
-
-        {/* Filter Action Bar */}
         <div className="flex gap-6 mb-6">
           <div className="flex-shrink-0 mr-4" style={{ width: '300px' }}></div>
           <div className="flex-1">
@@ -384,10 +391,7 @@ function FilterPage() {
             </div>
           </div>
         </div>
-
-        {/* Two-Column Layout */}
         <div className="flex gap-6">
-          {/* Left Sidebar - Filters */}
           <div className="flex-shrink-0 mr-4">
             <FilterComponent
               selectedTopics={selectedTopics}
@@ -397,7 +401,6 @@ function FilterPage() {
             />
           </div>
 
-          {/* Right Content - Resources */}
           <div className="flex-1">
             {loading && (
               <div className="text-center py-12">
@@ -426,13 +429,25 @@ function FilterPage() {
                     {filteredResources.map((resource) => (
                       <ResourceListCard
                         key={resource.id}
+                        id={resource.id}
                         title={resource.title}
                         description={resource.description || 'No description available'}
                         tags={resource.labels?.map((l) => l.label.label_name) || []}
-                        category={resource.category} // 👈 ADD THIS
+                        category={resource.category}
                         imageUrl={resource.imageUrl ?? undefined}
                         onLearnMore={() => handleLearnMore(resource)}
+                        onSaved={handleResourceSaved}
+                        onCreateCollection={(imageUrl, resourceId) => {
+                          setCreateCollectionImage(imageUrl);
+                          setCreateCollectionResourceId(resourceId ?? null);
+                          setShowCreateCollection(true);
+                        }}
+                        
+                        
                       />
+
+
+
                     ))}
                   </div>
                 ) : (
@@ -443,13 +458,22 @@ function FilterPage() {
                       return (
                         <ResourceGridCard
                           key={resource.id}
+                          id={resource.id}
                           title={resource.title}
                           description={resource.description || ''}
                           tags={resource.labels?.map((l) => l.label.label_name) || []}
                           category={resource.category}
                           imageUrl={resource.imageUrl ?? undefined}
                           onLearnMore={() => handleLearnMore(resource)}
+                          onSaved={handleResourceSaved}
+                          onCreateCollection={(imageUrl) => {
+                            setCreateCollectionImage(imageUrl);
+                            setShowCreateCollection(true);
+                          }}
                         />
+
+
+
                       );
                     })}
                   </div>
@@ -459,6 +483,105 @@ function FilterPage() {
           </div>
         </div>
       </div>
+      {saveToast && (
+        <div className="fixed bottom-6 left-1/2 z-50">
+          <div
+            className={`flex items-center gap-4 bg-[#4b4b47] text-white px-4 py-3 rounded-xl shadow-lg
+              ${toastClosing ? 'toast-exit' : 'toast-enter'}`}
+          >
+            {saveToast.imageUrl && (
+              <img
+                src={saveToast.imageUrl}
+                alt=""
+                className="w-10 h-10 rounded-md object-cover"
+              />
+            )}
+
+            <span className="text-sm font-normal">
+              Saved to{' '}
+              <span className="font-semibold">
+                {saveToast.collectionName}
+              </span>
+            </span>
+
+            <button
+              className="ml-2 text-sm font-semibold text-black bg-white px-2 py-1 rounded hover:bg-gray-200"
+              onClick={() => {
+                saveToast.undo();
+                setToastClosing(true);
+                setTimeout(() => setSaveToast(null), 200);
+              }}
+            >
+              Undo
+            </button>
+          </div>
+        </div>
+      )}
+
+      <CreateCollection
+        isOpen={showCreateCollection}
+        imageUrl={createCollectionImage}
+        onCancel={() => setShowCreateCollection(false)}
+        onCreate={async (name) => {
+          try {
+            const res = await fetch('http://localhost:8000/api/collections', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              credentials: 'include',
+              body: JSON.stringify({ name }),
+            });
+
+            const newCollection = await res.json();
+            let createdItemId: string | null = null;
+
+            if (createCollectionResourceId) {
+              const itemRes = await fetch(
+                `http://localhost:8000/api/collections/${newCollection.id}/items`,
+                {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  credentials: 'include',
+                  body: JSON.stringify({
+                    resource_fk: createCollectionResourceId,
+                  }),
+                }
+              );
+
+              const createdItem = await itemRes.json();
+              createdItemId = createdItem.id;
+            }
+
+            setSaveToast({
+              collectionName: newCollection.name,
+              imageUrl: createCollectionImage,
+              undo: async () => {
+                if (createdItemId) {
+                  await fetch(
+                    `http://localhost:8000/api/collections/items/${createdItemId}`,
+                    {
+                      method: 'DELETE',
+                      credentials: 'include',
+                    }
+                  );
+                }
+              },
+            });
+
+            setTimeout(() => {
+              setToastClosing(true);
+              setTimeout(() => {
+                setSaveToast(null);
+                setToastClosing(false);
+              }, 200);
+            }, 3000);
+
+            setShowCreateCollection(false);
+            setCreateCollectionResourceId(null);
+          } catch (err) {
+            console.error('Failed to create collection + save resource', err);
+          }
+        }}
+      />
     </div>
   );
 }

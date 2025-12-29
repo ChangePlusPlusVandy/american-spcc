@@ -1,5 +1,6 @@
 import styles from './ResourceListCard.module.css';
 import { type ResourceListCardProps } from './ResourceListCardDefinitions';
+
 import parentingIcon from '@/assets/parenting_skills_relationships_icon.png';
 import childDevIcon from '@/assets/child_development_icon.png';
 import mentalHealthIcon from '@/assets/mental_emotional_health_icon.png';
@@ -8,7 +9,10 @@ import educationIcon from '@/assets/education_learning.png';
 import wellbeingIcon from '@/assets/health_wellbeing_icon.png';
 import lifeSkillsIcon from '@/assets/life_skills_independence_icon.png';
 import familySupportIcon from '@/assets/family_support_community_icon.png';
-import bookmarkIcon from '@/assets/bookmark.png'
+import bookmarkIcon from '@/assets/bookmark.png';
+
+import { useState, useRef, useEffect } from 'react';
+import SaveResource from '@/components/SaveResourceComponent/SaveResource';
 
 const CATEGORY_ICON_MAP: Record<string, string> = {
   PARENTING_SKILLS_RELATIONSHIPS: parentingIcon,
@@ -22,25 +26,60 @@ const CATEGORY_ICON_MAP: Record<string, string> = {
 };
 
 function ResourceListCard({
+  id,
   title,
   description,
   tags,
   category,
   imageUrl,
   onLearnMore,
+  onSaved,
+  onCreateCollection,
 }: ResourceListCardProps) {
+
+
   const categoryIcon = CATEGORY_ICON_MAP[category];
+
+  const [showSavePopup, setShowSavePopup] = useState(false);
+  const popupRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (
+        showSavePopup &&
+        popupRef.current &&
+        !popupRef.current.contains(e.target as Node)
+      ) {
+        setShowSavePopup(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showSavePopup]);
 
   return (
     <div className={styles.card}>
-      {/* BOOKMARK — here */}
-      <button className={styles.bookmark}>
-        <img
-          src={bookmarkIcon}
-          alt="Save"
-          className={styles.bookmarkIcon}
+      <div className={styles.bookmarkWrapper} ref={popupRef}>
+        <button
+          className={styles.bookmark}
+          aria-label="Save to collection"
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowSavePopup((prev) => !prev);
+          }}
+        >
+          <img src={bookmarkIcon} alt="" className={styles.bookmarkIcon} />
+        </button>
+        <SaveResource
+          isOpen={showSavePopup}
+          onClose={() => setShowSavePopup(false)}
+          resourceId={id}
+          resourceImage={imageUrl}
+          onSaved={onSaved}
+          onCreateCollection={onCreateCollection}
         />
-      </button>
+      </div>
 
       <div className={styles.content}>
         <div className={styles.titleRow}>
@@ -60,17 +99,19 @@ function ResourceListCard({
 
         <p className={styles.description}>{description}</p>
 
-        <button className={styles.learnMoreButton} onClick={onLearnMore}>
-          Learn More
-        </button>
-        </div>
-
-        {imageUrl && (
-          <div className={styles.imageContainer}>
-            <img src={imageUrl} alt={title} className={styles.image} />
-          </div>
+        {onLearnMore && (
+          <button className={styles.learnMoreButton} onClick={onLearnMore}>
+            Learn More
+          </button>
         )}
+      </div>
+
+      {imageUrl && (
+        <div className={styles.imageContainer}>
+          <img src={imageUrl} alt={title} className={styles.image} />
         </div>
+      )}
+    </div>
   );
 }
 

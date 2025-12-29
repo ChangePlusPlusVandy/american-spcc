@@ -1,5 +1,5 @@
 .card {
-  perspective: 1200px; /* slightly higher = smoother */
+  perspective: 1200px;
   width: 100%;
   height: 460px;
   position: relative;
@@ -12,19 +12,12 @@
 
   transform-style: preserve-3d;
   transition: transform 0.6s ease;
-  transform-origin: center center; /* 🔑 THIS FIXES THE WEIRDNESS */
-}
-
-
-.flipZone {
-  display: flex;
-  justify-content: center;
+  transform-origin: center center;
 }
 
 .flipped {
   transform: rotateY(180deg);
 }
-
 
 .front,
 .back {
@@ -32,7 +25,7 @@
   inset: 0;
 
   backface-visibility: hidden;
-  -webkit-backface-visibility: hidden; /* Safari fix */
+  -webkit-backface-visibility: hidden;
 
   display: flex;
   flex-direction: column;
@@ -42,9 +35,9 @@
   background-color: #00a0a0;
   border-radius: 16px;
   padding: 24px;
+
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
-
 
 .back {
   transform: rotateY(180deg);
@@ -52,7 +45,6 @@
   align-items: center;
   text-align: center;
 }
-
 
 .title {
   font-size: 1.5rem;
@@ -72,11 +64,10 @@
 }
 
 .imageContainer {
-  width: 400px;
-  height: 300px;
+  width: 100%;
+  height: 220px;
   overflow: hidden;
   border-radius: 8px;
-  margin: 0 auto;
 }
 
 .image {
@@ -115,9 +106,6 @@
   cursor: pointer;
   transition: all 0.3s ease;
   font-family: 'Lato', sans-serif;
-
-  align-self: center;
-  margin-top: 12px;
 }
 
 .learnMoreButton:hover {
@@ -147,38 +135,22 @@
   object-fit: contain;
 }
 
-.bookmark {
+.bookmarkWrapper {
   position: absolute;
   top: 16px;
   right: 16px;
+  z-index: 20;
+}
 
+.bookmark {
   background: transparent;
   border: none;
   padding: 0;
   cursor: pointer;
-
-  z-index: 20; /* higher than front/back */
 }
 
 .bookmarkIcon {
   width: 28px;
   height: 36px;
   display: block;
-}
-
-.front {
-  pointer-events: auto;
-}
-
-.back {
-  pointer-events: none;
-}
-
-/* when flipped, swap interactivity */
-.flipped .front {
-  pointer-events: none;
-}
-
-.flipped .back {
-  pointer-events: auto;
 }

@@ -1,7 +1,6 @@
 import { useState } from 'react';
 
 import navSidebar from '../../assets/nav_sidebar_button.png';
-import donateButton from '../../assets/heart.png';
 import aspccLogoTurqoise from '../../assets/aspcc_logo_turqois.png';
 import chevron from '../../assets/chevron.png';
 import { useNavigate } from 'react-router-dom';

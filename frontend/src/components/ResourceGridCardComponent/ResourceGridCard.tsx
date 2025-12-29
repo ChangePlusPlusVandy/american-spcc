@@ -8,8 +8,10 @@ import educationIcon from '@/assets/education_learning.png';
 import wellbeingIcon from '@/assets/health_wellbeing_icon.png';
 import lifeSkillsIcon from '@/assets/life_skills_independence_icon.png';
 import familySupportIcon from '@/assets/family_support_community_icon.png';
-import bookmarkIcon from '@/assets/bookmark.png'; // 👈 ADD THIS
-import { useState } from 'react';
+import bookmarkIcon from '@/assets/bookmark.png';
+import { useState, useRef, useEffect } from 'react';
+
+import SaveResource from '@/components/SaveResourceComponent/SaveResource';
 
 const CATEGORY_ICON_MAP: Record<string, string> = {
   PARENTING_SKILLS_RELATIONSHIPS: parentingIcon,
@@ -23,80 +25,113 @@ const CATEGORY_ICON_MAP: Record<string, string> = {
 };
 
 function ResourceGridCard({
+  id,
   title,
   tags,
   description,
   category,
-  imageUrl = 'https://placehold.co/600x400',
+  imageUrl,
   onLearnMore,
+  onSaved,
+  onCreateCollection,
 }: ResourceGridCardProps) {
+
+
   const categoryIcon = CATEGORY_ICON_MAP[category];
+
   const [flipped, setFlipped] = useState(false);
+  const [showSavePopup, setShowSavePopup] = useState(false);
+  const popupRef = useRef<HTMLDivElement | null>(null);
 
-
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (
+        showSavePopup &&
+        popupRef.current &&
+        !popupRef.current.contains(e.target as Node)
+      ) {
+        setShowSavePopup(false);
+      }
+    }
+  
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showSavePopup]);
+  
   return (
-<div
-  className={styles.card}
-  onMouseLeave={() => setFlipped(false)} // 👈 unflip ONLY here
->
-  <div className={`${styles.inner} ${flipped ? styles.flipped : ''}`}>
-    {/* FRONT */}
-    <div className={styles.front}>
-      {/* 🔖 BOOKMARK */}
-      <button
-        className={styles.bookmark}
-        aria-label="Save to collection"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <img src={bookmarkIcon} alt="" className={styles.bookmarkIcon} />
-      </button>
+    <div
+      className={styles.card}
+      onMouseLeave={() => {
+        setFlipped(false);
+      }}
+    >
 
-      <div className={styles.titleRow}>
-        {categoryIcon && (
-          <div className={styles.categoryIcon}>
-            <img src={categoryIcon} alt={category} />
+      <div className={`${styles.inner} ${flipped ? styles.flipped : ''}`}>
+        <div className={styles.front}>
+          <div className={styles.bookmarkWrapper} ref={popupRef}>
+            <button
+              className={styles.bookmark}
+              aria-label="Save to collection"
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowSavePopup((prev) => !prev);
+              }}
+            >
+              <img src={bookmarkIcon} alt="" className={styles.bookmarkIcon} />
+            </button>
+
+            <SaveResource
+              isOpen={showSavePopup}
+              onClose={() => setShowSavePopup(false)}
+              resourceId={id}
+              resourceImage={imageUrl}
+              onSaved={onSaved}
+              onCreateCollection={onCreateCollection}
+            />
           </div>
-        )}
-        <h3 className={styles.title}>{title}</h3>
-      </div>
-
-      {/* 👇 FLIP TRIGGER */}
-      <div
-        className={styles.imageContainer}
-        onMouseEnter={() => setFlipped(true)} // 👈 flip ON
-      >
-        <img src={imageUrl} alt={title} className={styles.image} />
-      </div>
-
-      <div className={styles.tagsContainer}>
-        {tags.map((tag, index) => (
-          <span key={index} className={styles.tag}>
-            {tag}
-          </span>
-        ))}
+          <div className={styles.titleRow}>
+            {categoryIcon && (
+              <div className={styles.categoryIcon}>
+                <img src={categoryIcon} alt={category} />
+              </div>
+            )}
+            <h3 className={styles.title}>{title}</h3>
+          </div>
+          <div
+            className={styles.imageContainer}
+            onMouseEnter={() => setFlipped(true)}
+          >
+            <img src={imageUrl} alt={title} className={styles.image} />
+          </div>
+          <div className={styles.tagsContainer}>
+            {tags.map((tag, index) => (
+              <span key={index} className={styles.tag}>
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+        <div className={styles.back}>
+          <p className={styles.description}>
+            {description || 'No description available.'}
+          </p>
+          {onLearnMore && (
+            <button
+              className={styles.learnMoreButton}
+              onClick={(e) => {
+                e.stopPropagation();
+                onLearnMore();
+              }}
+            >
+              Learn More
+            </button>
+          )}
+        </div>
       </div>
     </div>
-
-    {/* BACK */}
-    <div className={styles.back}>
-      <p className={styles.description}>
-        {description || 'No description available.'}
-      </p>
-
-      {onLearnMore && (
-        <button
-          className={styles.learnMoreButton}
-          onClick={(e) => {
-            e.stopPropagation();
-            onLearnMore();
-          }}
-        >
-          Learn More
-        </button>
-      )}
-    </div>
-  </div>
-</div>
-  )}
+  );
+}
 
 export default ResourceGridCard;
