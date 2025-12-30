@@ -56,10 +56,23 @@ export const getCollectionsByUser = async (req: Request, res: Response) => {
       orderBy: { created_at: 'desc' },
       include: {
         items: {
-          select: { resource_fk: true },
+          include: {
+            resource: {
+              select: {
+                id: true,
+                title: true,
+                externalResources: {
+                  select: {
+                    external_url: true,
+                  },
+                },
+              },
+            },
+          },
         },
       },
     });
+    
 
     res.json(collections);
   } catch (error) {

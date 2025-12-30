@@ -1,18 +1,40 @@
 import { useEffect, useState } from 'react';
 import { useUser, useAuth } from '@clerk/clerk-react';
 import './Account.css';
+import CreateCollection from '@components/CreateCollectionComponent/CreateCollection';
+
+interface CollectionResource {
+  id: string;
+  title: string;
+  externalResources?: {
+    external_url: string;
+  };
+}
+
+interface CollectionItem {
+  id: string;
+  resource: CollectionResource;
+}
 
 interface Collection {
   id: string;
-  title: string;
+  name: string;
+  items: CollectionItem[];
 }
 
 export default function AccountPage() {
   const { user, isLoaded } = useUser();
   const { getToken } = useAuth();
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+
 
   const [collections, setCollections] = useState<Collection[]>([]);
   const [loadingCollections, setLoadingCollections] = useState(true);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Collection | null>(null);
+
+
 
   useEffect(() => {
     const fetchCollections = async () => {
@@ -30,7 +52,14 @@ export default function AccountPage() {
         }
 
         const data = await res.json();
-        setCollections(data);
+
+        const normalized = data.map((c: Collection) => ({
+          ...c,
+          items: c.items ?? [],
+        }));
+
+        setCollections(normalized);
+
       } catch (err) {
         console.error(err);
       } finally {
@@ -49,16 +78,10 @@ export default function AccountPage() {
     <div className="min-h-screen px-8 py-10 account-page">
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-        {/* ================= LEFT: PROFILE ================= */}
         <div className="account-card p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="account-card-title">Your Profile</h2>
-            <button
-              className="text-sm text-gray-500 hover:underline"
-              onClick={() => {
-                // later: navigate('/account/edit') or open modal
-              }}
-            >
+            <button className="text-sm text-gray-500 hover:underline">
               Edit
             </button>
           </div>
@@ -79,7 +102,6 @@ export default function AccountPage() {
             </p>
           </div>
 
-          {/* App-specific fields (DB-driven later) */}
           <div className="mt-6 space-y-2 text-sm text-gray-700">
             <p>
               <span className="font-medium">Household Type:</span> Other
@@ -99,49 +121,202 @@ export default function AccountPage() {
           </div>
         </div>
 
-        {/* ================= RIGHT: COLLECTIONS ================= */}
         <div className="lg:col-span-2 account-card p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="account-card-title">Your Collections</h2>
             <button
-              className="px-3 py-1 text-sm bg-[#4AA6A6] text-white rounded-md hover:opacity-90"
+              className="new-collection-btn"
+              onClick={() => setIsCreateOpen(true)}
             >
               + New Collection
             </button>
+
+
           </div>
 
-          {/* Loading */}
           {loadingCollections && (
             <p className="text-sm text-gray-500">Loading collections…</p>
           )}
 
-          {/* Empty state */}
           {!loadingCollections && collections.length === 0 && (
             <p className="text-sm text-gray-500 text-center mt-6">
               You haven’t created any collections yet.
             </p>
           )}
 
-          {/* Collections list */}
           {!loadingCollections && collections.length > 0 && (
             <div className="space-y-3 max-h-[420px] overflow-y-auto pr-2 collections-scroll">
-              {collections.map(collection => (
-                <div
-                  key={collection.id}
-                  className="collection-item px-4 py-3"
-                >
-                  <div>
-                    <p className="font-semibold text-black">
-                      {collection.title}
-                    </p>
+            {collections.map(collection => {
+              const isOpen = expandedId === collection.id;
+
+              return (
+                <div key={collection.id} className="collection-wrapper">
+                  <div className={`collection-shell ${isOpen ? 'open' : ''}`}>
+                  <button
+                    className={`collection-header ${isOpen ? 'expanded' : ''}`}
+                    onClick={() => setExpandedId(isOpen ? null : collection.id)}
+                  >
+                    <span>{collection.name}</span>
+
+                    <div className="collection-actions">
+                      <span className="chevron">{isOpen ? '▲' : '▼'}</span>
+
+                      <button
+                        className="collection-menu-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setOpenMenuId(openMenuId === collection.id ? null : collection.id);
+                        }}
+                      >
+                        ⋮
+                      </button>
+                    </div>
+                  </button>
+                  {openMenuId === collection.id && (
+                    <div
+                      className="collection-menu"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <button
+                        className="collection-menu-item delete"
+                        onClick={() => {
+                          setOpenMenuId(null);
+                          setDeleteTarget(collection);
+                        }}
+                      >
+                        Delete collection
+                      </button>
+
+                    </div>
+                  )}
+
+
+
+                    <div className="collection-body">
+                      <div className="collection-inner">
+                        {collection.items.length === 0 ? (
+                          <p className="empty-text">No resources yet</p>
+                        ) : (
+                          <ul className="resource-list">
+                            {collection.items.map(item => (
+                              <li key={item.resource.id}>
+                                <a
+                                  href={item.resource.externalResources?.external_url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="resource-link-plain"
+                                >
+                                  {item.resource.title}
+                                </a>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
-              ))}
+              );
+            })}
+
             </div>
           )}
         </div>
-
       </div>
+      <CreateCollection
+        isOpen={isCreateOpen}
+        onCancel={() => setIsCreateOpen(false)}
+        onCreate={async (name) => {
+          try {
+            const token = await getToken();
+
+            const res = await fetch('http://localhost:8000/api/collections', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({ name }),
+            });
+
+            if (!res.ok) throw new Error('Failed to create collection');
+
+            const newCollection: Collection = await res.json();
+
+            setCollections(prev => [
+              {
+                ...newCollection,
+                items: [],
+              },
+              ...prev,
+            ]);
+            
+            setExpandedId(newCollection.id);
+
+            setIsCreateOpen(false);
+          } catch (err) {
+            console.error('Create collection failed', err);
+          }
+        }}
+      />
+        {deleteTarget && (
+          <div className="create-overlay" onClick={() => setDeleteTarget(null)}>
+            <div
+              className="create-modal"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="create-content">
+                <h2>Delete collection</h2>
+
+                <p className="text-sm text-gray-600 mt-2">
+                  Are you sure you want to delete{' '}
+                  <strong>{deleteTarget.name}</strong>? This cannot be undone.
+                </p>
+
+                <div className="create-actions">
+                  <button
+                    className="cancel"
+                    onClick={() => setDeleteTarget(null)}
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    className="create"
+                    style={{ backgroundColor: '#d14343' }}
+                    onClick={async () => {
+                      try {
+                        const token = await getToken();
+
+                        await fetch(
+                          `http://localhost:8000/api/collections/${deleteTarget.id}`,
+                          {
+                            method: 'DELETE',
+                            headers: {
+                              Authorization: `Bearer ${token}`,
+                            },
+                          }
+                        );
+
+                        setCollections(prev =>
+                          prev.filter(c => c.id !== deleteTarget.id)
+                        );
+
+                        setExpandedId(null);
+                        setDeleteTarget(null);
+                      } catch (err) {
+                        console.error('Delete failed', err);
+                      }
+                    }}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
     </div>
   );
 }

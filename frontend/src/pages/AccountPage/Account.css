@@ -1,9 +1,7 @@
-/* Page background */
 .account-page {
     background-color: #fff9f0;
   }
   
-  /* Shared card styling */
   .account-card {
     border: 1px solid #d9d9d9;
     border-radius: 14px;
@@ -11,39 +9,141 @@
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
   }
   
-  /* Section headers */
   .account-card-title {
     color: #4aa6a6;
     font-weight: 600;
     font-size: 1.1rem;
   }
   
-  /* Profile tags */
   .profile-tag {
-    background-color: #4b5563; /* slate */
+    background-color: #4b5563;
     color: white;
     padding: 4px 10px;
     border-radius: 9999px;
     font-size: 0.75rem;
-    white-space: nowrap;
   }
   
-  /* Collections list */
-  .collection-item {
-    background-color: #7fc6c6;
-    border-radius: 12px;
+  .collection-wrapper {
+    margin-bottom: 16px;
+    background: white;
+  }
+
+  .collection-shell {
+    border: 2px solid #c7dd5a;
+    border-radius: 16px;
     overflow: hidden;
+    background: white;
+  }
+
+  .collection-header {
+    width: 100%;
+    background-color: #79c6c3;
+    color: white;
+  
+    padding: 8px 20px;
+  
+    font-size: 22px;
+    font-weight: 600;
+  
     display: flex;
-    gap: 16px;
+    justify-content: space-between;
+    align-items: center;
+  
+    cursor: pointer;
+    text-align: left;
+    border: none;
+  
+    transition:
+      background-color 0.25s ease,
+      color 0.25s ease;
   }
   
-  .collection-item img {
-    width: 130px;
-    height: 90px;
-    object-fit: cover;
+  .collection-header.expanded {
+    background-color: white;
+    color: #79c6c3;
   }
   
-  /* Scrollbar polish (optional but nice) */
+  .collection-header .chevron {
+    font-size: 18px;
+    transition: transform 0.25s ease;
+  }
+  
+  .collection-header.expanded .chevron {
+    transform: rotate(180deg);
+  }
+  
+  .collection-shell {
+    border: 2px solid #c7dd5a;
+    border-radius: 16px;
+    overflow: hidden;
+    background: white;
+  
+    max-height: 52px;
+    transition: max-height 0.55s cubic-bezier(0.4, 0, 0.6, 1);
+
+  }
+  
+  .collection-shell.open {
+    max-height: 520px;
+    transition: max-height 0.9s cubic-bezier(0.4, 0, 0.6, 1);
+  }
+  
+
+  .collection-shell.open .collection-body {
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+      opacity 0.45s ease-in-out,
+      transform 0.65s cubic-bezier(0.4, 0, 0.6, 1);
+  }
+  
+  .collection-body {
+    opacity: 0;
+    transform: translateY(-6px);
+    transition:
+      opacity 0.25s ease-out,
+      transform 0.35s ease-out;
+  }
+  
+  .collection-body > .collection-inner {
+    overflow: hidden;
+  }
+  
+  .collection-inner {
+    padding: 6px 26px 14px;
+  }
+  
+  .resource-list {
+    list-style: disc;
+    padding-left: 26px;
+    margin: 0;
+  }
+  
+  .resource-list li {
+    font-size: 18px;
+    color: #5b6472;
+    margin-bottom: 8px;
+  }
+  
+  .empty-text {
+    font-size: 16px;
+    color: #888;
+  }
+  
+  .resource-link-plain {
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  
+  .resource-link-plain:hover,
+  .resource-link-plain:focus,
+  .resource-link-plain:active,
+  .resource-link-plain:visited {
+    color: inherit;
+    text-decoration: none;
+  }
+  
   .collections-scroll::-webkit-scrollbar {
     width: 6px;
   }
@@ -53,7 +153,80 @@
     border-radius: 8px;
   }
   
-  .collections-scroll::-webkit-scrollbar-track {
-    background: transparent;
+  button,
+  button:focus,
+  button:focus-visible,
+  button:active {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  
+  button {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+.new-collection-btn {
+    background-color: #79c6c3; 
+    color: white;
+  
+    border: none;
+    border-radius: 10px;
+  
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 600;
+  
+    cursor: pointer;
+  
+    transition: opacity 0.2s ease;
+  }
+  
+  .new-collection-btn:hover {
+    opacity: 0.9;
+  }
+  
+.collection-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .collection-menu-btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: inherit;
+    cursor: pointer;
+    padding: 2px 6px;
+    line-height: 1;
+  }
+
+  .collection-menu {
+    position: absolute;
+    right: 16px;
+    margin-top: 4px;
+    background: white;
+    border: 1px solid #d9d9d9;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    z-index: 50;
+  }
+  
+  .collection-menu-item {
+    width: 100%;
+    padding: 10px 14px;
+    text-align: left;
+    background: none;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  
+  .collection-menu-item.delete {
+    color: #b91c1c;
+  }
+  
+  .collection-menu-item:hover {
+    background-color: #f5f5f5;
   }
   
