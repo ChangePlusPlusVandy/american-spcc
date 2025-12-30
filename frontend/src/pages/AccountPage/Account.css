@@ -1,0 +1,59 @@
+/* Page background */
+.account-page {
+    background-color: #fff9f0;
+  }
+  
+  /* Shared card styling */
+  .account-card {
+    border: 1px solid #d9d9d9;
+    border-radius: 14px;
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  }
+  
+  /* Section headers */
+  .account-card-title {
+    color: #4aa6a6;
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+  
+  /* Profile tags */
+  .profile-tag {
+    background-color: #4b5563; /* slate */
+    color: white;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+  }
+  
+  /* Collections list */
+  .collection-item {
+    background-color: #7fc6c6;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    gap: 16px;
+  }
+  
+  .collection-item img {
+    width: 130px;
+    height: 90px;
+    object-fit: cover;
+  }
+  
+  /* Scrollbar polish (optional but nice) */
+  .collections-scroll::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .collections-scroll::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.25);
+    border-radius: 8px;
+  }
+  
+  .collections-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  

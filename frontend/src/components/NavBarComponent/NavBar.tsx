@@ -294,7 +294,17 @@ export default function DefaultNav() {
             </button>
           </SignedOut>
           <SignedIn>
-            <UserButton userProfileUrl="/account"></UserButton>
+          <UserButton
+            userProfileUrl="/account"
+            appearance={{
+              elements: {
+                userButtonPopoverFooter: {
+                  display: 'none',
+                },
+              },
+            }}
+          />
+
           </SignedIn>
         </div>
       </nav>

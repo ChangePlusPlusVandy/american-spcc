@@ -29,6 +29,17 @@ interface ResourceListCardProps {
 
 }
 
+const CATEGORY_DISPLAY_MAP: Record<string, string> = {
+  PARENTING_SKILLS_RELATIONSHIPS: 'Parenting & Relationships',
+  CHILD_DEVELOPMENT: 'Child Development',
+  MENTAL_EMOTIONAL_HEALTH: 'Mental & Emotional Health',
+  SAFETY_PROTECTION: 'Safety & Protection',
+  EDUCATION_LEARNING: 'Education & Learning',
+  HEALTH_WELLBEING: 'Health & Wellbeing',
+  LIFE_SKILLS_INDEPENDENCE: 'Life Skills & Independence',
+  FAMILY_SUPPORT_COMMUNITY: 'Family Support & Community',
+};
+
 const CATEGORY_ICON_MAP: Record<string, string> = {
   PARENTING_SKILLS_RELATIONSHIPS: parentingIcon,
   CHILD_DEVELOPMENT: childDevIcon,
@@ -105,12 +116,24 @@ function ResourceListCard({
         </div>
 
         <div className={styles.tagsContainer}>
-          {tags.map((tag, index) => (
-            <span key={index} className={styles.tag}>
-              {tag}
-            </span>
-          ))}
+          <span className={styles.tagPrefix}>Topic:</span>
+          <span className={styles.tag}>
+            {CATEGORY_DISPLAY_MAP[category]}
+          </span>
+
+          {tags.length > 0 && (
+            <>
+              <span className={styles.tagPrefix}>Descriptors:</span>
+              {tags.map((tag, index) => (
+                <span key={index} className={styles.tag}>
+                  {tag}
+                </span>
+              ))}
+            </>
+          )}
         </div>
+
+
 
         <p className={styles.description}>{description}</p>
 
