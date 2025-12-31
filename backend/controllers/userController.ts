@@ -5,6 +5,8 @@ import { getAuth } from '@clerk/express';
 
 // Create a new user
 export const createUser = async (req: Request, res: Response) => {
+  console.log('🔥 createUser CALLED');
+
   const { userId } = getAuth(req);
   if (!userId) {
     return res.status(401).json({ error: 'Unauthorized' });
@@ -139,6 +141,7 @@ export const updateCurrentUser = async (req: Request, res: Response) => {
     }
 
     const {
+      email,
       relationship,
       household_type,
       topics_of_interest,
@@ -146,10 +149,12 @@ export const updateCurrentUser = async (req: Request, res: Response) => {
       subscribed_newsletter,
       onboarding_complete,
     } = req.body;
+    
 
     const updatedUser = await prisma.user.update({
       where: { clerk_id: userId },
       data: {
+        email: email ?? undefined, // ✅ THIS WAS MISSING
         relationship,
         household_type,
         topics_of_interest,
@@ -157,6 +162,7 @@ export const updateCurrentUser = async (req: Request, res: Response) => {
         subscribed_newsletter,
         onboarding_complete,
       },
+      
     });
 
     res.json(updatedUser);

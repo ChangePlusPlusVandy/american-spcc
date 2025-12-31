@@ -1,0 +1,53 @@
+.single-dropdown {
+  width: 100%;
+}
+
+.single-trigger {
+  background-color: #79c6c3;
+  color: white;
+  padding: 14px 18px;
+  border-radius: 0px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.single-menu {
+  margin-top: 8px;
+  border-radius: 0px;
+  overflow: hidden;
+}
+
+.single-option {
+  padding: 14px 18px;
+  background-color: #79c6c3;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.single-option + .single-option {
+  border-top: 0px solid rgba(255, 255, 255, 0.6);
+}
+
+.single-option:hover {
+  background-color: #6bbab6;
+}
+
+.single-option.selected {
+  background-color: #63b3af;
+}
+
+.chevron {
+  transition: transform 0.2s ease;
+  font-size: 25px; 
+  line-height: 1;
+}
+
+.chevron.open {
+  transform: rotate(180deg);
+}
