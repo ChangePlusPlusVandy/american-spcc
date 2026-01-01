@@ -60,10 +60,7 @@ function ResourceGridCard({
   onSaved,
   onCreateCollection,
 }: ResourceGridCardProps) {
-
-
   const categoryIcon = CATEGORY_ICON_MAP[category];
-
   const [flipped, setFlipped] = useState(false);
   const [showSavePopup, setShowSavePopup] = useState(false);
   const popupRef = useRef<HTMLDivElement | null>(null);
@@ -92,7 +89,6 @@ function ResourceGridCard({
         setFlipped(false);
       }}
     >
-
       <div className={`${styles.inner} ${flipped ? styles.flipped : ''}`}>
         <div className={styles.front}>
           <div className={styles.bookmarkWrapper} ref={popupRef}>
@@ -106,7 +102,6 @@ function ResourceGridCard({
             >
               <img src={bookmarkIcon} alt="" className={styles.bookmarkIcon} />
             </button>
-
             <SaveResource
               isOpen={showSavePopup}
               onClose={() => setShowSavePopup(false)}
@@ -131,24 +126,21 @@ function ResourceGridCard({
             <img src={imageUrl} alt={title} className={styles.image} />
           </div>
           <div className={styles.tagsContainer}>
-            <span className={styles.tagPrefix}>Topic:</span>
-            <span className={styles.tag}>
-              {CATEGORY_DISPLAY_MAP[category]}
-            </span>
-
-            {tags.length > 0 && (
-              <>
-                <span className={styles.tagPrefix}>Descriptors:</span>
-                {tags.map((tag, index) => (
-                  <span key={index} className={styles.tag}>
-                    {tag}
-                  </span>
-                ))}
-              </>
-            )}
-          </div>
-          
-
+          <span className={styles.tagPrefix}>
+            {CATEGORY_DISPLAY_MAP[category]}
+          </span>
+          {tags.length > 0 && (
+            <>
+              <span className={styles.tagPrefix}> | </span>
+              {tags.map((tag, index) => (
+                <span key={index} className={styles.tag}>
+                  {index > 0 && ', '}
+                  {tag}
+                </span>
+              ))}
+            </>
+          )}
+        </div>           
         </div>
         <div className={styles.back}>
           <p className={styles.description}>

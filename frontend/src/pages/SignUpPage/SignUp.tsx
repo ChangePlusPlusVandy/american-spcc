@@ -30,11 +30,12 @@ export default function SignUp() {
   const { setActive } = useClerk();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-
+  const [processing, setProcessing] = useState(false);
   const stepParam = Number(searchParams.get('step'));
   const initialStep: Step = stepParam === 2 || stepParam === 3 ? stepParam : 1;
   const [step, setStep] = useState<Step>(initialStep);
-
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [hasSynced, setHasSynced] = useState(false);
@@ -43,7 +44,6 @@ export default function SignUp() {
   const [topics, setTopics] = useState<string[]>([]);
   const [ageGroups, setAgeGroups] = useState<string[]>([]);
   const [subscribeNewsletter, setSubscribeNewsletter] = useState(false);
-
   const goToStep = (next: Step) => {
     setStep(next);
     navigate(`/sign-up?step=${next}`, { replace: true });
@@ -51,7 +51,6 @@ export default function SignUp() {
 
   useEffect(() => {
     if (!user || hasSynced) return;
-
     const syncUser = async () => {
       try {
         await fetch('http://localhost:8000/api/users', {
@@ -66,65 +65,78 @@ export default function SignUp() {
 
     syncUser();
   }, [user, hasSynced]);
-
+  useEffect(() => {
+    const stepParam = Number(searchParams.get('step'));
+    if (stepParam === 1 || stepParam === 2 || stepParam === 3) {
+      setStep(stepParam);
+    }
+  }, [searchParams]);
+  
   const handleEmailSignup = async () => {
-    if (!isLoaded || !signUp) return;
-
-    const result = await signUp.create({
-      emailAddress: email,
-      password,
-    });
-
-    if (result.status !== 'complete') {
-      alert('Signup incomplete');
-      return;
+    if (!isLoaded || !signUp || processing) return;
+    setProcessing(true);
+    setEmailError(null);
+    setPasswordError(null);
+    try {
+      const result = await signUp.create({
+        emailAddress: email,
+        password,
+      });
+      if (result.status !== 'complete') return;
+      await setActive({ session: result.createdSessionId });
+      navigate('/sign-up?step=2', { replace: true });
+    } catch (err: any) {
+      if (!Array.isArray(err?.errors)) {
+        setPasswordError('Something went wrong. Please try again.');
+        return;
+      }
+      for (const e of err.errors) {
+        const message = e.longMessage || e.message;
+        if (
+          e.code.startsWith('form_identifier') ||
+          e.code.startsWith('form_param') ||
+          e.code === 'form_email_invalid'
+        ) {
+          setEmailError(message);
+        }
+        if (e.code.startsWith('form_password')) {
+          setPasswordError(message);
+        }
+      }
+    } finally {
+      setProcessing(false);
     }
-
-    await setActive({ session: result.createdSessionId });
-
-    const response = await fetch('http://localhost:8000/api/users', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      console.error('Failed to create DB user');
-      return;
-    }
-
-    goToStep(2);
   };
-
+  
   const handleCompleteSignup = async () => {
-    if (!user) return;
-
-    const response = await fetch('http://localhost:8000/api/users/me', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({
-        relationship,
-        household_type: householdType,
-        topics_of_interest: topics,
-        kids_age_groups: ageGroups,
-        subscribed_newsletter: subscribeNewsletter,
-        onboarding_complete: true,
-      }),
-    });
-
-    if (!response.ok) {
-      console.error('Failed to update user in DB');
-      return;
+    if (!user || processing) return;
+    setProcessing(true);
+    try {
+      const response = await fetch('http://localhost:8000/api/users/me', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          relationship,
+          household_type: householdType,
+          topics_of_interest: topics,
+          kids_age_groups: ageGroups,
+          subscribed_newsletter: subscribeNewsletter,
+          onboarding_complete: true,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to update user');
+      }
+      await user.update({
+        unsafeMetadata: {
+          onboarding_complete: true,
+        },
+      });
+      navigate('/');
+    } finally {
+      setProcessing(false);
     }
-
-    await user.update({
-      unsafeMetadata: {
-        onboarding_complete: true,
-      },
-    });
-
-    navigate('/');
   };
 
   return (
@@ -134,6 +146,8 @@ export default function SignUp() {
       password={password}
       setEmail={setEmail}
       setPassword={setPassword}
+      emailError={emailError}
+      passwordError={passwordError}
       onNext={handleEmailSignup}
       onGoogleSignup={() =>
         signUp?.authenticateWithRedirect({
@@ -157,6 +171,7 @@ export default function SignUp() {
       subscribeNewsletter={subscribeNewsletter}
       setSubscribeNewsletter={setSubscribeNewsletter}
       onComplete={handleCompleteSignup}
+      processing={processing}
     />
   );
 }

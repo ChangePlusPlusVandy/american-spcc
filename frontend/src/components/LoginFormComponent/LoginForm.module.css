@@ -148,26 +148,11 @@
   opacity: 0.8;
 }
 
-@media (max-width: 768px) {
-  .loginContainer {
-    flex-direction: column;
-  }
 
-  .leftSection {
-    display: none;
-  }
-
-  .rightSection {
-    width: 100%;
-    padding: 4vh 8vw;
-  }
-
-  .logo {
-    width: 50vw;
-    max-width: 250px;
-  }
-
-  .formCard {
-    width: 100%;
-  }
+.fieldError {
+  margin-top: 6px;
+  margin-bottom: 12px;
+  font-size: 0.85rem;
+  color: #b42318;
+  font-family: 'Lato', sans-serif;
 }

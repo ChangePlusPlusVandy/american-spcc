@@ -15,18 +15,16 @@ type SelectOption = {
 
 interface SignupFormProps {
   step: 1 | 2 | 3;
-
-  // step 1
   email: string;
   password: string;
   setEmail: (v: string) => void;
   setPassword: (v: string) => void;
+  emailError: string | null;
+  passwordError: string | null;
   onNext: () => void;
   onGoogleSignup: () => void;
   onSignInClick: () => void;
   googleLoading?: boolean;
-
-  // step 2
   relationship: string;
   householdType: string;
   setRelationship: (v: string) => void;
@@ -34,8 +32,6 @@ interface SignupFormProps {
   relationshipOptions: readonly SelectOption[];
   householdOptions: readonly SelectOption[];
   goToStep3: () => void;
-
-  // step 3
   topics: string[];
   setTopics: (v: string[]) => void;
   ageGroups: string[];
@@ -43,20 +39,21 @@ interface SignupFormProps {
   subscribeNewsletter: boolean;
   setSubscribeNewsletter: (v: boolean) => void;
   onComplete: () => void;
+  processing: boolean;
 }
 
 export default function SignupForm({
   step,
-
   email,
   password,
   setEmail,
   setPassword,
+  emailError,
+  passwordError,
   onNext,
   onGoogleSignup,
   onSignInClick,
   googleLoading = false,
-
   relationship,
   householdType,
   setRelationship,
@@ -64,7 +61,6 @@ export default function SignupForm({
   relationshipOptions,
   householdOptions,
   goToStep3,
-
   topics,
   setTopics,
   ageGroups,
@@ -72,22 +68,17 @@ export default function SignupForm({
   subscribeNewsletter,
   setSubscribeNewsletter,
   onComplete,
+  processing,
 }: SignupFormProps) {
   return (
     <div className={styles.loginContainer}>
-      {/* LEFT IMAGE */}
       <div className={styles.leftSection}>
         <img src={signupPageImage} className={styles.loginImage} />
       </div>
-
-      {/* RIGHT FORM */}
       <div className={styles.rightSection}>
         <img src={americanSPCCLogo} className={styles.logo} />
-
         <div className={styles.formCard}>
           <h1 className={styles.title}>Create Your Account</h1>
-
-          {/* STEP INDICATOR */}
           <div className={styles.stepper}>
             {[1, 2, 3].map((n) => (
               <div key={n} className={styles.stepItem}>
@@ -99,46 +90,55 @@ export default function SignupForm({
             ))}
           </div>
 
-          {/* STEP 1 */}
           {step === 1 && (
             <>
               <form className={styles.form}>
-                <InputField
-                  label="Email"
-                  type={InputType.Email}
-                  placeholder="example@mail.com"
-                  value={email}
-                  onChange={setEmail}
-                  name="email"
-                  required
-                />
-
-                <InputField
-                  label="Password"
-                  type={InputType.Password}
-                  placeholder="************"
-                  value={password}
-                  onChange={setPassword}
-                  name="password"
-                  required
-                  showPasswordToggle
-                />
-
-                <Button
-                  text="NEXT"
-                  type="button"
-                  color={ButtonColor.DarkBlue}
-                  variant={ButtonVariant.Regular}
-                  onClick={onNext}
-                />
+              <InputField
+                label="Email"
+                type={InputType.Email}
+                placeholder="example@mail.com"
+                value={email}
+                onChange={setEmail}
+                name="email"
+                required
+              />
+              <InputField
+                label="Password"
+                type={InputType.Password}
+                placeholder="************"
+                value={password}
+                onChange={setPassword}
+                name="password"
+                required
+                showPasswordToggle
+              />
+              {(emailError || passwordError) && (
+                <p className={styles.fieldError}>
+                  {emailError ?? passwordError}
+                </p>
+              )}
+              <Button
+                type="button"
+                disabled={processing}
+                onClick={onNext}
+                color={ButtonColor.DarkBlue}
+                variant={ButtonVariant.Regular}
+              >
+                {processing ? (
+                  <span className={styles.processingContent}>
+                    <span className={styles.buttonSpinner} />
+                    Processing…
+                  </span>
+                ) : (
+                  'NEXT'
+                )}
+              </Button>
               </form>
-
               <div className={styles.divider}>
                 <div className={styles.line} />
                 <span className={styles.dividerText}>OR</span>
                 <div className={styles.line} />
               </div>
-
               <button
                 type="button"
                 className={styles.googleButton}
@@ -151,7 +151,6 @@ export default function SignupForm({
                   <img src={googleLogo} className={styles.googleIcon} />
                 )}
               </button>
-
               <div className={styles.signUpSection}>
                 <span className={styles.signUpText}>Already have an account? </span>
                 <button className={styles.signUpLink} onClick={onSignInClick}>
@@ -161,11 +160,9 @@ export default function SignupForm({
             </>
           )}
 
-          {/* STEP 2 */}
           {step === 2 && (
             <div className={styles.form}>
               <p className={styles.sectionTitle}>Which best describes you?</p>
-
               <div className={styles.choiceGrid}>
                 {relationshipOptions.map((opt) => (
                   <button
@@ -180,9 +177,7 @@ export default function SignupForm({
                   </button>
                 ))}
               </div>
-
               <p className={styles.sectionTitle}>Household Type</p>
-
               <div className={styles.choiceGrid}>
                 {householdOptions.map((opt) => (
                   <button
@@ -197,15 +192,15 @@ export default function SignupForm({
                   </button>
                 ))}
               </div>
-
               <div className={styles.actions}>
-                <Button
-                  text="Next"
-                  type="button"
-                  color={ButtonColor.DarkBlue}
-                  variant={ButtonVariant.Regular}
-                  onClick={goToStep3}
-                />
+              <Button
+                type="button"
+                onClick={goToStep3}
+                color={ButtonColor.DarkBlue}
+                variant={ButtonVariant.Regular}
+              >
+                Next
+              </Button>
                 <button className={styles.skip} onClick={goToStep3} type="button">
                   Skip
                 </button>
@@ -213,11 +208,9 @@ export default function SignupForm({
             </div>
           )}
 
-          {/* STEP 3 */}
           {step === 3 && (
             <div className={styles.form}>
               <p className={styles.sectionTitle}>Topics of Interest</p>
-
               <div className={styles.choiceGrid}>
                 {[
                   { label: 'Safety & Protection', value: 'SAFETY_PROTECTION' },
@@ -250,9 +243,7 @@ export default function SignupForm({
                   </button>
                 ))}
               </div>
-
               <p className={styles.sectionTitle}>Your Kids’ Age Group(s)</p>
-
               <div className={styles.choiceGrid}>
                 {[
                   { label: 'Ages 0–3', value: 'AGE_0_3' },
@@ -280,7 +271,6 @@ export default function SignupForm({
                   </button>
                 ))}
               </div>
-
               <label className={styles.checkboxRow}>
                 <input
                   type="checkbox"
@@ -289,15 +279,23 @@ export default function SignupForm({
                 />
                 <span>Subscribe to Newsletter?</span>
               </label>
-
               <div className={styles.actions}>
-                <Button
-                  text="DONE"
-                  type="button"
-                  color={ButtonColor.DarkBlue}
-                  variant={ButtonVariant.Regular}
-                  onClick={onComplete}
-                />
+              <Button
+                type="button"
+                disabled={processing}
+                onClick={onComplete}
+                color={ButtonColor.DarkBlue}
+                variant={ButtonVariant.Regular}
+              >
+                {processing ? (
+                  <span className={styles.processingContent}>
+                    <span className={styles.buttonSpinner} />
+                    Processing…
+                  </span>
+                ) : (
+                  'DONE'
+                )}
+              </Button>
               </div>
             </div>
           )}

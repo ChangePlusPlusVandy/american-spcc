@@ -1,7 +1,3 @@
-/* ================================
-   BASE LAYOUT (IDENTICAL TO LOGIN)
-================================ */
-
 .loginContainer {
   height: 100vh;
   width: 100vw;
@@ -36,6 +32,7 @@
 }
 
 .rightSection {
+  position: relative;
   width: 50%;
   flex-shrink: 0;
   display: flex;
@@ -76,18 +73,14 @@
 .form {
   display: flex;
   flex-direction: column;
-  gap: 2vh; /* EXACT MATCH */
+  gap: 2vh; 
 }
-
-/* ================================
-     STEPPER (ADDS, DOES NOT DISTURB)
-  ================================ */
 
 .stepper {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  margin-bottom: 2vh; /* SAME vertical rhythm */
+  margin-bottom: 2vh; 
 }
 
 .stepItem {
@@ -111,13 +104,6 @@
   margin-bottom: 4px;
 }
 
-.stepLine {
-  width: 48px;
-  height: 2px;
-  border-top: 2px dashed #cbd5e0;
-  margin-top: 13px; /* aligns with circle center */
-}
-
 .stepItem span {
   font-size: clamp(0.75rem, 0.8vw, 0.85rem);
   color: #a0aec0;
@@ -135,9 +121,6 @@
   font-weight: 600;
 }
 
-/* ================================
-     DIVIDER (IDENTICAL TO LOGIN)
-  ================================ */
 
 .divider {
   display: flex;
@@ -160,9 +143,6 @@
   font-family: 'Lato', sans-serif;
 }
 
-/* ================================
-     GOOGLE (IDENTICAL SIZE + FEEL)
-  ================================ */
 
 .googleButton {
   width: clamp(45px, 4vw, 55px);
@@ -189,10 +169,6 @@
   object-fit: contain;
 }
 
-/* ================================
-     FOOTER (IDENTICAL TO LOGIN)
-  ================================ */
-
 .signUpSection {
   text-align: center;
   margin-top: 2vh;
@@ -218,34 +194,6 @@
 
 .signUpLink:hover {
   opacity: 0.8;
-}
-
-/* ================================
-     MOBILE (IDENTICAL)
-  ================================ */
-
-@media (max-width: 768px) {
-  .loginContainer {
-    flex-direction: column;
-  }
-
-  .leftSection {
-    display: none;
-  }
-
-  .rightSection {
-    width: 100%;
-    padding: 4vh 8vw;
-  }
-
-  .logo {
-    width: 50vw;
-    max-width: 250px;
-  }
-
-  .formCard {
-    width: 100%;
-  }
 }
 
 .sectionTitle {
@@ -320,6 +268,33 @@
   border-top: 3px solid #5a6c7d;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.fieldError {
+  margin-top: 6px;
+  margin-bottom: 12px;
+  font-size: 0.85rem;
+  color: #b42318;
+}
+
+.processingContent {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.buttonSpinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
 }
 
 @keyframes spin {

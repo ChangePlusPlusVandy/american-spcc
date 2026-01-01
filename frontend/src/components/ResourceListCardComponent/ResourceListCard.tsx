@@ -62,13 +62,10 @@ function ResourceListCard({
   onSaved,
   onCreateCollection,
 }: ResourceListCardProps) {
-
-
   const categoryIcon = CATEGORY_ICON_MAP[category];
-
   const [showSavePopup, setShowSavePopup] = useState(false);
   const popupRef = useRef<HTMLDivElement | null>(null);
-
+  
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (
@@ -106,7 +103,6 @@ function ResourceListCard({
           onCreateCollection={onCreateCollection}
         />
       </div>
-
       <div className={styles.content}>
         <div className={styles.titleRow}>
           {categoryIcon && (
@@ -114,36 +110,29 @@ function ResourceListCard({
           )}
           <h3 className={styles.title}>{title}</h3>
         </div>
-
         <div className={styles.tagsContainer}>
-          <span className={styles.tagPrefix}>Topic:</span>
-          <span className={styles.tag}>
+          <span className={styles.tagPrefix}>
             {CATEGORY_DISPLAY_MAP[category]}
           </span>
-
           {tags.length > 0 && (
             <>
-              <span className={styles.tagPrefix}>Descriptors:</span>
+              <span className={styles.tagPrefix}> | </span>
               {tags.map((tag, index) => (
                 <span key={index} className={styles.tag}>
+                  {index > 0 && ', '}
                   {tag}
                 </span>
               ))}
             </>
           )}
         </div>
-
-
-
         <p className={styles.description}>{description}</p>
-
         {onLearnMore && (
           <button className={styles.learnMoreButton} onClick={onLearnMore}>
             Learn More
           </button>
         )}
       </div>
-
       {imageUrl && (
         <div className={styles.imageContainer}>
           <img src={imageUrl} alt={title} className={styles.image} />

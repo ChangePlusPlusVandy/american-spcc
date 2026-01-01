@@ -11,9 +11,15 @@ interface LoginFormProps {
   onSubmit: (email: string, password: string) => void;
   onGoogleLogin: () => void;
   onSignUpClick: () => void;
+  error: string | null;
 }
 
-function LoginForm({ onSubmit, onGoogleLogin, onSignUpClick }: LoginFormProps) {
+function LoginForm({
+  onSubmit,
+  onGoogleLogin,
+  onSignUpClick,
+  error,
+}: LoginFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -31,7 +37,6 @@ function LoginForm({ onSubmit, onGoogleLogin, onSignUpClick }: LoginFormProps) {
         <img src={americanSPCCLogo} alt="American SPCC" className={styles.logo} />
         <div className={styles.formCard}>
           <h1 className={styles.title}>Login</h1>
-
           <form className={styles.form} onSubmit={handleSubmit}>
             <InputField
               label="Email"
@@ -42,7 +47,6 @@ function LoginForm({ onSubmit, onGoogleLogin, onSignUpClick }: LoginFormProps) {
               name="email"
               required
             />
-
             <InputField
               label="Password"
               type={InputType.Password}
@@ -53,7 +57,7 @@ function LoginForm({ onSubmit, onGoogleLogin, onSignUpClick }: LoginFormProps) {
               required
               showPasswordToggle
             />
-
+            {error && <p className={styles.fieldError}>{error}</p>}
             <Button
               text="SIGN IN"
               type="submit"
@@ -61,17 +65,14 @@ function LoginForm({ onSubmit, onGoogleLogin, onSignUpClick }: LoginFormProps) {
               variant={ButtonVariant.Regular}
             />
           </form>
-
           <div className={styles.divider}>
-            <div className={styles.line}></div>
+            <div className={styles.line} />
             <span className={styles.dividerText}>OR</span>
-            <div className={styles.line}></div>
+            <div className={styles.line} />
           </div>
-
           <button type="button" className={styles.googleButton} onClick={onGoogleLogin}>
             <img src={googleLogo} alt="Google" className={styles.googleIcon} />
           </button>
-
           <div className={styles.signUpSection}>
             <span className={styles.signUpText}>Don't have an account? </span>
             <button type="button" className={styles.signUpLink} onClick={onSignUpClick}>
