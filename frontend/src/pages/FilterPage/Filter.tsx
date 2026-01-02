@@ -11,6 +11,7 @@ import formatIcon from '../../assets/format_dropdown.png';
 import languageIcon from '../../assets/language_dropdown.png';
 import timeIcon from '../../assets/time_dropdown.png';
 import CreateCollection from '@/components/CreateCollectionComponent/CreateCollection';
+import SaveToast from '@/components/SaveToastComponent/SaveToast';
 
 
 interface Resource {
@@ -23,7 +24,7 @@ interface Resource {
   age_groups: string[];
   language: string;
   time_to_read: number;
-  imageUrl?: string | null; // ✅ ADD THIS
+  imageUrl?: string | null;
   labels?: Array<{ label: { label_name: string } }>;
   externalResources?: { external_url: string } | null;
 }
@@ -70,14 +71,29 @@ function FilterPage() {
     { value: 'grid', label: 'Grid', icon: <GridIcon /> },
   ];
   const [saveToast, setSaveToast] = useState<{
+    open: boolean;
     collectionName: string;
     imageUrl?: string;
-    undo: () => void;
+    undo?: () => void;
   } | null>(null);
+  
     const [showCreateCollection, setShowCreateCollection] = useState(false);
     const [createCollectionImage, setCreateCollectionImage] = useState<string | undefined>();
     const [createCollectionResourceId, setCreateCollectionResourceId] = useState<string | null>(null);
     const [toastClosing, setToastClosing] = useState(false);
+    const [bookmarkedResourceIds, setBookmarkedResourceIds] = useState<Set<string>>(new Set());
+    const handleBookmarkChange = (resourceId: string, isBookmarked: boolean) => {
+      setBookmarkedResourceIds(prev => {
+        const next = new Set(prev);
+        if (isBookmarked) {
+          next.add(resourceId);
+        } else {
+          next.delete(resourceId);
+        }
+        return next;
+      });
+    };
+    
   
   
 
@@ -109,7 +125,17 @@ function FilterPage() {
         if (!res.ok) return;
   
         const data = await res.json();
+  
         setCollectionNames(data.map((c: { name: string }) => c.name));
+  
+        const ids = new Set<string>();
+        data.forEach((collection: any) => {
+          collection.items?.forEach((item: any) => {
+            ids.add(item.resource_fk);
+          });
+        });
+  
+        setBookmarkedResourceIds(ids);
       } catch (err) {
         console.error('Failed to fetch collections', err);
       }
@@ -279,23 +305,35 @@ function FilterPage() {
     collectionName,
     imageUrl,
     undo,
+    resourceId,
   }: {
     collectionName: string;
     imageUrl?: string;
     undo: () => void;
+    resourceId: string;
   }) => {
-    setSaveToast({ collectionName, imageUrl, undo });
+  
+    setSaveToast({
+      open: true,
+      collectionName,
+      imageUrl,
+      undo: async () => {
+        await undo();
+        handleBookmarkChange(resourceId, false);
+      },
+      
+      
+    });
   
     setTimeout(() => {
       setToastClosing(true);
-    
       setTimeout(() => {
         setSaveToast(null);
         setToastClosing(false);
       }, 200);
     }, 3000);
-    
   };
+  
   
   
 
@@ -451,16 +489,25 @@ function FilterPage() {
                         tags={resource.labels?.map((l) => l.label.label_name) || []}
                         category={resource.category}
                         imageUrl={resource.imageUrl ?? undefined}
+
+                        isBookmarked={bookmarkedResourceIds.has(resource.id)}
+                        onBookmarkChange={(isBookmarked) =>
+                          handleBookmarkChange(resource.id, isBookmarked)
+                        }
+
                         onLearnMore={() => handleLearnMore(resource)}
-                        onSaved={handleResourceSaved}
-                        onCreateCollection={(imageUrl, resourceId) => {
-                          setCreateCollectionImage(imageUrl);
-                          setCreateCollectionResourceId(resourceId ?? null);
-                          setShowCreateCollection(true);
-                        }}
-                        
-                        
+                        onSaved={({ collectionName, imageUrl, undo }) =>
+                          handleResourceSaved({
+                            collectionName,
+                            imageUrl,
+                            undo,
+                            resourceId: resource.id,
+                          })
+                        }
                       />
+
+
+
 
 
 
@@ -472,21 +519,29 @@ function FilterPage() {
                       console.log('RESOURCE:', resource);
 
                       return (
-                        <ResourceGridCard
-                          key={resource.id}
-                          id={resource.id}
-                          title={resource.title}
-                          description={resource.description || ''}
-                          tags={resource.labels?.map((l) => l.label.label_name) || []}
-                          category={resource.category}
-                          imageUrl={resource.imageUrl ?? undefined}
-                          onLearnMore={() => handleLearnMore(resource)}
-                          onSaved={handleResourceSaved}
-                          onCreateCollection={(imageUrl) => {
-                            setCreateCollectionImage(imageUrl);
-                            setShowCreateCollection(true);
-                          }}
-                        />
+                      <ResourceGridCard
+                        key={resource.id}
+                        id={resource.id}
+                        title={resource.title}
+                        description={resource.description || ''}
+                        tags={resource.labels?.map((l) => l.label.label_name) || []}
+                        category={resource.category}
+                        imageUrl={resource.imageUrl ?? undefined}
+                        isBookmarked={bookmarkedResourceIds.has(resource.id)}
+                        onLearnMore={() => handleLearnMore(resource)}
+                        onSaved={({ collectionName, imageUrl, undo }) =>
+                          handleResourceSaved({
+                            collectionName,
+                            imageUrl,
+                            undo,
+                            resourceId: resource.id,
+                          })
+                        }
+                        onBookmarkChange={(isBookmarked) =>
+                          handleBookmarkChange(resource.id, isBookmarked)
+                        }
+                      />
+
 
 
 
@@ -499,40 +554,13 @@ function FilterPage() {
           </div>
         </div>
       </div>
-      {saveToast && (
-        <div className="fixed bottom-6 left-1/2 z-50">
-          <div
-            className={`flex items-center gap-4 bg-[#4b4b47] text-white px-4 py-3 rounded-xl shadow-lg
-              ${toastClosing ? 'toast-exit' : 'toast-enter'}`}
-          >
-            {saveToast.imageUrl && (
-              <img
-                src={saveToast.imageUrl}
-                alt=""
-                className="w-10 h-10 rounded-md object-cover"
-              />
-            )}
+      <SaveToast
+        open={!!saveToast}
+        collectionName={saveToast?.collectionName ?? ''}
+        imageUrl={saveToast?.imageUrl}
+        onUndo={saveToast?.undo}
+      />
 
-            <span className="text-sm font-normal">
-              Saved to{' '}
-              <span className="font-semibold">
-                {saveToast.collectionName}
-              </span>
-            </span>
-
-            <button
-              className="ml-2 text-sm font-semibold text-black bg-white px-2 py-1 rounded hover:bg-gray-200"
-              onClick={() => {
-                saveToast.undo();
-                setToastClosing(true);
-                setTimeout(() => setSaveToast(null), 200);
-              }}
-            >
-              Undo
-            </button>
-          </div>
-        </div>
-      )}
 
       <CreateCollection
         isOpen={showCreateCollection}
@@ -569,6 +597,7 @@ function FilterPage() {
             }
 
             setSaveToast({
+              open: true,
               collectionName: newCollection.name,
               imageUrl: createCollectionImage,
               undo: async () => {

@@ -9,6 +9,7 @@ import lifeSkillsIcon from '@/assets/life_skills_independence_icon.png';
 import familySupportIcon from '@/assets/family_support_community_icon.png';
 import bookmarkIcon from '@/assets/bookmark.png';
 import { useState, useRef, useEffect } from 'react';
+import bookmarkFilled from '@/assets/bookmark-filled.png';
 
 import SaveResource from '@/components/SaveResourceComponent/SaveResource';
 interface ResourceGridCardProps {
@@ -18,13 +19,15 @@ interface ResourceGridCardProps {
   tags: string[];
   category: string;
   imageUrl?: string;
+  isBookmarked: boolean;
   onLearnMore?: () => void;
   onSaved?: (payload: {
     collectionName: string;
     imageUrl?: string;
     undo: () => void;
+    resourceId: string;
   }) => void;
-
+  onBookmarkChange?: (isBookmarked: boolean) => void;
   onCreateCollection?: (imageUrl?: string) => void;
 }
 const CATEGORY_DISPLAY_MAP: Record<string, string> = {
@@ -56,8 +59,10 @@ function ResourceGridCard({
   description,
   category,
   imageUrl,
+  isBookmarked,
   onLearnMore,
-  onSaved,
+  onSaved,  
+  onBookmarkChange,
   onCreateCollection,
 }: ResourceGridCardProps) {
   const categoryIcon = CATEGORY_ICON_MAP[category];
@@ -97,19 +102,35 @@ function ResourceGridCard({
               aria-label="Save to collection"
               onClick={(e) => {
                 e.stopPropagation();
-                setShowSavePopup((prev) => !prev);
+              setShowSavePopup((prev) => !prev);
               }}
             >
-              <img src={bookmarkIcon} alt="" className={styles.bookmarkIcon} />
+            <img
+              src={isBookmarked ? bookmarkFilled : bookmarkIcon}
+              alt=""
+              className={styles.bookmarkIcon}
+            />
             </button>
             <SaveResource
               isOpen={showSavePopup}
               onClose={() => setShowSavePopup(false)}
               resourceId={id}
               resourceImage={imageUrl}
-              onSaved={onSaved}
+              onSaved={(payload) => {
+                onSaved?.({
+                  ...payload,
+                  resourceId: id,
+                });
+              }}
+              
+              onBookmarkChange={(isBookmarked) => {
+                setShowSavePopup(false);
+                onBookmarkChange?.(isBookmarked);
+              }}
               onCreateCollection={onCreateCollection}
             />
+
+
           </div>
           <div className={styles.titleRow}>
             {categoryIcon && (
@@ -129,18 +150,19 @@ function ResourceGridCard({
           <span className={styles.tagPrefix}>
             {CATEGORY_DISPLAY_MAP[category]}
           </span>
+
           {tags.length > 0 && (
             <>
-              <span className={styles.tagPrefix}> | </span>
+              <span style={{ flexBasis: '100%', height: 0 }} />
+
               {tags.map((tag, index) => (
                 <span key={index} className={styles.tag}>
-                  {index > 0 && ', '}
                   {tag}
                 </span>
               ))}
             </>
           )}
-        </div>           
+        </div>          
         </div>
         <div className={styles.back}>
           <p className={styles.description}>

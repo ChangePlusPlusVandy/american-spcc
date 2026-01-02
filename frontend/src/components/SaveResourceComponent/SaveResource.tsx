@@ -1,12 +1,16 @@
 import './SaveResource.css';
 import { useAuth } from '@clerk/clerk-react';
 import { useEffect, useState } from 'react';
+import bookmarkOutline from '@/assets/small-bookmark.png';
+import bookmarkFilled from '@/assets/small-bookmark-filled.png';
+
 
 interface SaveResourceProps {
   isOpen: boolean;
   onClose: () => void;
   resourceId: string;
   resourceImage?: string;
+  onBookmarkChange?: (isBookmarked: boolean) => void;
   onSaved?: (payload: {
     collectionName: string;
     imageUrl?: string;
@@ -17,17 +21,24 @@ interface SaveResourceProps {
 
 }
 
-interface Collection {
-  id: string;
-  name: string;
-  items: { resource_fk: string }[];
-}
+interface CollectionItem {
+    id: string;
+    resource_fk: string;
+  }
+  
+  interface Collection {
+    id: string;
+    name: string;
+    items: CollectionItem[];
+  }
+  
 
 function SaveResource({
   isOpen,
   onClose,
   resourceId,
   resourceImage,
+  onBookmarkChange,
   onSaved,
   onCreateCollection,
 }: SaveResourceProps) {
@@ -38,6 +49,9 @@ function SaveResource({
   const [visible, setVisible] = useState(isOpen);
   const [closing, setClosing] = useState(false);
 
+
+  
+  
   useEffect(() => {
     if (isOpen) {
       setVisible(true);
@@ -91,13 +105,6 @@ function SaveResource({
         className={`save-popover ${closing ? 'closing' : ''}`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="save-header">
-          Save to
-          <button className="save-close" onClick={onClose}>
-            ✕
-          </button>
-        </div>
-
         <div className="save-body">
         {loading && (
             <div className="collection-item" style={{ cursor: 'default' }}>
@@ -112,59 +119,88 @@ function SaveResource({
             )}
 
 
-          {collections.map((collection) => {
-            const isSaved = collection.items.some(
-              (item) => item.resource_fk === resourceId
-            );
+            {collections.map((collection) => {
+                const isSaved = collection.items.some(
+                    (item) => item.resource_fk === resourceId
+                );
 
-            return (
-              <div
+                return (
+                <button
                 key={collection.id}
                 className="collection-item"
-                onClick={async () => {
-                  if (isSaved) return;
+                onClick={async (e) => {
+                    e.stopPropagation();
 
-                  const res = await fetch(
-                    `http://localhost:8000/api/collections/${collection.id}/items`,
-                    {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      credentials: 'include',
-                      body: JSON.stringify({ resource_fk: resourceId }),
-                    }
-                  );
+                    if (isSaved) {
+                    const item = collection.items.find(
+                        (i) => i.resource_fk === resourceId
+                    );
+                    if (!item) return;
 
-                  const createdItem = await res.json();
-
-                  onSaved?.({
-                    collectionName: collection.name,
-                    imageUrl: resourceImage,
-                    undo: async () => {
-                      await fetch(
-                        `http://localhost:8000/api/collections/items/${createdItem.id}`,
+                    await fetch(
+                        `http://localhost:8000/api/collections/items/${item.id}`,
+                        { method: 'DELETE', credentials: 'include' }
+                    );
+                    } else {
+                    const res = await fetch(
+                        `http://localhost:8000/api/collections/${collection.id}/items`,
                         {
-                          method: 'DELETE',
-                          credentials: 'include',
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include',
+                        body: JSON.stringify({ resource_fk: resourceId }),
                         }
-                      );
-                    },
-                  });
+                    );
 
-                  onClose();
+                    const createdItem = await res.json();
+
+                    onSaved?.({
+                        collectionName: collection.name,
+                        imageUrl: resourceImage,
+                        undo: async () => {
+                        await fetch(
+                            `http://localhost:8000/api/collections/items/${createdItem.id}`,
+                            {
+                            method: 'DELETE',
+                            credentials: 'include',
+                            }
+                        );
+                        },
+                    });
+                    }
+
+                    const res2 = await fetch('http://localhost:8000/api/collections', {
+                    credentials: 'include',
+                    });
+                    const updatedCollections = await res2.json();
+                    setCollections(updatedCollections);
+
+                    const stillBookmarked = updatedCollections.some(
+                    (c: Collection) =>
+                        c.items.some((i) => i.resource_fk === resourceId)
+                    );
+
+                    onBookmarkChange?.(stillBookmarked);
+
+                    onClose();
                 }}
-              >
-                <span>{collection.name}</span>
-                {isSaved && <span className="saved-check">✓</span>}
-              </div>
-            );
-          })}
-        </div>
+                >
+                <span className="collection-name">{collection.name}</span>
 
+                <img
+                    src={isSaved ? bookmarkFilled : bookmarkOutline}
+                    alt=""
+                    className="bookmark-icon"
+                />
+                </button>
+
+                );
+                })}
+        </div>
         <div className="save-footer">
           <button
             className="save-create"
             onClick={() => onCreateCollection?.(resourceImage, resourceId)}
-
           >
             + Create collection
           </button>

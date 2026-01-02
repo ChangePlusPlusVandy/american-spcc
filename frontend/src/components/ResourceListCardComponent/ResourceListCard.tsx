@@ -8,6 +8,7 @@ import wellbeingIcon from '@/assets/health_wellbeing_icon.png';
 import lifeSkillsIcon from '@/assets/life_skills_independence_icon.png';
 import familySupportIcon from '@/assets/family_support_community_icon.png';
 import bookmarkIcon from '@/assets/bookmark.png';
+import bookmarkFilled from '@/assets/bookmark-filled.png';
 
 import { useState, useRef, useEffect } from 'react';
 import SaveResource from '@/components/SaveResourceComponent/SaveResource';
@@ -18,6 +19,8 @@ interface ResourceListCardProps {
   tags: string[];
   category: string;
   imageUrl?: string;
+  isBookmarked: boolean;
+  onBookmarkChange?: (isBookmarked: boolean) => void;
   onLearnMore?: () => void;
   onSaved?: (payload: {
     collectionName: string;
@@ -58,6 +61,8 @@ function ResourceListCard({
   tags,
   category,
   imageUrl,
+  isBookmarked,
+  onBookmarkChange,
   onLearnMore,
   onSaved,
   onCreateCollection,
@@ -92,7 +97,12 @@ function ResourceListCard({
             setShowSavePopup((prev) => !prev);
           }}
         >
-          <img src={bookmarkIcon} alt="" className={styles.bookmarkIcon} />
+        <img
+          src={isBookmarked ? bookmarkFilled : bookmarkIcon}
+          alt=""
+          className={styles.bookmarkIcon}
+        />
+
         </button>
         <SaveResource
           isOpen={showSavePopup}
@@ -100,8 +110,12 @@ function ResourceListCard({
           resourceId={id}
           resourceImage={imageUrl}
           onSaved={onSaved}
+          onBookmarkChange={(isBookmarked) => {
+            onBookmarkChange?.(isBookmarked);
+          }}
           onCreateCollection={onCreateCollection}
         />
+
       </div>
       <div className={styles.content}>
         <div className={styles.titleRow}>
@@ -114,18 +128,20 @@ function ResourceListCard({
           <span className={styles.tagPrefix}>
             {CATEGORY_DISPLAY_MAP[category]}
           </span>
+
           {tags.length > 0 && (
             <>
-              <span className={styles.tagPrefix}> | </span>
+              <span style={{ flexBasis: '100%', height: 0 }} />
+
               {tags.map((tag, index) => (
                 <span key={index} className={styles.tag}>
-                  {index > 0 && ', '}
                   {tag}
                 </span>
               ))}
             </>
           )}
         </div>
+
         <p className={styles.description}>{description}</p>
         {onLearnMore && (
           <button className={styles.learnMoreButton} onClick={onLearnMore}>

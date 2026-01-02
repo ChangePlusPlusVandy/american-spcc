@@ -5,7 +5,6 @@ import { getAuth } from '@clerk/express';
 
 // Create a new user
 export const createUser = async (req: Request, res: Response) => {
-  console.log('🔥 createUser CALLED');
 
   const { userId } = getAuth(req);
   if (!userId) {
@@ -154,7 +153,7 @@ export const updateCurrentUser = async (req: Request, res: Response) => {
     const updatedUser = await prisma.user.update({
       where: { clerk_id: userId },
       data: {
-        email: email ?? undefined, // ✅ THIS WAS MISSING
+        email: email ?? undefined,
         relationship,
         household_type,
         topics_of_interest,

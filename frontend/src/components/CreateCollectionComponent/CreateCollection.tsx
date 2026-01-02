@@ -50,49 +50,41 @@ function CreateCollection({
         className="create-modal"
         onClick={(e) => e.stopPropagation()}
       >
-        {imageUrl && (
-          <div className="create-image">
-            <img src={imageUrl} alt="Preview" />
-          </div>
-        )}
-
         <div className="create-content">
-          <h2>Create collection</h2>
-
+          <h2>New Collection</h2>
+  
           <label>
-            Name
+            Title
             <input
-                placeholder='Like "Parenting Tips" or "Favorites"'
-                value={name}
-                onChange={(e) => {
+              value={name}
+              onChange={(e) => {
                 setName(e.target.value);
                 setError('');
-                }}
-                autoFocus
+              }}
+              autoFocus
             />
-            </label>
-
-            {error && <div className="fieldError">{error}</div>}
-
-
+          </label>
+  
+          {error && <div className="fieldError">{error}</div>}
+  
           <div className="create-actions">
             <button className="cancel" onClick={onCancel}>
               Cancel
             </button>
-
+  
             <button
-                className="create"
-                disabled={!name.trim()}
-                onClick={handleCreate}
-                >
-                Create
-                </button>
-
+              className="create"
+              disabled={!name.trim()}
+              onClick={handleCreate}
+            >
+              Create
+            </button>
           </div>
         </div>
       </div>
     </div>
   );
+  
 }
 
 export default CreateCollection;
