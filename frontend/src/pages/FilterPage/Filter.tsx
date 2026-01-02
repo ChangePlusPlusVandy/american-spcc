@@ -50,6 +50,7 @@ function FilterPage() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
+  const [collectionNames, setCollectionNames] = useState<string[]>([]);
   const [labelSearchResults, setLabelSearchResults] = useState<
     Array<{ id: string; label_name: string; category: string }>
   >([]);
@@ -99,7 +100,24 @@ function FilterPage() {
     { value: 'MEDIUM', label: 'Medium 5-15 min' },
     { value: 'LONG', label: 'Long >15 min' },
   ];
-
+  useEffect(() => {
+    const fetchCollections = async () => {
+      try {
+        const res = await fetch('http://localhost:8000/api/collections', {
+          credentials: 'include',
+        });
+        if (!res.ok) return;
+  
+        const data = await res.json();
+        setCollectionNames(data.map((c: { name: string }) => c.name));
+      } catch (err) {
+        console.error('Failed to fetch collections', err);
+      }
+    };
+  
+    fetchCollections();
+  }, []);
+  
   useEffect(() => {
     const queryParam = searchParams.get('q');
     if (queryParam) {
@@ -518,6 +536,7 @@ function FilterPage() {
 
       <CreateCollection
         isOpen={showCreateCollection}
+        existingNames={collectionNames}
         imageUrl={createCollectionImage}
         onCancel={() => setShowCreateCollection(false)}
         onCreate={async (name) => {

@@ -90,4 +90,10 @@
     opacity: 0.4;
     cursor: not-allowed;
   }
+  .fieldError {
+    margin-top: 6px;
+    margin-bottom: 12px;
+    font-size: 0.85rem;
+    color: #b42318; /* red */
+  }
   

@@ -48,7 +48,6 @@ export default function AccountPage() {
   const { user, isLoaded } = useUser();
   const { getToken } = useAuth();
   const { openUserProfile } = useClerk();
-
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [collections, setCollections] = useState<Collection[]>([]);
   const [loadingCollections, setLoadingCollections] = useState(true);
@@ -370,7 +369,8 @@ export default function AccountPage() {
             )}
 
             {!loadingCollections && collections.length > 0 && (
-              <div className="space-y-3 overflow-y-auto collections-scroll flex-1 min-h-0">
+              <div className="mt-4 space-y-3 overflow-y-auto collections-scroll flex-1 min-h-0">
+
                 {collections.map((collection) => {
                   const isOpen = expandedId === collection.id;
 
@@ -474,6 +474,7 @@ export default function AccountPage() {
 
         <CreateCollection
           isOpen={isCreateOpen}
+          existingNames={collections.map(c => c.name)}
           onCancel={() => setIsCreateOpen(false)}
           onCreate={async (name) => {
             try {

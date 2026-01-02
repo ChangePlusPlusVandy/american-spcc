@@ -1,8 +1,9 @@
 import './CreateCollection.css';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface CreateCollectionProps {
   isOpen: boolean;
+  existingNames: string[];
   imageUrl?: string;
   onCancel: () => void;
   onCreate: (name: string) => void;
@@ -10,11 +11,36 @@ interface CreateCollectionProps {
 
 function CreateCollection({
   isOpen,
+  existingNames,
   imageUrl,
   onCancel,
   onCreate,
 }: CreateCollectionProps) {
   const [name, setName] = useState('');
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (isOpen) {
+      setName('');
+      setError('');
+    }
+  }, [isOpen]);
+
+  const normalizedExisting = existingNames.map(n =>
+    n.trim().toLowerCase()
+  );
+
+  const handleCreate = () => {
+    const trimmed = name.trim();
+
+    if (normalizedExisting.includes(trimmed.toLowerCase())) {
+      setError('You already have this name.');
+      return;
+    }
+
+    setError('');
+    onCreate(trimmed);
+  };
 
   if (!isOpen) return null;
 
@@ -36,11 +62,18 @@ function CreateCollection({
           <label>
             Name
             <input
-              placeholder='Like "Places to Go" or "Recipes to Make"'
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+                placeholder='Like "Parenting Tips" or "Favorites"'
+                value={name}
+                onChange={(e) => {
+                setName(e.target.value);
+                setError('');
+                }}
+                autoFocus
             />
-          </label>
+            </label>
+
+            {error && <div className="fieldError">{error}</div>}
+
 
           <div className="create-actions">
             <button className="cancel" onClick={onCancel}>
@@ -48,12 +81,13 @@ function CreateCollection({
             </button>
 
             <button
-              className="create"
-              disabled={!name.trim()}
-              onClick={() => onCreate(name)}
-            >
-              Create
-            </button>
+                className="create"
+                disabled={!name.trim()}
+                onClick={handleCreate}
+                >
+                Create
+                </button>
+
           </div>
         </div>
       </div>
