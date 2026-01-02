@@ -191,36 +191,59 @@ export const deleteResource = async (req: Request, res: Response) => {
 
 export const searchResources = async (req: Request, res: Response) => {
   try {
-    const query = req.query.q as string;
+    const query = (req.query.q as string)?.trim();
+    if (!query) return res.json([]);
 
-    if (!query?.trim()) {
-      return res.json([]);
-    }
+    const tokens = query.toLowerCase().split(/\s+/);
 
     const resources = await prisma.resource.findMany({
-      where: {
-        OR: [
-          { title: { contains: query, mode: 'insensitive' } },
-          { description: { contains: query, mode: 'insensitive' } },
-        ],
-      },
       select: {
         id: true,
         title: true,
         description: true,
+        category: true,
         hosting_type: true,
         externalResources: {
-          select: {
-            external_url: true,
-          },
+          select: { external_url: true },
         },
       },
-      take: 10,
     });
 
-    res.json(resources);
-  } catch (error) {
-    console.error('Error searching resources:', error);
-    res.status(500).json({ error: 'Failed to search resources' });
+    const results = resources
+      .map((r) => {
+        let score = 0;
+
+        for (const token of tokens) {
+          if (r.title) {
+            const count =
+              r.title.toLowerCase().split(token).length - 1;
+            score += count * 3;
+          }
+          if (r.category) {
+            const count =
+              r.category.toLowerCase().split(token).length - 1;
+            score += count * 2;
+          }
+          if (r.description) {
+            const count =
+              r.description.toLowerCase().split(token).length - 1;
+            score += count * 1;
+          }
+        }
+
+        return { ...r, score };
+      })
+      .filter((r) => r.score > 0)
+      .sort((a, b) => {
+        if (b.score !== a.score) return b.score - a.score;
+        return a.title.localeCompare(b.title);
+      })
+      .slice(0, 10)
+      .map(({ score, ...rest }) => rest);
+
+    res.json(results);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Search failed' });
   }
 };

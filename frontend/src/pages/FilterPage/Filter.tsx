@@ -117,6 +117,13 @@ function FilterPage() {
     { value: 'LONG', label: 'Long >15 min' },
   ];
   useEffect(() => {
+    const q = searchParams.get('q');
+    if (q) {
+      searchResources(q);
+    }
+  }, [searchParams]);
+  
+  useEffect(() => {
     const fetchCollections = async () => {
       try {
         const res = await fetch('http://localhost:8000/api/collections', {
@@ -154,10 +161,20 @@ function FilterPage() {
 
   useEffect(() => {
     const categoryParam = searchParams.get('category');
+  
     if (categoryParam) {
       setSelectedTopics([categoryParam]);
+  
+      setSelectedAges([]);
+      setSelectedFormats([]);
+      setSelectedTimeRanges([]);
+      if (!searchParams.get('q')) {
+        setSearchQuery('');
+      }
     }
   }, [searchParams]);
+  
+
 
   const searchResources = async (query: string) => {
     if (!query.trim()) {
@@ -206,6 +223,7 @@ function FilterPage() {
   };
 
   useEffect(() => {
+    if (searchParams.get('q')) return;
     const labelIdParam = searchParams.get('label_id');
 
     const fetchResources = async () => {
@@ -253,13 +271,16 @@ function FilterPage() {
   }, [selectedTopics, searchParams]);
 
   const filteredResources = useMemo(() => {
-    return resources.filter((resource) => {
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase();
-        const matchesTitle = resource.title.toLowerCase().includes(query);
-        const matchesDesc = resource.description?.toLowerCase().includes(query);
-        if (!matchesTitle && !matchesDesc) return false;
+    const baseResources =
+    searchQuery.trim().length > 0
+      ? resourceSearchResults
+      : resources;
+
+      return baseResources.filter((resource) => {
+      if (searchQuery && resourceSearchResults === baseResources) {
+        return true;
       }
+
 
       if (selectedFormats.length > 0 && !selectedFormats.includes(resource.resource_type)) {
         return false;
@@ -288,7 +309,7 @@ function FilterPage() {
 
       return true;
     });
-  }, [resources, searchQuery, selectedFormats, selectedLanguage, selectedTimeRanges, selectedAges]);
+  }, [resources, resourceSearchResults, searchQuery, selectedFormats, selectedLanguage, selectedTimeRanges, selectedAges]);
 
   const handleLearnMore = (resource: Resource) => {
     if (resource.hosting_type !== 'EXTERNAL') {
@@ -347,10 +368,10 @@ function FilterPage() {
               e.preventDefault();
               if (searchQuery.trim()) {
                 navigate(`/filter?q=${encodeURIComponent(searchQuery)}`);
-                setResourceSearchResults([]);
                 setIsTyping(false);
               }
             }}
+
             className="relative"
           >
             <SearchBar
