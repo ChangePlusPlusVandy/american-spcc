@@ -203,45 +203,47 @@ export const searchResources = async (req: Request, res: Response) => {
         description: true,
         category: true,
         hosting_type: true,
+        image_s3_key: true,
         externalResources: {
           select: { external_url: true },
         },
       },
     });
 
-    const results = resources
+    const scored = resources
       .map((r) => {
         let score = 0;
 
         for (const token of tokens) {
-          if (r.title) {
-            const count =
-              r.title.toLowerCase().split(token).length - 1;
-            score += count * 3;
-          }
-          if (r.category) {
-            const count =
-              r.category.toLowerCase().split(token).length - 1;
-            score += count * 2;
-          }
-          if (r.description) {
-            const count =
-              r.description.toLowerCase().split(token).length - 1;
-            score += count * 1;
-          }
+          if (r.title) score += (r.title.toLowerCase().split(token).length - 1) * 3;
+          if (r.category) score += (r.category.toLowerCase().split(token).length - 1) * 2;
+          if (r.description)
+            score += (r.description.toLowerCase().split(token).length - 1);
         }
 
         return { ...r, score };
       })
       .filter((r) => r.score > 0)
-      .sort((a, b) => {
-        if (b.score !== a.score) return b.score - a.score;
-        return a.title.localeCompare(b.title);
-      })
-      .slice(0, 10)
-      .map(({ score, ...rest }) => rest);
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 10);
 
-    res.json(results);
+    const withImages = await Promise.all(
+      scored.map(async ({ score, image_s3_key, ...rest }) => ({
+        ...rest,
+        imageUrl: image_s3_key
+          ? await getSignedUrl(
+              s3,
+              new GetObjectCommand({
+                Bucket: process.env.S3_BUCKET_NAME!,
+                Key: image_s3_key,
+              }),
+              { expiresIn: 60 * 5 }
+            )
+          : null,
+      }))
+    );
+
+    res.json(withImages);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Search failed' });
