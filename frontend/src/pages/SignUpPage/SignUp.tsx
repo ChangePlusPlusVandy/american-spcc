@@ -51,27 +51,26 @@ export default function SignUp() {
   };
 
   useEffect(() => {
-    if (!user || hasSynced) return;
-    const syncUser = async () => {
-      try {
-        await fetch(`${API_BASE_URL}/api/auth/sync-user`, {
-          method: 'POST',
-          credentials: 'include',
-        });        
-        setHasSynced(true);
-      } catch (err) {
-        console.error('Failed to sync user to DB', err);
-      }
-    };
-
-    syncUser();
-  }, [user, hasSynced]);
-  useEffect(() => {
     const stepParam = Number(searchParams.get('step'));
     if (stepParam === 1 || stepParam === 2 || stepParam === 3) {
       setStep(stepParam);
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    if (!user || step !== 2 || hasSynced) return;
+  
+    const syncUser = async () => {
+      await fetch(`${API_BASE_URL}/api/auth/sync-user`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+      setHasSynced(true);
+    };
+  
+    syncUser();
+  }, [user, step, hasSynced]);
+  
   
   const handleEmailSignup = async () => {
     if (!isLoaded || !signUp || processing) return;
@@ -85,7 +84,18 @@ export default function SignUp() {
       });
       if (result.status !== 'complete') return;
       await setActive({ session: result.createdSessionId });
+
+      if (!hasSynced) {
+        await fetch(`${API_BASE_URL}/api/auth/sync-user`, {
+          method: 'POST',
+          credentials: 'include',
+        });
+        setHasSynced(true);
+      }
+      
+      
       navigate('/sign-up?step=2', { replace: true });
+      
     } catch (err: any) {
       if (!Array.isArray(err?.errors)) {
         setPasswordError('Something went wrong. Please try again.');
