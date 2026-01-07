@@ -50,52 +50,35 @@ export default function SignUp() {
     navigate(`/sign-up?step=${next}`, { replace: true });
   };
 
-  useEffect(() => {
-    const stepParam = Number(searchParams.get('step'));
-    if (stepParam === 1 || stepParam === 2 || stepParam === 3) {
-      setStep(stepParam);
-    }
-  }, [searchParams]);
-  
+
   const handleEmailSignup = async () => {
     if (!isLoaded || !signUp || processing) return;
     setProcessing(true);
-    setEmailError(null);
-    setPasswordError(null);
+  
     try {
       const result = await signUp.create({
         emailAddress: email,
         password,
       });
+  
       if (result.status !== 'complete') return;
+  
+      // 🔑 Activate session FIRST
       await setActive({ session: result.createdSessionId });
-
-      // 🔑 create DB user immediately, while auth is guaranteed
-      await fetch(`${API_BASE_URL}/api/users`, {
+  
+      // 🔑 THEN create DB user (cookies guaranteed)
+      const res = await fetch(`${API_BASE_URL}/api/users`, {
         method: 'POST',
         credentials: 'include',
       });
-      
+  
+      if (!res.ok) {
+        throw new Error('Failed to create DB user');
+      }
+  
       navigate('/sign-up?step=2', { replace: true });
-      
-    } catch (err: any) {
-      if (!Array.isArray(err?.errors)) {
-        setPasswordError('Something went wrong. Please try again.');
-        return;
-      }
-      for (const e of err.errors) {
-        const message = e.longMessage || e.message;
-        if (
-          e.code.startsWith('form_identifier') ||
-          e.code.startsWith('form_param') ||
-          e.code === 'form_email_invalid'
-        ) {
-          setEmailError(message);
-        }
-        if (e.code.startsWith('form_password')) {
-          setPasswordError(message);
-        }
-      }
+    } catch (err) {
+      console.error(err);
     } finally {
       setProcessing(false);
     }
