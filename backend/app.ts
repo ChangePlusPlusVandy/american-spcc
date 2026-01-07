@@ -43,7 +43,6 @@ app.use(
 
 app.use(express.json())
 // ✅ REGISTER CLERK HERE (ONCE)
-app.use(clerkMiddleware())
 app.post('/api/auth/__ping', (req, res) => {
   console.log('🧪 AUTH PING HIT');
   res.json({ ok: true });
