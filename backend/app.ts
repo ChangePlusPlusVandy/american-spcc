@@ -41,6 +41,10 @@ app.use(
 
 
 app.use(express.json())
+app.post('/api/auth/__ping', (req, res) => {
+  console.log('🧪 AUTH PING HIT');
+  res.json({ ok: true });
+});
 
 app.get('/', (_req, res) => {
   res.status(200).send('OK')
