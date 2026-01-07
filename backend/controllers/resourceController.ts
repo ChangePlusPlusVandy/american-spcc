@@ -3,18 +3,19 @@ import { GetObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { getS3 } from '../config/s3'
 
-const s3 = getS3()
 
 const getSignedImageUrl = async (key: string) => {
+  const s3 = getS3(); // ✅ SAFE
   const command = new GetObjectCommand({
     Bucket: process.env.S3_BUCKET_NAME!,
     Key: key,
   });
 
   return getSignedUrl(s3, command, {
-    expiresIn: 60 * 5, // 5 minutes
+    expiresIn: 60 * 5,
   });
 };
+
 
 export const createResource = async (req: Request, res: Response) => {
   try {
@@ -91,6 +92,7 @@ export const getAllResources = async (req: Request, res: Response) => {
         let imageUrl: string | null = null;
 
         if (resource.image_s3_key) {
+          const s3 = getS3();
           const command = new GetObjectCommand({
             Bucket: process.env.S3_BUCKET_NAME!,
             Key: resource.image_s3_key,
@@ -238,15 +240,19 @@ export const searchResources = async (req: Request, res: Response) => {
       scored.map(async ({ score, image_s3_key, ...rest }) => ({
         ...rest,
         imageUrl: image_s3_key
-          ? await getSignedUrl(
+        ? await (() => {
+            const s3 = getS3(); // ✅ ADD THIS
+            return getSignedUrl(
               s3,
               new GetObjectCommand({
                 Bucket: process.env.S3_BUCKET_NAME!,
                 Key: image_s3_key,
               }),
               { expiresIn: 60 * 5 }
-            )
-          : null,
+            );
+          })()
+        : null,
+      
       }))
     );
 
