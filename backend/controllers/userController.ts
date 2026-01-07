@@ -5,7 +5,8 @@ import { prisma } from '../config/prisma';
 
 // sync user
 export const syncUser = async (req: Request, res: Response) => {
-  console.log('🔥🔥🔥 SYNC USER ENDPOINT HIT 🔥🔥🔥');
+  console.log('🟢 syncUser HIT');
+  console.log('Headers:', req.headers.cookie);
   const { userId } = getAuth(req);
 
   if (!userId) {

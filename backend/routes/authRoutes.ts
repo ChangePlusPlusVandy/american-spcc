@@ -4,9 +4,6 @@ import { syncUser } from '../controllers/userController';
 
 const router = express.Router();
 
-router.post('/sync-user', requireAuth(), (req, res, next) => {
-  console.log('🟢 requireAuth passed');
-  next();
-}, syncUser);
+router.post('/sync-user', syncUser);
 
 export default router;
