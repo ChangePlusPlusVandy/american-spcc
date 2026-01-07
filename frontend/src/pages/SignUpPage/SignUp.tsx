@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import SignupForm from '@/components/SignupFormComponent/SignupForm';
 import { useEffect } from 'react';
 import { API_BASE_URL } from '@/config/api';
+import { useAuth } from '@clerk/clerk-react';
 
 type Step = 1 | 2 | 3;
 
@@ -29,6 +30,7 @@ export default function SignUp() {
   console.log('API_BASE_URL:', API_BASE_URL);
   const { signUp, isLoaded } = useSignUp();
   const { user } = useUser();
+  const { getToken } = useAuth();
   const { setActive } = useClerk();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -62,15 +64,23 @@ export default function SignUp() {
     if (!user || step !== 2 || hasSynced) return;
   
     const syncUser = async () => {
+      const token = await getToken();
+
       await fetch(`${API_BASE_URL}/api/auth/sync-user`, {
         method: 'POST',
-        credentials: 'include',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
+      
+  
       setHasSynced(true);
     };
   
     syncUser();
-  }, [user, step, hasSynced]);
+  }, [user, step, hasSynced, getToken]);
+
+  
   
   
   const handleEmailSignup = async () => {
@@ -86,13 +96,20 @@ export default function SignUp() {
       if (result.status !== 'complete') return;
       await setActive({ session: result.createdSessionId });
 
-      if (!hasSynced) {
+      if (!hasSynced && user) {
+        const token = await getToken();
+
         await fetch(`${API_BASE_URL}/api/auth/sync-user`, {
           method: 'POST',
-          credentials: 'include',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
+        
+      
         setHasSynced(true);
       }
+      
       
       
       navigate('/sign-up?step=2', { replace: true });
