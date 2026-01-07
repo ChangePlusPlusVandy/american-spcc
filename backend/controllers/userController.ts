@@ -1,41 +1,33 @@
 import { Request, Response } from 'express';
-import { clerkClient } from '@clerk/clerk-sdk-node';
 import { getAuth } from '@clerk/express';
+import { clerkClient } from '@clerk/clerk-sdk-node';
+import { prisma } from '../config/prisma';
 
-// Create a new user
-export const createUser = async (req: Request, res: Response) => {
-  const { prisma } = await import('../config/prisma');
-
+// sync user
+export const syncUser = async (req: Request, res: Response) => {
   const { userId } = getAuth(req);
+
   if (!userId) {
-    return res.status(401).json({ error: 'Unauthorized' });
+    return res.status(200).json({ ok: true });
   }
 
   const clerkUser = await clerkClient.users.getUser(userId);
 
-  const firstName = clerkUser.firstName || undefined;
-  const lastName = clerkUser.lastName || undefined;
-
-  const email = clerkUser.emailAddresses[0]?.emailAddress ?? undefined;
-
-  const user = await prisma.user.upsert({
+  await prisma.user.upsert({
     where: { clerk_id: userId },
-    update: {
-      // only set names if DB doesn't already have them
-      first_name: firstName,
-      last_name: lastName,
-    },
+    update: {},
     create: {
       clerk_id: userId,
-      email,
-      first_name: firstName,
-      last_name: lastName,
+      email: clerkUser.emailAddresses[0]?.emailAddress ?? null,
+      first_name: clerkUser.firstName ?? null,
+      last_name: clerkUser.lastName ?? null,
       role: 'PARENT',
     },
   });
 
-  res.json(user);
+  return res.status(200).json({ ok: true });
 };
+
 // Get all users
 export const getAllUsers = async (req: Request, res: Response) => {
   try {

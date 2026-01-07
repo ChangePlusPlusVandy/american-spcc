@@ -10,6 +10,7 @@ import resourceViewRoutes from './routes/resourceViewRoutes'
 import internalHostedResourceRoutes from './routes/internalHostedResourcesRoutes'
 import adminLogsRoutes from './routes/adminLogsRoutes'
 import testS3Routes from './routes/testS3Routes'
+import authRoutes from './routes/authRoutes'
 
 const app = express()
 
@@ -52,7 +53,7 @@ app.get('/', (_req, res) => {
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok' })
 })
-
+app.use('/api/auth', authRoutes) 
 app.use('/api/resources', resourceRoutes)
 app.use('/api/labels', categoryLabelRoutes)
 app.use('/api/externalResources', externalResourcesRoutes)

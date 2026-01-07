@@ -1,6 +1,6 @@
 import express from 'express';
+import { requireAuth } from '@clerk/express';
 import {
-  createUser,
   getAllUsers,
   getUserById,
   getUserByClerkId,
@@ -11,7 +11,9 @@ import {
 
 const router = express.Router();
 
-router.post('/', createUser);
+// 🔐 everything below requires auth
+router.use(requireAuth());
+
 router.patch('/me', updateCurrentUser);
 router.get('/', getAllUsers);
 router.get('/clerk/:clerkId', getUserByClerkId);
