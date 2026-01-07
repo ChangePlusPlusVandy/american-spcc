@@ -148,6 +148,7 @@ export const deleteUser = async (req: Request, res: Response) => {
 
 export const updateCurrentUser = async (req: Request, res: Response) => {
   try {
+    console.log('🟢 PATCH /api/users/me HIT');
     const { prisma } = await import('../config/prisma');
     const { userId } = getAuth(req);
 
