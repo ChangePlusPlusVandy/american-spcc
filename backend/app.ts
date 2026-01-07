@@ -32,6 +32,13 @@ app.use(
 
 app.options('*', cors())
 app.use(express.json())
+app.get('/', (_req, res) => {
+  res.send('OK')
+})
+
+app.get('/favicon.ico', (_req, res) => {
+  res.sendStatus(204)
+})
 
 // ✅ health check BEFORE auth
 app.get('/api/health', (_req, res) => {
