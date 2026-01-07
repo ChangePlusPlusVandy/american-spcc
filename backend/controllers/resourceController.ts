@@ -2,7 +2,9 @@ import { Request, Response } from 'express';
 import prisma from '../config/prisma';
 import { GetObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { s3 } from '../config/s3';
+import { getS3 } from '../config/s3'
+
+const s3 = getS3()
 
 const getSignedImageUrl = async (key: string) => {
   const command = new GetObjectCommand({
