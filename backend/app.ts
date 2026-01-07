@@ -1,5 +1,6 @@
 import express from 'express'
 import cors from 'cors'
+import { clerkMiddleware } from '@clerk/express'
 
 import collectionRoutes from './routes/collectionRoutes'
 import resourceRoutes from './routes/resourceRoutes'
@@ -13,39 +14,28 @@ import testS3Routes from './routes/testS3Routes'
 
 const app = express()
 
-const allowedOrigins = [
-  'http://localhost:5173',
-  'https://american-spcc-frontend.vercel.app',
-  'https://american-spcc-frontend-dev.vercel.app',
-]
+app.use(express.json())
 
 app.use(
   cors({
-    origin: (origin, callback) => {
-      if (!origin) return callback(null, true)
-      if (allowedOrigins.includes(origin)) return callback(null, true)
-      callback(new Error('Not allowed by CORS'))
-    },
+    origin: [
+      'http://localhost:5173',
+      'https://american-spcc-frontend.vercel.app',
+      'https://american-spcc-frontend-dev.vercel.app',
+    ],
     credentials: true,
   })
 )
 
-app.options('*', cors())
-app.use(express.json())
-app.get('/', (_req, res) => {
-  res.send('OK')
-})
+// Clerk is fine here
+app.use(clerkMiddleware())
 
-app.get('/favicon.ico', (_req, res) => {
-  res.sendStatus(204)
-})
-
-// ✅ health check BEFORE auth
+// health check (always keep this)
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok' })
 })
 
-// routes (NO Clerk here)
+// routes
 app.use('/api/resources', resourceRoutes)
 app.use('/api/labels', categoryLabelRoutes)
 app.use('/api/externalResources', externalResourcesRoutes)
