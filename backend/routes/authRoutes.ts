@@ -1,11 +1,12 @@
 import express from 'express';
-import { syncUser } from '../controllers/userController';
 import { requireAuth } from '@clerk/express';
+import { syncUser } from '../controllers/userController';
 
 const router = express.Router();
 
-// 🔐 MUST require auth so Clerk attaches userId
-router.post('/sync-user', requireAuth(), syncUser);
+router.post('/sync-user', requireAuth(), (req, res, next) => {
+  console.log('🟢 requireAuth passed');
+  next();
+}, syncUser);
 
 export default router;
-
