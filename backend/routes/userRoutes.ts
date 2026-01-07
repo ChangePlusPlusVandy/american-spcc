@@ -14,7 +14,7 @@ const router = express.Router();
 // 🔐 everything below requires auth
 router.use(requireAuth());
 
-router.patch('/me', updateCurrentUser);
+router.patch('/me', requireAuth(), updateCurrentUser);
 router.get('/', getAllUsers);
 router.get('/clerk/:clerkId', getUserByClerkId);
 router.get('/:id', getUserById);
