@@ -15,27 +15,30 @@ import testS3Routes from './routes/testS3Routes';
 
 const app = express();
 
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://american-spcc-frontend.vercel.app',
+  'https://american-spcc-frontend-dev.vercel.app',
+]
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin) return callback(null, true);
+      if (!origin) return callback(null, true)
 
-      if (origin === 'http://localhost:5173') {
-        return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true)
       }
 
-      if (origin.endsWith('.vercel.app')) {
-        return callback(null, true);
-      }
-
-      callback(new Error('Not allowed by CORS'));
+      console.error('Blocked by CORS:', origin)
+      callback(new Error('Not allowed by CORS'))
     },
     credentials: true,
   })
-);
+)
 
 
+app.options('*', cors())
 app.use(express.json());
 app.use(clerkMiddleware());
 
