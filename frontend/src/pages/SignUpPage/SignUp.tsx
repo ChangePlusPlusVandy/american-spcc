@@ -26,6 +26,7 @@ const HOUSEHOLD_OPTIONS = [
 ] as const;
 
 export default function SignUp() {
+  console.log('API_BASE_URL:', API_BASE_URL);
   const { signUp, isLoaded } = useSignUp();
   const { user } = useUser();
   const { setActive } = useClerk();
