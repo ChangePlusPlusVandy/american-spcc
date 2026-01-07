@@ -12,6 +12,7 @@ import languageIcon from '../../assets/language_dropdown.png';
 import timeIcon from '../../assets/time_dropdown.png';
 import CreateCollection from '@/components/CreateCollectionComponent/CreateCollection';
 import SaveToast from '@/components/SaveToastComponent/SaveToast';
+import { API_BASE_URL } from '@/config/api';
 
 
 interface Resource {
@@ -126,7 +127,7 @@ function FilterPage() {
   useEffect(() => {
     const fetchCollections = async () => {
       try {
-        const res = await fetch('http://localhost:8000/api/collections', {
+        const res = await fetch(`${API_BASE_URL}/api/collections`, {
           credentials: 'include',
         });
         if (!res.ok) return;
@@ -185,7 +186,7 @@ function FilterPage() {
     setIsSearching(true);
     try {
       const response = await fetch(
-        `http://localhost:8000/api/resources/search?q=${encodeURIComponent(query)}`
+        `${API_BASE_URL}/api/resources/search?q=${encodeURIComponent(query)}`
       );
       const data = await response.json();
       setResourceSearchResults(data);
@@ -210,7 +211,7 @@ function FilterPage() {
     setError(null);
 
     try {
-      const response = await fetch(`http://localhost:8000/api/resources?label_id=${labelId}`);
+      const response = await fetch(`${API_BASE_URL}/api/resources?label_id=${labelId}`);
       if (!response.ok) throw new Error('Failed to fetch resources');
       const data = await response.json();
       setResources(data);
@@ -235,14 +236,14 @@ function FilterPage() {
 
         if (labelIdParam) {
           const response = await fetch(
-            `http://localhost:8000/api/resources?label_id=${labelIdParam}`
+            `${API_BASE_URL}/api/resources?label_id=${labelIdParam}`
           );
           if (!response.ok) throw new Error('Failed to fetch resources');
           allResources = await response.json();
         }
         else if (selectedTopics.length > 0) {
           const promises = selectedTopics.map((category) =>
-            fetch(`http://localhost:8000/api/resources?category=${category}`).then((res) => {
+            fetch(`${API_BASE_URL}/api/resources?category=${category}`).then((res) => {
               if (!res.ok) throw new Error('Failed to fetch resources');
               return res.json();
             })
@@ -253,7 +254,7 @@ function FilterPage() {
         }
 
         else {
-          const response = await fetch(`http://localhost:8000/api/resources`);
+          const response = await fetch(`${API_BASE_URL}/api/resources`);
           if (!response.ok) throw new Error('Failed to fetch resources');
           allResources = await response.json();
         }
@@ -590,7 +591,7 @@ function FilterPage() {
         onCancel={() => setShowCreateCollection(false)}
         onCreate={async (name) => {
           try {
-            const res = await fetch('http://localhost:8000/api/collections', {
+            const res = await fetch(`${API_BASE_URL}/api/collections`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               credentials: 'include',
@@ -602,7 +603,7 @@ function FilterPage() {
 
             if (createCollectionResourceId) {
               const itemRes = await fetch(
-                `http://localhost:8000/api/collections/${newCollection.id}/items`,
+                `${API_BASE_URL}/api/collections/${newCollection.id}/items`,
                 {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
@@ -624,7 +625,7 @@ function FilterPage() {
               undo: async () => {
                 if (createdItemId) {
                   await fetch(
-                    `http://localhost:8000/api/collections/items/${createdItemId}`,
+                    `${API_BASE_URL}/api/collections/items/${createdItemId}`,
                     {
                       method: 'DELETE',
                       credentials: 'include',

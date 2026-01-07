@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import SignupForm from '@/components/SignupFormComponent/SignupForm';
 import { useEffect } from 'react';
+import { API_BASE_URL } from '@/config/api';
 
 type Step = 1 | 2 | 3;
 
@@ -53,7 +54,7 @@ export default function SignUp() {
     if (!user || hasSynced) return;
     const syncUser = async () => {
       try {
-        await fetch('http://localhost:8000/api/users', {
+        await fetch(`${API_BASE_URL}/api/users`, {
           method: 'POST',
           credentials: 'include',
         });
@@ -112,7 +113,7 @@ export default function SignUp() {
     if (!user || processing) return;
     setProcessing(true);
     try {
-      const response = await fetch('http://localhost:8000/api/users/me', {
+      const response = await fetch(`${API_BASE_URL}/api/users/me`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

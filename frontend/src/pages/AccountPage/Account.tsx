@@ -5,6 +5,7 @@ import CreateCollection from '@components/CreateCollectionComponent/CreateCollec
 import { useClerk } from '@clerk/clerk-react';
 import CheckboxDropdown from '@/components/CheckboxDropdownComponent/CheckboxDropdown';
 import SingleSelectDropdown from '@/components/SingleSelectDropdownComponent/SingleSelectDropdown';
+import { API_BASE_URL } from '@/config/api';
 
 interface DbUser {
   first_name: string | null;
@@ -73,7 +74,7 @@ export default function AccountPage() {
     const token = await getToken();
 
     const res = await fetch(
-      `http://localhost:8000/api/users/clerk/${user.id}`,
+      `${API_BASE_URL}/api/users/clerk/${user.id}`,
       {
         headers: { Authorization: `Bearer ${token}` },
       }
@@ -90,7 +91,7 @@ export default function AccountPage() {
 
     const token = await getToken();
 
-    await fetch('http://localhost:8000/api/users/me', {
+    await fetch(`${API_BASE_URL}/api/users/me`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -115,7 +116,7 @@ export default function AccountPage() {
       try {
         const token = await getToken();
 
-        const res = await fetch('http://localhost:8000/api/collections', {
+        const res = await fetch(`${API_BASE_URL}/api/collections`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -173,7 +174,7 @@ export default function AccountPage() {
     (async () => {
       const token = await getToken();
 
-      await fetch('http://localhost:8000/api/users/me', {
+      await fetch(`${API_BASE_URL}/api/users/me`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -481,7 +482,7 @@ export default function AccountPage() {
               const token = await getToken();
 
               const res = await fetch(
-                'http://localhost:8000/api/collections',
+                `${API_BASE_URL}/api/collections`,
                 {
                   method: 'POST',
                   headers: {
@@ -544,7 +545,7 @@ export default function AccountPage() {
                         const token = await getToken();
 
                         await fetch(
-                          `http://localhost:8000/api/collections/${deleteTarget.id}`,
+                          `${API_BASE_URL}/api/collections/${deleteTarget.id}`,
                           {
                             method: 'DELETE',
                             headers: {

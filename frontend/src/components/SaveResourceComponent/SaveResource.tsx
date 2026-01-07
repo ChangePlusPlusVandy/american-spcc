@@ -3,6 +3,7 @@ import { useAuth } from '@clerk/clerk-react';
 import { useEffect, useState } from 'react';
 import bookmarkOutline from '@/assets/small-bookmark.png';
 import bookmarkFilled from '@/assets/small-bookmark-filled.png';
+import { API_BASE_URL } from '@/config/api';
 
 
 interface SaveResourceProps {
@@ -72,7 +73,7 @@ function SaveResource({
     async function fetchCollections() {
       setLoading(true);
       try {
-        const res = await fetch('http://localhost:8000/api/collections', {
+        const res = await fetch(`${API_BASE_URL}/api/collections`, {
           credentials: 'include',
         });
         const data = await res.json();
@@ -138,12 +139,12 @@ function SaveResource({
                     if (!item) return;
 
                     await fetch(
-                        `http://localhost:8000/api/collections/items/${item.id}`,
+                        `${API_BASE_URL}/api/collections/items/${item.id}`,
                         { method: 'DELETE', credentials: 'include' }
                     );
                     } else {
                     const res = await fetch(
-                        `http://localhost:8000/api/collections/${collection.id}/items`,
+                        `${API_BASE_URL}/api/collections/${collection.id}/items`,
                         {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -159,7 +160,7 @@ function SaveResource({
                         imageUrl: resourceImage,
                         undo: async () => {
                         await fetch(
-                            `http://localhost:8000/api/collections/items/${createdItem.id}`,
+                            `${API_BASE_URL}/api/collections/items/${createdItem.id}`,
                             {
                             method: 'DELETE',
                             credentials: 'include',
@@ -169,7 +170,7 @@ function SaveResource({
                     });
                     }
 
-                    const res2 = await fetch('http://localhost:8000/api/collections', {
+                    const res2 = await fetch(`${API_BASE_URL}/api/collections`, {
                     credentials: 'include',
                     });
                     const updatedCollections = await res2.json();

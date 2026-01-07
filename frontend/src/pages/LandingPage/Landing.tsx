@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import homepageBackground from '../../assets/SPCC - Homepage.png';
 import searchIcon from '../../assets/search_icon.png';
-
+import { API_BASE_URL } from '@/config/api';
 interface Resource {
   id: string;
   title: string;
@@ -29,7 +29,7 @@ function Landing() {
 
     setIsSearching(true);
     try {
-      const url = `http://localhost:8000/api/resources/search?q=${encodeURIComponent(query)}`;
+      const url = `${API_BASE_URL}/api/resources/search?q=${encodeURIComponent(query)}`;
       console.log('Fetching from:', url);
 
       const response = await fetch(url);
