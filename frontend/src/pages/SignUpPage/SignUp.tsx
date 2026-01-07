@@ -51,22 +51,6 @@ export default function SignUp() {
   };
 
   useEffect(() => {
-    if (!user || hasSynced) return;
-    const syncUser = async () => {
-      try {
-        await fetch(`${API_BASE_URL}/api/users`, {
-          method: 'POST',
-          credentials: 'include',
-        });
-        setHasSynced(true);
-      } catch (err) {
-        console.error('Failed to sync user to DB', err);
-      }
-    };
-
-    syncUser();
-  }, [user, hasSynced]);
-  useEffect(() => {
     const stepParam = Number(searchParams.get('step'));
     if (stepParam === 1 || stepParam === 2 || stepParam === 3) {
       setStep(stepParam);
@@ -85,7 +69,15 @@ export default function SignUp() {
       });
       if (result.status !== 'complete') return;
       await setActive({ session: result.createdSessionId });
+
+      // 🔑 create DB user immediately, while auth is guaranteed
+      await fetch(`${API_BASE_URL}/api/users`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+      
       navigate('/sign-up?step=2', { replace: true });
+      
     } catch (err: any) {
       if (!Array.isArray(err?.errors)) {
         setPasswordError('Something went wrong. Please try again.');
