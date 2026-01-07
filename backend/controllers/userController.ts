@@ -7,6 +7,8 @@ import { prisma } from '../config/prisma';
 export const syncUser = async (req: Request, res: Response) => {
   console.log('🟢 syncUser HIT');
   console.log('Headers:', req.headers.cookie);
+  const auth = getAuth(req);
+  console.log('🟢 auth:', auth);
   const { userId } = getAuth(req);
 
   if (!userId) {

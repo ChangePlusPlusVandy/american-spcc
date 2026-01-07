@@ -10,6 +10,7 @@ import internalHostedResourceRoutes from './routes/internalHostedResourcesRoutes
 import adminLogsRoutes from './routes/adminLogsRoutes'
 import testS3Routes from './routes/testS3Routes'
 import authRoutes from './routes/authRoutes'
+import { clerkMiddleware } from '@clerk/express'
 
 const app = express()
 
@@ -41,6 +42,8 @@ app.use(
 
 
 app.use(express.json())
+// ✅ REGISTER CLERK HERE (ONCE)
+app.use(clerkMiddleware())
 app.post('/api/auth/__ping', (req, res) => {
   console.log('🧪 AUTH PING HIT');
   res.json({ ok: true });
@@ -53,6 +56,7 @@ app.get('/', (_req, res) => {
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok' })
 })
+
 app.use('/api/auth', authRoutes) 
 app.use('/api/resources', resourceRoutes)
 app.use('/api/labels', categoryLabelRoutes)
