@@ -154,11 +154,12 @@ export const updateCurrentUser = async (req: Request, res: Response) => {
       subscribed_newsletter,
       onboarding_complete,
     } = req.body;
-    
 
-    const updatedUser = await prisma.user.update({
+    const updatedUser = await prisma.user.upsert({
       where: { clerk_id: userId },
-      data: {
+
+      // 🔹 If the user already exists → update
+      update: {
         email: email ?? undefined,
         relationship,
         household_type,
@@ -167,7 +168,19 @@ export const updateCurrentUser = async (req: Request, res: Response) => {
         subscribed_newsletter,
         onboarding_complete,
       },
-      
+
+      // 🔹 If step 1 hasn't created the user yet → create
+      create: {
+        clerk_id: userId,
+        email: email ?? '',
+        role: 'PARENT',
+        relationship,
+        household_type,
+        topics_of_interest,
+        kids_age_groups,
+        subscribed_newsletter,
+        onboarding_complete,
+      },
     });
 
     res.json(updatedUser);
@@ -176,3 +189,4 @@ export const updateCurrentUser = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Failed to update user' });
   }
 };
+
