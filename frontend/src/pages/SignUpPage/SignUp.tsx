@@ -54,10 +54,10 @@ export default function SignUp() {
     if (!user || hasSynced) return;
     const syncUser = async () => {
       try {
-        await fetch(`${API_BASE_URL}/api/users`, {
+        await fetch(`${API_BASE_URL}/api/auth/sync-user`, {
           method: 'POST',
           credentials: 'include',
-        });
+        });        
         setHasSynced(true);
       } catch (err) {
         console.error('Failed to sync user to DB', err);
