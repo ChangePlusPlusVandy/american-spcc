@@ -1,5 +1,4 @@
 import express from 'express';
-import { requireAuth } from '@clerk/express';
 import {
   getAllUsers,
   getUserById,
@@ -11,10 +10,7 @@ import {
 
 const router = express.Router();
 
-// 🔐 everything below requires auth
-router.use(requireAuth());
-
-router.patch('/me', requireAuth(), updateCurrentUser);
+router.patch('/me', updateCurrentUser);
 router.get('/', getAllUsers);
 router.get('/clerk/:clerkId', getUserByClerkId);
 router.get('/:id', getUserById);
