@@ -1,8 +1,6 @@
-// server.ts
-import app from "./app"
+import app from './app'
+import { clerkMiddleware } from '@clerk/express'
 
-const PORT = process.env.PORT || 8000
+app.use(clerkMiddleware())
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`)
-})
+export default app

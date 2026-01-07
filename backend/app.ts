@@ -1,6 +1,5 @@
 import express from 'express'
 import cors from 'cors'
-import { clerkMiddleware } from '@clerk/express'
 
 import resourceRoutes from './routes/resourceRoutes'
 import categoryLabelRoutes from './routes/categoryLabelsRoutes'
@@ -42,9 +41,6 @@ app.use(
 
 
 app.use(express.json())
-
-// ✅ ADD THIS LINE
-app.use(clerkMiddleware())
 
 app.get('/', (_req, res) => {
   res.status(200).send('OK')
