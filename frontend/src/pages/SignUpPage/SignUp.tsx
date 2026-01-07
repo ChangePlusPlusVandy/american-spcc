@@ -141,26 +141,24 @@ export default function SignUp() {
     if (!user || processing) return;
     setProcessing(true);
     try {
-      const token = await getToken();
 
-      const response = await fetch(
-        `${API_BASE_URL}/api/users/me`,
-        {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            relationship,
-            household_type: householdType,
-            topics_of_interest: topics,
-            kids_age_groups: ageGroups,
-            subscribed_newsletter: subscribeNewsletter,
-            onboarding_complete: true,
-          }),
-        }
-      );
+
+      const response = await fetch(`${API_BASE_URL}/api/users/me`, {
+        method: 'PATCH',
+        credentials: 'include', // ✅ REQUIRED
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          relationship,
+          household_type: householdType,
+          topics_of_interest: topics,
+          kids_age_groups: ageGroups,
+          subscribed_newsletter: subscribeNewsletter,
+          onboarding_complete: true,
+        }),
+      });
+      
       
       if (!response.ok) {
         throw new Error('Failed to update user');
