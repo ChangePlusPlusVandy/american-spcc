@@ -138,49 +138,18 @@ export const deleteUser = async (req: Request, res: Response) => {
 
 export const updateCurrentUser = async (req: Request, res: Response) => {
   try {
-    const { prisma } = await import('../config/prisma');
-    const { userId } = getAuth(req);
+    const auth = getAuth(req);
+    console.log('AUTH DEBUG:', auth);
 
-    if (!userId) {
-      return res.status(401).json({ error: 'Unauthorized' });
+    if (!auth?.userId) {
+      return res.status(401).json({ error: 'Unauthorized (no Clerk user)' });
     }
 
-    const {
-      email,
-      relationship,
-      household_type,
-      topics_of_interest,
-      kids_age_groups,
-      subscribed_newsletter,
-      onboarding_complete,
-    } = req.body;
+    const { prisma } = await import('../config/prisma');
 
-    const updatedUser = await prisma.user.upsert({
-      where: { clerk_id: userId },
-
-      // 🔹 If the user already exists → update
-      update: {
-        email: email ?? undefined,
-        relationship,
-        household_type,
-        topics_of_interest,
-        kids_age_groups,
-        subscribed_newsletter,
-        onboarding_complete,
-      },
-
-      // 🔹 If step 1 hasn't created the user yet → create
-      create: {
-        clerk_id: userId,
-        email: email ?? '',
-        role: 'PARENT',
-        relationship,
-        household_type,
-        topics_of_interest,
-        kids_age_groups,
-        subscribed_newsletter,
-        onboarding_complete,
-      },
+    const updatedUser = await prisma.user.update({
+      where: { clerk_id: auth.userId },
+      data: req.body,
     });
 
     res.json(updatedUser);
@@ -189,4 +158,3 @@ export const updateCurrentUser = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Failed to update user' });
   }
 };
-
