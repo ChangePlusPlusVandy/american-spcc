@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
-import prisma from '../config/prisma';
 import { clerkClient } from '@clerk/clerk-sdk-node';
 import { getAuth } from '@clerk/express';
 
 // Create a new user
 export const createUser = async (req: Request, res: Response) => {
+  const { prisma } = await import('../config/prisma');
 
   const { userId } = getAuth(req);
   if (!userId) {
@@ -39,6 +39,7 @@ export const createUser = async (req: Request, res: Response) => {
 // Get all users
 export const getAllUsers = async (req: Request, res: Response) => {
   try {
+    const { prisma } = await import('../config/prisma');
     const users = await prisma.user.findMany({
       orderBy: { created_at: 'desc' },
     });
@@ -52,6 +53,7 @@ export const getAllUsers = async (req: Request, res: Response) => {
 // Get user by ID
 export const getUserById = async (req: Request, res: Response) => {
   try {
+    const { prisma } = await import('../config/prisma');
     const id = req.params.id as string;
     const user = await prisma.user.findUnique({ where: { id } });
 
@@ -67,6 +69,7 @@ export const getUserById = async (req: Request, res: Response) => {
 // Get user by Clerk ID
 export const getUserByClerkId = async (req: Request, res: Response) => {
   try {
+    const { prisma } = await import('../config/prisma');
     const clerk_id = req.params.clerkId as string;
     const user = await prisma.user.findUnique({ where: { clerk_id } });
 
@@ -82,6 +85,7 @@ export const getUserByClerkId = async (req: Request, res: Response) => {
 // Update user
 export const updateUser = async (req: Request, res: Response) => {
   try {
+    const { prisma } = await import('../config/prisma');
     const id = req.params.id as string;
 
     const {
@@ -121,6 +125,7 @@ export const updateUser = async (req: Request, res: Response) => {
 // Delete user
 export const deleteUser = async (req: Request, res: Response) => {
   try {
+    const { prisma } = await import('../config/prisma');
     const id = req.params.id as string;
     await prisma.user.delete({ where: { id } });
 
@@ -133,6 +138,7 @@ export const deleteUser = async (req: Request, res: Response) => {
 
 export const updateCurrentUser = async (req: Request, res: Response) => {
   try {
+    const { prisma } = await import('../config/prisma');
     const { userId } = getAuth(req);
 
     if (!userId) {

@@ -1,9 +1,10 @@
 import { Request, Response } from 'express';
 import { getAuth } from '@clerk/express';
-import prisma from '../config/prisma';
 
 export const createCollection = async (req: Request, res: Response) => {
   try {
+    const { prisma } = await import('../config/prisma');
+
     const { userId: clerkId } = getAuth(req);
 
     if (!clerkId) {
@@ -43,6 +44,8 @@ export const createCollection = async (req: Request, res: Response) => {
 
 export const getCollectionsByUser = async (req: Request, res: Response) => {
   try {
+    const { prisma } = await import('../config/prisma');
+
     const { userId: clerkId } = getAuth(req);
     if (!clerkId) return res.status(401).json({ error: 'Unauthorized' });
 
@@ -83,7 +86,10 @@ export const getCollectionsByUser = async (req: Request, res: Response) => {
 
 export const getCollectionById = async (req: Request, res: Response) => {
   try {
+    const { prisma } = await import('../config/prisma');
+
     const { userId: clerkId } = getAuth(req);
+    
     const { id } = req.params;
 
     if (!clerkId) return res.status(401).json({ error: 'Unauthorized' });
@@ -114,6 +120,7 @@ export const getCollectionById = async (req: Request, res: Response) => {
 
 export const renameCollection = async (req: Request, res: Response) => {
   try {
+    const { prisma } = await import('../config/prisma');
     const { userId: clerkId } = getAuth(req);
     const { id } = req.params;
     const { name } = req.body;
@@ -151,6 +158,7 @@ export const renameCollection = async (req: Request, res: Response) => {
 
 export const deleteCollection = async (req: Request, res: Response) => {
   try {
+    const { prisma } = await import('../config/prisma');
     const { userId: clerkId } = getAuth(req);
     const { id } = req.params;
 
@@ -179,6 +187,7 @@ export const deleteCollection = async (req: Request, res: Response) => {
 
 export const addResourceToCollection = async (req: Request, res: Response) => {
   try {
+    const { prisma } = await import('../config/prisma');
     const { userId: clerkId } = getAuth(req);
     const { collectionId } = req.params;
     const { resource_fk } = req.body;
@@ -218,6 +227,7 @@ export const addResourceToCollection = async (req: Request, res: Response) => {
 
 export const removeResourceFromCollection = async (req: Request, res: Response) => {
   try {
+    const { prisma } = await import('../config/prisma');
     const { userId: clerkId } = getAuth(req);
     const { itemId } = req.params;
 

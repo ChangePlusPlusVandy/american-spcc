@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import prisma from '../config/prisma';
 
 export const recordResourceView = async (req: Request, res: Response) => {
   try {
+    const { prisma } = await import('../config/prisma');
     const { user_fk, resource_fk } = req.body;
 
     if (!user_fk || !resource_fk) {
@@ -44,6 +44,7 @@ export const recordResourceView = async (req: Request, res: Response) => {
 
 export const getAllResourceViews = async (_req: Request, res: Response) => {
   try {
+    const { prisma } = await import('../config/prisma');
     const all = await prisma.resourceView.findMany();
     res.json(all);
   } catch (error) {
@@ -54,6 +55,7 @@ export const getAllResourceViews = async (_req: Request, res: Response) => {
 
 export const getResourceViewById = async (req: Request, res: Response) => {
   try {
+    const { prisma } = await import('../config/prisma');
     const id = req.params.id;
 
     const view = await prisma.resourceView.findUnique({
@@ -71,6 +73,7 @@ export const getResourceViewById = async (req: Request, res: Response) => {
 
 export const deleteResourceView = async (req: Request, res: Response) => {
   try {
+    const { prisma } = await import('../config/prisma');
     const id = req.params.id;
 
     await prisma.resourceView.delete({ where: { id } });

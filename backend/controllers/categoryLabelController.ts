@@ -1,9 +1,10 @@
 import { Request, Response } from 'express';
-import prisma from '../config/prisma';
 import { CATEGORY_TYPE } from '@prisma/client';
 
 export const createLabel = async (req: Request, res: Response) => {
   try {
+    const { prisma } = await import('../config/prisma');
+
     const { label_name, category } = req.body;
 
     if (!label_name || !category) {
@@ -27,8 +28,9 @@ export const createLabel = async (req: Request, res: Response) => {
 
 export const getAllLabels = async (req: Request, res: Response) => {
   try {
-    const { category } = req.query;
+    const { prisma } = await import('../config/prisma');
 
+    const { category } = req.query;
     const where = category ? { category: category as CATEGORY_TYPE } : undefined;
 
     const labels = await prisma.categoryLabel.findMany({
@@ -45,13 +47,19 @@ export const getAllLabels = async (req: Request, res: Response) => {
 
 export const getLabelById = async (req: Request, res: Response) => {
   try {
+    const { prisma } = await import('../config/prisma');
+
     const id = req.params.id as string;
+
     const label = await prisma.categoryLabel.findUnique({
       where: { id },
       include: { resources: true },
     });
 
-    if (!label) return res.status(404).json({ error: 'Label not found' });
+    if (!label) {
+      return res.status(404).json({ error: 'Label not found' });
+    }
+
     res.json(label);
   } catch (error) {
     console.error('Error fetching label:', error);
@@ -61,6 +69,8 @@ export const getLabelById = async (req: Request, res: Response) => {
 
 export const updateLabel = async (req: Request, res: Response) => {
   try {
+    const { prisma } = await import('../config/prisma');
+
     const id = req.params.id as string;
     const { label_name, category } = req.body;
 
@@ -78,8 +88,14 @@ export const updateLabel = async (req: Request, res: Response) => {
 
 export const deleteLabel = async (req: Request, res: Response) => {
   try {
+    const { prisma } = await import('../config/prisma');
+
     const id = req.params.id as string;
-    await prisma.categoryLabel.delete({ where: { id } });
+
+    await prisma.categoryLabel.delete({
+      where: { id },
+    });
+
     res.json({ message: 'Label deleted successfully' });
   } catch (error) {
     console.error('Error deleting label:', error);
@@ -89,6 +105,8 @@ export const deleteLabel = async (req: Request, res: Response) => {
 
 export const searchLabels = async (req: Request, res: Response) => {
   try {
+    const { prisma } = await import('../config/prisma');
+
     const { q } = req.query;
 
     if (!q || typeof q !== 'string') {

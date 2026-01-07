@@ -1,8 +1,9 @@
 import { Request, Response } from 'express';
-import prisma from '../config/prisma';
 
 export const createAdminLog = async (req: Request, res: Response) => {
   try {
+    const { prisma } = await import('../config/prisma');
+
     const { admin_id, action, details } = req.body;
 
     if (!admin_id || !action) {
@@ -39,6 +40,8 @@ export const createAdminLog = async (req: Request, res: Response) => {
 
 export const getAllAdminLogs = async (_req: Request, res: Response) => {
   try {
+    const { prisma } = await import('../config/prisma');
+
     const logs = await prisma.adminLog.findMany({
       include: {
         admin: {

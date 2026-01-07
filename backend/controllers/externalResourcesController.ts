@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import prisma from '../config/prisma';
 
 export const createExternalResources = async (req: Request, res: Response) => {
   try {
+    const { prisma } = await import('../config/prisma');
     const { resource_fk, external_url } = req.body;
 
     const externalResources = await prisma.externalResources.create({
@@ -21,6 +21,7 @@ export const createExternalResources = async (req: Request, res: Response) => {
 
 export const getAllExternalResources = async (req: Request, res: Response) => {
   try {
+    const { prisma } = await import('../config/prisma');
     const allExternalResources = await prisma.externalResources.findMany();
     res.json(allExternalResources);
   } catch (error) {
@@ -31,6 +32,7 @@ export const getAllExternalResources = async (req: Request, res: Response) => {
 
 export const getExternalResourcesById = async (req: Request, res: Response) => {
   try {
+    const { prisma } = await import('../config/prisma');
     const id = req.params.id as string;
     const externalResources = await prisma.externalResources.findUnique({
       where: { id },
@@ -47,6 +49,7 @@ export const getExternalResourcesById = async (req: Request, res: Response) => {
 
 export const updateExternalResources = async (req: Request, res: Response) => {
   try {
+    const { prisma } = await import('../config/prisma');
     const id = req.params.id as string;
     const { resource_fk, external_url } = req.body;
 
@@ -64,6 +67,7 @@ export const updateExternalResources = async (req: Request, res: Response) => {
 
 export const deleteExternalResources = async (req: Request, res: Response) => {
   try {
+    const { prisma } = await import('../config/prisma');
     const id = req.params.id as string;
     await prisma.externalResources.delete({ where: { id } });
     res.json({ message: 'External resources deleted successfully' });

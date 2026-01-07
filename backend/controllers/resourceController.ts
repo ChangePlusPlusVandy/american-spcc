@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import prisma from '../config/prisma';
 import { GetObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { getS3 } from '../config/s3'
@@ -19,6 +18,7 @@ const getSignedImageUrl = async (key: string) => {
 
 export const createResource = async (req: Request, res: Response) => {
   try {
+    const { prisma } = await import('../config/prisma');
     const {
       title,
       description,
@@ -63,6 +63,7 @@ export const createResource = async (req: Request, res: Response) => {
 
 export const getAllResources = async (req: Request, res: Response) => {
   try {
+    const { prisma } = await import('../config/prisma');
     const { category, label_id } = req.query;
     const where: any = {};
 
@@ -116,6 +117,7 @@ export const getAllResources = async (req: Request, res: Response) => {
 
 export const getResourceById = async (req: Request, res: Response) => {
   try {
+    const { prisma } = await import('../config/prisma');
     const id = req.params.id;
     const resource = await prisma.resource.findUnique({
       where: { id },
@@ -135,6 +137,7 @@ export const getResourceById = async (req: Request, res: Response) => {
 
 export const updateResource = async (req: Request, res: Response) => {
   try {
+    const { prisma } = await import('../config/prisma');
     const id = req.params.id;
 
     const {
@@ -181,6 +184,7 @@ export const updateResource = async (req: Request, res: Response) => {
 
 export const deleteResource = async (req: Request, res: Response) => {
   try {
+    const { prisma } = await import('../config/prisma');
     const id = req.params.id;
 
     await prisma.resource.delete({ where: { id } });
@@ -193,6 +197,7 @@ export const deleteResource = async (req: Request, res: Response) => {
 
 export const searchResources = async (req: Request, res: Response) => {
   try {
+    const { prisma } = await import('../config/prisma');
     const query = (req.query.q as string)?.trim();
     if (!query) return res.json([]);
 

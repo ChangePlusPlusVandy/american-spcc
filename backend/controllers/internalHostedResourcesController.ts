@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import prisma from '../config/prisma';
 
 export const createInternalHostedResource = async (req: Request, res: Response) => {
   try {
+    const { prisma } = await import('../config/prisma');
     const { resource_fk, s3_key } = req.body;
 
     const internalHostedResources = await prisma.internalHostedResources.create({
@@ -21,6 +21,7 @@ export const createInternalHostedResource = async (req: Request, res: Response) 
 
 export const getAllInternalHostedResources = async (req: Request, res: Response) => {
   try {
+    const { prisma } = await import('../config/prisma');
     const allInternalResources = await prisma.internalHostedResources.findMany();
     res.json(allInternalResources);
   } catch (error) {
@@ -31,6 +32,7 @@ export const getAllInternalHostedResources = async (req: Request, res: Response)
 
 export const getInternalHostedResourceById = async (req: Request, res: Response) => {
   try {
+    const { prisma } = await import('../config/prisma');
     const id = req.params.id as string;
     const internalHostedResource = await prisma.internalHostedResources.findUnique({
       where: { id },
@@ -48,6 +50,7 @@ export const getInternalHostedResourceById = async (req: Request, res: Response)
 
 export const updateInternalHostedResource = async (req: Request, res: Response) => {
   try {
+    const { prisma } = await import('../config/prisma');
     const id = req.params.id as string;
     const { resource_fk, s3_key } = req.body;
 
@@ -68,6 +71,7 @@ export const updateInternalHostedResource = async (req: Request, res: Response) 
 
 export const deleteInternalHostedResource = async (req: Request, res: Response) => {
   try {
+    const { prisma } = await import('../config/prisma');
     const id = req.params.id as string;
     await prisma.internalHostedResources.delete({ where: { id } });
     res.json({ message: 'Internal Hosted Resource deleted successfully' });

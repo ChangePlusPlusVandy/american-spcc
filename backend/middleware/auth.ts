@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import { ClerkExpressWithAuth } from '@clerk/clerk-sdk-node';
-import prisma from '../config/prisma';
 import { clerkClient } from '@clerk/clerk-sdk-node';
 
 /**
@@ -21,8 +20,14 @@ export const authenticateUser = (req: Request, res: Response, next: NextFunction
   });
 };
 
-export const syncUserWithDB = async (req: Request, res: Response, next: NextFunction) => {
+export const syncUserWithDB = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
+    const { prisma } = await import('../config/prisma');
+
     const clerkId = (req as any).auth?.userId;
     if (!clerkId) {
       return res.status(401).json({ error: 'No Clerk user ID found' });
@@ -51,6 +56,7 @@ export const syncUserWithDB = async (req: Request, res: Response, next: NextFunc
     return res.status(500).json({ error: 'Failed to sync user with database' });
   }
 };
+
 
 export const requireParent = (req: Request, res: Response, next: NextFunction) => {
   const user = (req as any).user;
