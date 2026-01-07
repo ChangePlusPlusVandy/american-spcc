@@ -6,30 +6,44 @@ import { prisma } from '../config/prisma';
 // sync user
 export const syncUser = async (req: Request, res: Response) => {
   console.log('🟢 syncUser HIT');
-  console.log('Headers:', req.headers.cookie);
-  const auth = getAuth(req);
-  console.log('🟢 auth:', auth);
-  const { userId } = getAuth(req);
 
-  if (!userId) {
-    return res.status(200).json({ ok: true });
-  }
+  try {
+    const { userId } = getAuth(req);
+    console.log('🟢 userId:', userId);
 
-  const clerkUser = await clerkClient.users.getUser(userId);
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
 
-  await prisma.user.upsert({
-    where: { clerk_id: userId },
-    update: {},
-    create: {
+    const clerkUser = await clerkClient.users.getUser(userId);
+    console.log('🟢 clerk user fetched');
+
+    const email = clerkUser.emailAddresses[0]?.emailAddress ?? null;
+
+    console.log('🟢 attempting prisma upsert', {
       clerk_id: userId,
-      email: clerkUser.emailAddresses[0]?.emailAddress ?? null,
-      first_name: clerkUser.firstName ?? null,
-      last_name: clerkUser.lastName ?? null,
-      role: 'PARENT',
-    },
-  });
+      email,
+    });
 
-  return res.status(200).json({ ok: true });
+    const user = await prisma.user.upsert({
+      where: { clerk_id: userId },
+      update: {},
+      create: {
+        clerk_id: userId,
+        email,
+        first_name: clerkUser.firstName ?? null,
+        last_name: clerkUser.lastName ?? null,
+        role: 'PARENT',
+      },
+    });
+
+    console.log('✅ DB user synced:', user.id);
+
+    return res.json({ ok: true });
+  } catch (err) {
+    console.error('❌ syncUser FAILED:', err);
+    return res.status(500).json({ error: 'sync failed' });
+  }
 };
 
 // Get all users
