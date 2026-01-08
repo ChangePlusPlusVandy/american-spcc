@@ -1,23 +1,26 @@
 import { Request, Response, NextFunction } from 'express';
-import { ClerkExpressWithAuth } from '@clerk/clerk-sdk-node';
+import { getAuth } from '@clerk/express';
 import { clerkClient } from '@clerk/clerk-sdk-node';
+import prisma from '../config/prisma';
 
 /**
  * AUTHENTICATION & AUTHORIZATION TEMPLATE
  * ---------------------------------------
  * Roles: PARENT, ADMIN
- * Responsibilities:
- *  1. Verify Clerk authentication
- *  2. Sync user with database (if needed)
- *  3. Enforce role-based access control
  */
-export const authenticateUser = (req: Request, res: Response, next: NextFunction) => {
-  ClerkExpressWithAuth({})(req as any, res as any, () => {
-    if (!(req as any).auth?.userId) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
-    next();
-  });
+
+export const authenticateUser = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { userId } = getAuth(req);
+
+  if (!userId) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  next();
 };
 
 export const syncUserWithDB = async (
@@ -26,9 +29,8 @@ export const syncUserWithDB = async (
   next: NextFunction
 ) => {
   try {
-    const { prisma } = await import('../config/prisma');
+    const { userId: clerkId } = getAuth(req);
 
-    const clerkId = (req as any).auth?.userId;
     if (!clerkId) {
       return res.status(401).json({ error: 'No Clerk user ID found' });
     }
@@ -53,12 +55,15 @@ export const syncUserWithDB = async (
     next();
   } catch (error) {
     console.error('Error syncing user with database:', error);
-    return res.status(500).json({ error: 'Failed to sync user with database' });
+    res.status(500).json({ error: 'Failed to sync user with database' });
   }
 };
 
-
-export const requireParent = (req: Request, res: Response, next: NextFunction) => {
+export const requireParent = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const user = (req as any).user;
 
   if (!user) {
@@ -66,15 +71,19 @@ export const requireParent = (req: Request, res: Response, next: NextFunction) =
   }
 
   if (user.role === 'PARENT' || user.role === 'ADMIN') {
-    next();
-  } else {
-    return res.status(403).json({
-      error: 'Forbidden: Requires PARENT or ADMIN role',
-    });
+    return next();
   }
+
+  return res.status(403).json({
+    error: 'Forbidden: Requires PARENT or ADMIN role',
+  });
 };
 
-export const requireAdmin = (req: Request, res: Response, next: NextFunction) => {
+export const requireAdmin = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const user = (req as any).user;
 
   if (!user) {
@@ -82,10 +91,10 @@ export const requireAdmin = (req: Request, res: Response, next: NextFunction) =>
   }
 
   if (user.role === 'ADMIN') {
-    next();
-  } else {
-    return res.status(403).json({
-      error: 'Forbidden: Requires ADMIN role',
-    });
+    return next();
   }
+
+  return res.status(403).json({
+    error: 'Forbidden: Requires ADMIN role',
+  });
 };

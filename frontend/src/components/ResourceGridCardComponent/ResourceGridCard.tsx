@@ -10,8 +10,10 @@ import familySupportIcon from '@/assets/family_support_community_icon.png';
 import bookmarkIcon from '@/assets/bookmark.png';
 import { useState, useRef, useEffect } from 'react';
 import bookmarkFilled from '@/assets/bookmark-filled.png';
-
+import CreateCollection from '@/components/CreateCollectionComponent/CreateCollection';
+import { API_BASE_URL } from '@/config/api';
 import SaveResource from '@/components/SaveResourceComponent/SaveResource';
+
 interface ResourceGridCardProps {
   id: string;
   title: string;
@@ -69,6 +71,13 @@ function ResourceGridCard({
   const [flipped, setFlipped] = useState(false);
   const [showSavePopup, setShowSavePopup] = useState(false);
   const popupRef = useRef<HTMLDivElement | null>(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [pendingResourceId, setPendingResourceId] = useState<string | null>(null);
+  const [pendingImageUrl, setPendingImageUrl] = useState<string | undefined>();
+  const [collections, setCollections] = useState<{ id: string; name: string }[]>(
+    []
+  );
+
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -122,13 +131,65 @@ function ResourceGridCard({
                   resourceId: id,
                 });
               }}
-              
               onBookmarkChange={(isBookmarked) => {
                 setShowSavePopup(false);
                 onBookmarkChange?.(isBookmarked);
               }}
-              onCreateCollection={onCreateCollection}
+              onCreateCollection={(imageUrl, resourceId) => {
+                setPendingResourceId(resourceId ?? null);
+                setPendingImageUrl(imageUrl);
+                setShowCreateModal(true);
+              }}
             />
+            <CreateCollection
+              isOpen={showCreateModal}
+              existingNames={collections.map(c => c.name)}
+              imageUrl={pendingImageUrl}
+              onCancel={() => setShowCreateModal(false)}
+              onCreate={async (name) => {
+
+                const res = await fetch(`${API_BASE_URL}/api/collections`, {
+                  method: 'POST',
+                  credentials: 'include',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ name }),
+                });
+
+                const collection = await res.json();
+
+                await fetch(
+                  `${API_BASE_URL}/api/collections/${collection.id}/items`,
+                  {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ resource_fk: pendingResourceId }),
+                  }
+                );
+
+                onSaved?.({
+                  collectionName: collection.name,
+                  imageUrl: pendingImageUrl,
+                  resourceId: pendingResourceId!,
+                  undo: async () => {
+                    await fetch(
+                      `${API_BASE_URL}/api/collections/items/${collection.id}`,
+                      {
+                        method: 'DELETE',
+                        credentials: 'include',
+                      }
+                    );
+                  },
+                });
+
+                onBookmarkChange?.(true);
+
+                setShowCreateModal(false);
+                setShowSavePopup(false);
+              }}
+            />
+
+
 
 
           </div>

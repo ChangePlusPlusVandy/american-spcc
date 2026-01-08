@@ -2,25 +2,26 @@ import { Request, Response } from 'express';
 import { getAuth } from '@clerk/express';
 import { clerkClient } from '@clerk/clerk-sdk-node';
 import { prisma } from '../config/prisma';
+import { RELATIONSHIP_TYPE, HOUSEHOLD_TYPE } from '@prisma/client';
 
 // sync user
 export const syncUser = async (req: Request, res: Response) => {
-  console.log('🟢 syncUser HIT');
+  console.log('syncUser HIT');
 
   try {
     const userId = (req as any).auth?.userId;
-    console.log('🟢 userId:', userId);
+    console.log('userId:', userId);
 
     if (!userId) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
     const clerkUser = await clerkClient.users.getUser(userId);
-    console.log('🟢 clerk user fetched');
+    console.log('clerk user fetched');
 
     const email = clerkUser.emailAddresses[0]?.emailAddress ?? null;
 
-    console.log('🟢 attempting prisma upsert', {
+    console.log('attempting prisma upsert', {
       clerk_id: userId,
       email,
     });
@@ -37,11 +38,11 @@ export const syncUser = async (req: Request, res: Response) => {
       },
     });
 
-    console.log('✅ DB user synced:', user.id);
+    console.log('DB user synced:', user.id);
 
     return res.json({ ok: true });
   } catch (err) {
-    console.error('❌ syncUser FAILED:', err);
+    console.error('syncUser FAILED:', err);
     return res.status(500).json({ error: 'sync failed' });
   }
 };
@@ -146,18 +147,17 @@ export const deleteUser = async (req: Request, res: Response) => {
   }
 };
 
+
 export const updateCurrentUser = async (req: Request, res: Response) => {
   try {
-    console.log('🟢 PATCH /api/users/me HIT');
-    const { prisma } = await import('../config/prisma');
-    const { userId } = getAuth(req);
+    console.log('PATCH /api/users/me HIT');
 
+    const { userId } = getAuth(req);
     if (!userId) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
     const {
-      email,
       relationship,
       household_type,
       topics_of_interest,
@@ -165,25 +165,47 @@ export const updateCurrentUser = async (req: Request, res: Response) => {
       subscribed_newsletter,
       onboarding_complete,
     } = req.body;
-    
+
+    const data: any = {};
+
+    if (relationship !== undefined) {
+      data.relationship =
+        relationship && relationship !== ''
+          ? (relationship as RELATIONSHIP_TYPE)
+          : null;
+    }
+
+    if (household_type !== undefined) {
+      data.household_type =
+        household_type && household_type !== ''
+          ? (household_type as HOUSEHOLD_TYPE)
+          : null;
+    }
+
+    if (Array.isArray(topics_of_interest)) {
+      data.topics_of_interest = topics_of_interest;
+    }
+
+    if (Array.isArray(kids_age_groups)) {
+      data.kids_age_groups = kids_age_groups;
+    }
+
+    if (typeof subscribed_newsletter === 'boolean') {
+      data.subscribed_newsletter = subscribed_newsletter;
+    }
+
+    if (typeof onboarding_complete === 'boolean') {
+      data.onboarding_complete = onboarding_complete;
+    }
 
     const updatedUser = await prisma.user.update({
       where: { clerk_id: userId },
-      data: {
-        email: email ?? undefined,
-        relationship,
-        household_type,
-        topics_of_interest,
-        kids_age_groups,
-        subscribed_newsletter,
-        onboarding_complete,
-      },
-      
+      data,
     });
 
-    res.json(updatedUser);
+    return res.json(updatedUser);
   } catch (err) {
     console.error('updateCurrentUser error:', err);
-    res.status(500).json({ error: 'Failed to update user' });
+    return res.status(500).json({ error: 'Failed to update user' });
   }
 };

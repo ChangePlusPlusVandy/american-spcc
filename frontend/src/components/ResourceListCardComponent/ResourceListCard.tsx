@@ -9,7 +9,8 @@ import lifeSkillsIcon from '@/assets/life_skills_independence_icon.png';
 import familySupportIcon from '@/assets/family_support_community_icon.png';
 import bookmarkIcon from '@/assets/bookmark.png';
 import bookmarkFilled from '@/assets/bookmark-filled.png';
-
+import CreateCollection from '@/components/CreateCollectionComponent/CreateCollection';
+import { API_BASE_URL } from '@/config/api';
 import { useState, useRef, useEffect } from 'react';
 import SaveResource from '@/components/SaveResourceComponent/SaveResource';
 interface ResourceListCardProps {
@@ -70,6 +71,22 @@ function ResourceListCard({
   const categoryIcon = CATEGORY_ICON_MAP[category];
   const [showSavePopup, setShowSavePopup] = useState(false);
   const popupRef = useRef<HTMLDivElement | null>(null);
+  const [showCreateCollection, setShowCreateCollection] = useState(false);
+  const [collections, setCollections] = useState<{ name: string }[]>([]);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+const [pendingResourceId, setPendingResourceId] = useState<string | null>(null);
+const [pendingImageUrl, setPendingImageUrl] = useState<string | undefined>();
+
+  useEffect(() => {
+    if (!showCreateCollection) return;
+  
+    fetch(`${API_BASE_URL}/api/collections`, {
+      credentials: 'include',
+    })
+      .then(res => res.json())
+      .then(setCollections)
+      .catch(console.error);
+  }, [showCreateCollection]);
   
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -110,11 +127,61 @@ function ResourceListCard({
           resourceId={id}
           resourceImage={imageUrl}
           onSaved={onSaved}
-          onBookmarkChange={(isBookmarked) => {
-            onBookmarkChange?.(isBookmarked);
+          onBookmarkChange={onBookmarkChange}
+          onCreateCollection={(imageUrl, resourceId) => {
+            setPendingResourceId(resourceId ?? null);
+            setPendingImageUrl(imageUrl);
+            setShowCreateModal(true);
           }}
-          onCreateCollection={onCreateCollection}
         />
+
+        <CreateCollection
+          isOpen={showCreateModal}
+          existingNames={collections.map(c => c.name)}
+          imageUrl={pendingImageUrl}
+          onCancel={() => setShowCreateModal(false)}
+          onCreate={async (name) => {
+            const res = await fetch(`${API_BASE_URL}/api/collections`, {
+              method: 'POST',
+              credentials: 'include',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ name }),
+            });
+
+            const collection = await res.json();
+
+            await fetch(
+              `${API_BASE_URL}/api/collections/${collection.id}/items`,
+              {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ resource_fk: pendingResourceId }),
+              }
+            );
+
+            onSaved?.({
+              collectionName: collection.name,
+              imageUrl: pendingImageUrl,
+              undo: async () => {
+                await fetch(
+                  `${API_BASE_URL}/api/collections/items/${collection.id}`,
+                  {
+                    method: 'DELETE',
+                    credentials: 'include',
+                  }
+                );
+              },
+            });
+            onBookmarkChange?.(true);
+
+            setShowCreateModal(false);
+            setShowSavePopup(false);
+          }}
+        />
+
+
+
 
       </div>
       <div className={styles.content}>

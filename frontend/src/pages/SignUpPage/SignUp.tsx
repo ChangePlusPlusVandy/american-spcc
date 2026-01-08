@@ -68,10 +68,9 @@ export default function SignUp() {
 
       await fetch(`${API_BASE_URL}/api/auth/sync-user`, {
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        credentials: 'include',
       });
+      
       
   
       setHasSynced(true);
@@ -101,10 +100,9 @@ export default function SignUp() {
 
         await fetch(`${API_BASE_URL}/api/auth/sync-user`, {
           method: 'POST',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          credentials: 'include',
         });
+        
         
       
         setHasSynced(true);
@@ -145,7 +143,7 @@ export default function SignUp() {
 
       const response = await fetch(`${API_BASE_URL}/api/users/me`, {
         method: 'PATCH',
-        credentials: 'include', // ✅ REQUIRED
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
