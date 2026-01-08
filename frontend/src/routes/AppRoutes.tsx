@@ -1,11 +1,16 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { useUser, AuthenticateWithRedirectCallback } from '@clerk/clerk-react';
+import {
+  useUser,
+  AuthenticateWithRedirectCallback,
+} from '@clerk/clerk-react';
+
 
 import Landing from '@pages/LandingPage/Landing';
 import FilterPage from '@pages/FilterPage/Filter';
 import Login from '@pages/LoginPage/Login';
 import Signup from '@pages/SignUpPage/SignUp';
 import Account from '@pages/AccountPage/Account';
+import ResetPassword from '@pages/ResetPasswordPage/ResetPassword';
 
 function AccountRoute() {
   const { user, isLoaded } = useUser();
@@ -27,6 +32,7 @@ export default function AppRoutes() {
       <Route path="/filter" element={<FilterPage />} />
       <Route path="/sign-in/*" element={<Login />} />
       <Route path="/sign-up/*" element={<Signup />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route
         path="/sso-callback"
         element={<AuthenticateWithRedirectCallback />}

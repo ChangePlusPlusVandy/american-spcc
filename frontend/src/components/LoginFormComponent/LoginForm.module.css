@@ -156,3 +156,19 @@
   color: #b42318;
   font-family: 'Lato', sans-serif;
 }
+
+.forgotPassword {
+  background: none;
+  border: none;
+  color: #6EC6BF;
+  font-size: 0.85rem;
+  text-align: right;
+  cursor: pointer;
+  padding: 0;
+  margin: 4px 0 12px;
+  align-self: flex-end;
+}
+
+.forgotPassword:hover {
+  text-decoration: underline;
+}

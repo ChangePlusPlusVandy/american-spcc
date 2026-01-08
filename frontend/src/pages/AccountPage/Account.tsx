@@ -704,8 +704,9 @@ export default function AccountPage() {
                   />
                 </label>
 
-                <label className="edit-label">
-                  Age Groups
+                <div className="edit-label">
+                  <span className="edit-label-text">Age Groups</span>
+
                   <CheckboxDropdown
                     label="Select age group..."
                     value={editForm.kids_age_groups}
@@ -716,38 +717,22 @@ export default function AccountPage() {
                       })
                     }
                     options={[
-                      {
-                        label: 'Infant (0–3)',
-                        value: 'AGE_0_3',
-                      },
-                      {
-                        label: 'Preschool (4–6)',
-                        value: 'AGE_4_6',
-                      },
-                      {
-                        label: 'Elementary (7–10)',
-                        value: 'AGE_7_10',
-                      },
-                      {
-                        label: 'Middle School (11–13)',
-                        value: 'AGE_10_13',
-                      },
-                      {
-                        label: 'High School (14–18)',
-                        value: 'AGE_14_18',
-                      },
-                      {
-                        label: 'University & Above (18+)',
-                        value: 'AGE_18_ABOVE',
-                      },
+                      { label: 'Infant (0–3)', value: 'AGE_0_3' },
+                      { label: 'Preschool (4–6)', value: 'AGE_4_6' },
+                      { label: 'Elementary (7–10)', value: 'AGE_7_10' },
+                      { label: 'Middle School (11–13)', value: 'AGE_10_13' },
+                      { label: 'High School (14–18)', value: 'AGE_14_18' },
+                      { label: 'University & Above (18+)', value: 'AGE_18_ABOVE' },
                     ]}
                   />
-                </label>
+                </div>
 
-                <label className="edit-label">
-                  Topics of Interest
+
+                <div className="edit-label">
+                  <span className="edit-label-text">Topics of Interest</span>
+
                   <CheckboxDropdown
-                    label="Select Topics of Interest..."
+                    label="Select topics of interest..."
                     value={editForm.topics_of_interest}
                     onChange={(vals) =>
                       setEditForm({
@@ -756,45 +741,18 @@ export default function AccountPage() {
                       })
                     }
                     options={[
-                      {
-                        label: 'Parenting Skills & Relationships',
-                        value:
-                          'PARENTING_SKILLS_RELATIONSHIPS',
-                      },
-                      {
-                        label: 'Child Development',
-                        value: 'CHILD_DEVELOPMENT',
-                      },
-                      {
-                        label: 'Mental & Emotional Health',
-                        value:
-                          'MENTAL_EMOTIONAL_HEALTH',
-                      },
-                      {
-                        label: 'Safety & Protection',
-                        value: 'SAFETY_PROTECTION',
-                      },
-                      {
-                        label: 'Education & Learning',
-                        value: 'EDUCATION_LEARNING',
-                      },
-                      {
-                        label: 'Health & Wellbeing',
-                        value: 'HEALTH_WELLBEING',
-                      },
-                      {
-                        label: 'Life Skills & Independence',
-                        value:
-                          'LIFE_SKILLS_INDEPENDENCE',
-                      },
-                      {
-                        label: 'Family Support & Community',
-                        value:
-                          'FAMILY_SUPPORT_COMMUNITY',
-                      },
+                      { label: 'Parenting Skills & Relationships', value: 'PARENTING_SKILLS_RELATIONSHIPS' },
+                      { label: 'Child Development', value: 'CHILD_DEVELOPMENT' },
+                      { label: 'Mental & Emotional Health', value: 'MENTAL_EMOTIONAL_HEALTH' },
+                      { label: 'Safety & Protection', value: 'SAFETY_PROTECTION' },
+                      { label: 'Education & Learning', value: 'EDUCATION_LEARNING' },
+                      { label: 'Health & Wellbeing', value: 'HEALTH_WELLBEING' },
+                      { label: 'Life Skills & Independence', value: 'LIFE_SKILLS_INDEPENDENCE' },
+                      { label: 'Family Support & Community', value: 'FAMILY_SUPPORT_COMMUNITY' },
                     ]}
                   />
-                </label>
+                </div>
+
 
                 <div className="edit-actions">
                   <button

@@ -11,15 +11,19 @@ interface LoginFormProps {
   onSubmit: (email: string, password: string) => void;
   onGoogleLogin: () => void;
   onSignUpClick: () => void;
+  onForgotPassword: (email: string) => void;
   error: string | null;
 }
+
 
 function LoginForm({
   onSubmit,
   onGoogleLogin,
   onSignUpClick,
+  onForgotPassword,
   error,
 }: LoginFormProps) {
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -27,6 +31,7 @@ function LoginForm({
     e.preventDefault();
     onSubmit(email, password);
   };
+  
 
   return (
     <div className={styles.loginContainer}>
@@ -57,7 +62,18 @@ function LoginForm({
               required
               showPasswordToggle
             />
+
+            <button
+              type="button"
+              className={styles.forgotPassword}
+              onClick={() => onForgotPassword(email)}
+            >
+              Forgot password?
+            </button>
+
+
             {error && <p className={styles.fieldError}>{error}</p>}
+
             <Button
               text="SIGN IN"
               type="submit"

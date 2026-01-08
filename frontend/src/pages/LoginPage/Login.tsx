@@ -18,6 +18,9 @@ function Login() {
   const navigate = useNavigate();
   const { signIn, setActive } = useSignIn();
   const [error, setError] = useState<string | null>(null);
+  const handleForgotPassword = () => {
+    navigate('/reset-password');
+  };
   const handleLogin = async (email: string, password: string) => {
     if (!signIn) return;
     setError(null);
@@ -53,6 +56,7 @@ function Login() {
       onSubmit={handleLogin}
       onGoogleLogin={handleGoogleLogin}
       onSignUpClick={() => navigate('/sign-up')}
+      onForgotPassword={handleForgotPassword}
       error={error}
     />
   );
