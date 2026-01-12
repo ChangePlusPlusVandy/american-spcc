@@ -96,7 +96,6 @@ function FilterPage() {
       });
     };
     const { getToken } = useAuth();
-    const hasInitializedCategory = useRef(false);
 
 
   const formatOptions = [
@@ -119,13 +118,6 @@ function FilterPage() {
   ];
 
   useEffect(() => {
-    const sidebarCategory = searchParams.get('category');
-  
-    // ⛔ Prevent fetch-all before sidebar category initializes
-    if (sidebarCategory && !hasInitializedCategory.current) {
-      return;
-    }
-  
     const fetchResources = async () => {
       setLoading(true);
       setError(null);
@@ -148,7 +140,7 @@ function FilterPage() {
         }
   
         setResources(allResources);
-      } catch (err) {
+      } catch {
         setError('Failed to fetch resources. Please try again later.');
       } finally {
         setLoading(false);
@@ -157,6 +149,7 @@ function FilterPage() {
   
     fetchResources();
   }, [selectedTopics]);
+  
   
   useEffect(() => {
     const queryParam = searchParams.get('q');
@@ -168,9 +161,11 @@ function FilterPage() {
 
   useEffect(() => {
     const categoryParam = searchParams.get('category');
-    if (categoryParam && !hasInitializedCategory.current) {
+  
+    if (categoryParam) {
       setSelectedTopics([categoryParam]);
-      hasInitializedCategory.current = true;
+    } else {
+      setSelectedTopics([]);
     }
   }, [searchParams]);
   
