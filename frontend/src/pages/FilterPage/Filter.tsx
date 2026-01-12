@@ -50,6 +50,7 @@ const GridIcon = () => (
 
 function FilterPage() {
   const [searchParams] = useSearchParams();
+  const sidebarCategory = searchParams.get('category');
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
@@ -117,6 +118,24 @@ function FilterPage() {
     { value: 'LONG', label: 'Long >15 min' },
   ];
 
+  const effectiveTopics = useMemo(() => {
+    if (selectedTopics.length > 0) {
+      return selectedTopics;
+    }
+    if (sidebarCategory) {
+      return [sidebarCategory];
+    }
+    return [];
+  }, [selectedTopics, sidebarCategory]);
+  
+
+  useEffect(() => {
+    if (sidebarCategory) {
+      setSelectedTopics([]);
+    }
+  }, [sidebarCategory]);
+    
+
   useEffect(() => {
     const fetchResources = async () => {
       setLoading(true);
@@ -125,12 +144,11 @@ function FilterPage() {
       try {
         let allResources: Resource[] = [];
   
-        if (selectedTopics.length > 0) {
+        if (effectiveTopics.length > 0) {
           const results = await Promise.all(
-            selectedTopics.map((category) =>
-              fetch(`${API_BASE_URL}/api/resources?category=${category}`).then((res) =>
-                res.json()
-              )
+            effectiveTopics.map(category =>
+              fetch(`${API_BASE_URL}/api/resources?category=${category}`)
+                .then(res => res.json())
             )
           );
           allResources = results.flat();
@@ -148,8 +166,8 @@ function FilterPage() {
     };
   
     fetchResources();
-  }, [selectedTopics]);
-  
+  }, [effectiveTopics]);
+    
   
   useEffect(() => {
     const queryParam = searchParams.get('q');
@@ -158,17 +176,6 @@ function FilterPage() {
       setIsTyping(false);
     }
   }, [searchParams]);
-
-  useEffect(() => {
-    const categoryParam = searchParams.get('category');
-    if (!categoryParam) return;
-  
-    setSelectedTopics(prev =>
-      prev.includes(categoryParam) ? prev : [categoryParam]
-    );
-  }, [searchParams]);
-  
-  
 
 
   const searchResources = async (query: string) => {
