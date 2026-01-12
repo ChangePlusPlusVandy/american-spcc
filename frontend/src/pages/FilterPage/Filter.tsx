@@ -131,9 +131,10 @@ function FilterPage() {
 
   useEffect(() => {
     if (sidebarCategory) {
-      setSelectedTopics([]);
+      setSelectedTopics([sidebarCategory]);
     }
   }, [sidebarCategory]);
+  
     
 
   useEffect(() => {
