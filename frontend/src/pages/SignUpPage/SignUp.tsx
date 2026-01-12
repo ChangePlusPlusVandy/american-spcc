@@ -146,13 +146,13 @@ export default function SignUp() {
     setProcessing(true);
   
     try {
-      const token = await getToken(); // ✅ REQUIRED
+      const token = await getToken();
   
       const response = await fetch(`${API_BASE_URL}/api/users/me`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`, // ✅ REQUIRED
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           relationship,

@@ -13,6 +13,7 @@ import timeIcon from '../../assets/time_dropdown.png';
 import CreateCollection from '@/components/CreateCollectionComponent/CreateCollection';
 import SaveToast from '@/components/SaveToastComponent/SaveToast';
 import { API_BASE_URL } from '@/config/api';
+import { useAuth } from '@clerk/clerk-react';
 
 
 interface Resource {
@@ -94,6 +95,8 @@ function FilterPage() {
         return next;
       });
     };
+    const { getToken } = useAuth();
+
     
   
   
@@ -127,10 +130,19 @@ function FilterPage() {
   useEffect(() => {
     const fetchCollections = async () => {
       try {
+        const token = await getToken();
+        if (!token) return;
+  
         const res = await fetch(`${API_BASE_URL}/api/collections`, {
-          credentials: 'include',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
-        if (!res.ok) return;
+  
+        if (!res.ok) {
+          console.error('Collections fetch failed:', res.status);
+          return;
+        }
   
         const data = await res.json();
   
@@ -150,7 +162,8 @@ function FilterPage() {
     };
   
     fetchCollections();
-  }, []);
+  }, [getToken]);
+  
   
   useEffect(() => {
     const queryParam = searchParams.get('q');
@@ -538,7 +551,6 @@ function FilterPage() {
                 ) : (
                   <div className="grid grid-cols-2 gap-4">
                     {filteredResources.map((resource) => {
-                      console.log('RESOURCE:', resource);
 
                       return (
                       <ResourceGridCard
@@ -591,50 +603,64 @@ function FilterPage() {
         onCancel={() => setShowCreateCollection(false)}
         onCreate={async (name) => {
           try {
+            const token = await getToken();
+            if (!token) return;
+        
             const res = await fetch(`${API_BASE_URL}/api/collections`, {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              credentials: 'include',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+              },
               body: JSON.stringify({ name }),
             });
-
+        
+            if (!res.ok) throw new Error('Create collection failed');
+        
             const newCollection = await res.json();
             let createdItemId: string | null = null;
-
+        
             if (createCollectionResourceId) {
               const itemRes = await fetch(
                 `${API_BASE_URL}/api/collections/${newCollection.id}/items`,
                 {
                   method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  credentials: 'include',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                  },
                   body: JSON.stringify({
                     resource_fk: createCollectionResourceId,
                   }),
                 }
               );
-
+        
               const createdItem = await itemRes.json();
               createdItemId = createdItem.id;
             }
-
+        
             setSaveToast({
               open: true,
               collectionName: newCollection.name,
               imageUrl: createCollectionImage,
               undo: async () => {
-                if (createdItemId) {
-                  await fetch(
-                    `${API_BASE_URL}/api/collections/items/${createdItemId}`,
-                    {
-                      method: 'DELETE',
-                      credentials: 'include',
-                    }
-                  );
-                }
+                if (!createdItemId) return;
+        
+                const token = await getToken();
+                if (!token) return;
+        
+                await fetch(
+                  `${API_BASE_URL}/api/collections/items/${createdItemId}`,
+                  {
+                    method: 'DELETE',
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                    },
+                  }
+                );
               },
             });
-
+        
             setTimeout(() => {
               setToastClosing(true);
               setTimeout(() => {
@@ -642,13 +668,14 @@ function FilterPage() {
                 setToastClosing(false);
               }, 200);
             }, 3000);
-
+        
             setShowCreateCollection(false);
             setCreateCollectionResourceId(null);
           } catch (err) {
             console.error('Failed to create collection + save resource', err);
           }
         }}
+        
       />
     </div>
   );

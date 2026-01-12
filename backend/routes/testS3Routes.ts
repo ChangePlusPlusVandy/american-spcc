@@ -14,9 +14,9 @@ router.get('/s3-test', async (_req, res) => {
       s3,
       new GetObjectCommand({
         Bucket: process.env.S3_BUCKET_NAME!,
-        Key: 'childrens_mental_disorders', // ← include extension if needed
+        Key: 'childrens_mental_disorders',
       }),
-      { expiresIn: 300 } // 5 minutes
+      { expiresIn: 300 }
     );
 
     res.json({ url });

@@ -8,13 +8,13 @@ interface FilterDropdownProps {
   options: Array<{
     value: string;
     label: string;
-    icon?: React.ReactNode; // Optional icon for each option
+    icon?: React.ReactNode;
   }>;
-  // Support both single and multi-select
+
   selected: string | string[] | null;
   onChange: (value: string | string[]) => void;
-  multiSelect?: boolean; // Enable multi-select mode
-  style?: React.CSSProperties; // Optional custom styles
+  multiSelect?: boolean;
+  style?: React.CSSProperties;
 }
 function FilterDropdown({
   label,
@@ -28,7 +28,6 @@ function FilterDropdown({
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -44,16 +43,13 @@ function FilterDropdown({
 
   const handleSelect = (value: string) => {
     if (multiSelect) {
-      // Multi-select: toggle value in array
       const currentSelected = Array.isArray(selected) ? selected : [];
       if (currentSelected.includes(value)) {
         onChange(currentSelected.filter((v) => v !== value));
       } else {
         onChange([...currentSelected, value]);
       }
-      // Don't close dropdown for multi-select
     } else {
-      // Single-select: replace value
       onChange(value);
       setIsOpen(false);
     }
@@ -66,7 +62,6 @@ function FilterDropdown({
     return selected === value;
   };
 
-  // Always display the original label, not the selected option
   const displayLabel = label;
 
   return (

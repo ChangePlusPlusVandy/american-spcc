@@ -88,7 +88,7 @@
     padding: 12px 16px;
   
     display: flex;
-    justify-content: flex-end; /* ← bottom right */
+    justify-content: flex-end;
   }
   
   
@@ -97,7 +97,7 @@
     padding: 2px 9px;
   
     background: #e0665c;
-    color: white;              /* ← white text */
+    color: white;
     font-size: 14px;
     font-weight: 400;
   

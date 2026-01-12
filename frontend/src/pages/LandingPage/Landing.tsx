@@ -19,7 +19,6 @@ function Landing() {
 
   // API call to search resource titles
   const searchResources = async (query: string) => {
-    console.log('searchResources called with query:', query);
 
     if (!query.trim()) {
       console.log('Empty query, clearing results');
