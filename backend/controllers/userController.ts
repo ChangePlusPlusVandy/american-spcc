@@ -152,6 +152,8 @@ export const updateCurrentUser = async (req: Request, res: Response) => {
     }
 
     const {
+      first_name,
+      last_name,
       relationship,
       household_type,
       topics_of_interest,
@@ -159,8 +161,17 @@ export const updateCurrentUser = async (req: Request, res: Response) => {
       subscribed_newsletter,
       onboarding_complete,
     } = req.body;
+    
 
     const data: any = {};
+    if (first_name !== undefined) {
+      data.first_name = first_name || null;
+    }
+    
+    if (last_name !== undefined) {
+      data.last_name = last_name || null;
+    }
+    
 
     if (relationship !== undefined) {
       data.relationship =
