@@ -43,12 +43,11 @@ function SaveResource({
   onSaved,
   onCreateCollection,
 }: SaveResourceProps) {
-  const { isSignedIn } = useAuth();
-
   const [collections, setCollections] = useState<Collection[]>([]);
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(isOpen);
   const [closing, setClosing] = useState(false);
+  const { isSignedIn, getToken } = useAuth();
 
 
   
@@ -73,9 +72,14 @@ function SaveResource({
     async function fetchCollections() {
       setLoading(true);
       try {
+        const token = await getToken();
+
         const res = await fetch(`${API_BASE_URL}/api/collections`, {
-          credentials: 'include',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
+        
         const data = await res.json();
         setCollections(data);
       } catch (err) {
@@ -138,20 +142,33 @@ function SaveResource({
                     );
                     if (!item) return;
 
+                    const token = await getToken();
+
                     await fetch(
-                        `${API_BASE_URL}/api/collections/items/${item.id}`,
-                        { method: 'DELETE', credentials: 'include' }
+                      `${API_BASE_URL}/api/collections/items/${item.id}`,
+                      {
+                        method: 'DELETE',
+                        headers: {
+                          Authorization: `Bearer ${token}`,
+                        },
+                      }
                     );
+                    
                     } else {
-                    const res = await fetch(
-                        `${API_BASE_URL}/api/collections/${collection.id}/items`,
-                        {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        credentials: 'include',
-                        body: JSON.stringify({ resource_fk: resourceId }),
-                        }
-                    );
+                        const token = await getToken();
+
+                        const res = await fetch(
+                          `${API_BASE_URL}/api/collections/${collection.id}/items`,
+                          {
+                            method: 'POST',
+                            headers: {
+                              'Content-Type': 'application/json',
+                              Authorization: `Bearer ${token}`,
+                            },
+                            body: JSON.stringify({ resource_fk: resourceId }),
+                          }
+                        );
+                        
 
                     const createdItem = await res.json();
 
@@ -159,22 +176,39 @@ function SaveResource({
                         collectionName: collection.name,
                         imageUrl: resourceImage,
                         undo: async () => {
-                        await fetch(
-                            `${API_BASE_URL}/api/collections/items/${createdItem.id}`,
-                            {
-                            method: 'DELETE',
-                            credentials: 'include',
-                            }
-                        );
+                            const token = await getToken();
+
+                            await fetch(
+                              `${API_BASE_URL}/api/collections/items/${createdItem.id}`,
+                              {
+                                method: 'DELETE',
+                                headers: {
+                                  Authorization: `Bearer ${token}`,
+                                },
+                              }
+                            );
+                            
                         },
                     });
                     }
 
+                    const token = await getToken();
+
                     const res2 = await fetch(`${API_BASE_URL}/api/collections`, {
-                    credentials: 'include',
+                      headers: {
+                        Authorization: `Bearer ${token}`,
+                      },
                     });
+                    
                     const updatedCollections = await res2.json();
+
+                    if (!Array.isArray(updatedCollections)) {
+                      console.error('Expected collections array, got:', updatedCollections);
+                      return;
+                    }
+                    
                     setCollections(updatedCollections);
+                    
 
                     const stillBookmarked = updatedCollections.some(
                     (c: Collection) =>
