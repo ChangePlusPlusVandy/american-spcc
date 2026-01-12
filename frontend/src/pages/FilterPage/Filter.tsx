@@ -161,12 +161,11 @@ function FilterPage() {
 
   useEffect(() => {
     const categoryParam = searchParams.get('category');
+    if (!categoryParam) return;
   
-    if (categoryParam) {
-      setSelectedTopics([categoryParam]);
-    } else {
-      setSelectedTopics([]);
-    }
+    setSelectedTopics(prev =>
+      prev.includes(categoryParam) ? prev : [categoryParam]
+    );
   }, [searchParams]);
   
   
