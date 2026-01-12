@@ -14,7 +14,7 @@ import CreateCollection from '@/components/CreateCollectionComponent/CreateColle
 import SaveToast from '@/components/SaveToastComponent/SaveToast';
 import { API_BASE_URL } from '@/config/api';
 import { useAuth } from '@clerk/clerk-react';
-
+import { useRef } from 'react';
 
 interface Resource {
   id: string;
@@ -96,10 +96,7 @@ function FilterPage() {
       });
     };
     const { getToken } = useAuth();
-
-    
-  
-  
+    const hasInitializedCategory = useRef(false);
 
 
   const formatOptions = [
@@ -170,18 +167,13 @@ function FilterPage() {
   useEffect(() => {
     const categoryParam = searchParams.get('category');
   
-    if (categoryParam && selectedTopics.length === 0) {
+    // Apply sidebar category ONLY once on initial load
+    if (categoryParam && !hasInitializedCategory.current) {
       setSelectedTopics([categoryParam]);
-  
-      setSelectedAges([]);
-      setSelectedFormats([]);
-      setSelectedTimeRanges([]);
-  
-      if (!searchParams.get('q')) {
-        setSearchQuery('');
-      }
+      hasInitializedCategory.current = true;
     }
-  }, [searchParams, selectedTopics.length]);
+  }, [searchParams]);
+  
   
 
 
@@ -260,14 +252,6 @@ function FilterPage() {
           allResources = results.flat();
         }
         
-        else if (categoryParam) {
-          const response = await fetch(
-            `${API_BASE_URL}/api/resources?category=${categoryParam}`
-          );
-          allResources = await response.json();
-        }
-        
-        
         else {
           const response = await fetch(`${API_BASE_URL}/api/resources`);
           allResources = await response.json();
@@ -284,11 +268,10 @@ function FilterPage() {
     };
 
     fetchResources();
-  }, [selectedTopics, searchParams]);
+  }, [selectedTopics]);
 
   const filteredResources = useMemo(() => {
     return resources.filter((resource) => {
-      // 🔍 AND: text search within filtered resources
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
         const matchesTitle = resource.title.toLowerCase().includes(q);
