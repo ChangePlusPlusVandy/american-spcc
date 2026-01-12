@@ -9,7 +9,7 @@ export const syncUser = async (req: Request, res: Response) => {
   console.log('syncUser HIT');
 
   try {
-    const userId = (req as any).auth?.userId;
+    const { userId } = getAuth(req); // ✅ CORRECT
     console.log('userId:', userId);
 
     if (!userId) {
@@ -17,14 +17,8 @@ export const syncUser = async (req: Request, res: Response) => {
     }
 
     const clerkUser = await clerkClient.users.getUser(userId);
-    console.log('clerk user fetched');
 
     const email = clerkUser.emailAddresses[0]?.emailAddress ?? null;
-
-    console.log('attempting prisma upsert', {
-      clerk_id: userId,
-      email,
-    });
 
     const user = await prisma.user.upsert({
       where: { clerk_id: userId },
@@ -39,13 +33,13 @@ export const syncUser = async (req: Request, res: Response) => {
     });
 
     console.log('DB user synced:', user.id);
-
     return res.json({ ok: true });
   } catch (err) {
     console.error('syncUser FAILED:', err);
     return res.status(500).json({ error: 'sync failed' });
   }
 };
+
 
 // Get all users
 export const getAllUsers = async (req: Request, res: Response) => {
