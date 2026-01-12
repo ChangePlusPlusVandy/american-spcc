@@ -78,19 +78,9 @@ function ResourceListCard({
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [pendingResourceId, setPendingResourceId] = useState<string | null>(null);
   const [pendingImageUrl, setPendingImageUrl] = useState<string | undefined>();
-  const { isSignedIn } = useAuth();
+  const { isSignedIn, getToken } = useAuth();
 
-  useEffect(() => {
-    if (!showCreateCollection) return;
-    if (!isSignedIn) return;
-  
-    fetch(`${API_BASE_URL}/api/collections`, {
-      credentials: 'include',
-    })
-      .then(res => res.json())
-      .then(setCollections)
-      .catch(console.error);
-  }, [showCreateCollection, isSignedIn]);
+
   
   
   useEffect(() => {
@@ -142,47 +132,77 @@ function ResourceListCard({
 
         <CreateCollection
           isOpen={showCreateModal}
-          existingNames={collections.map(c => c.name)}
+          existingNames={[]}
           imageUrl={pendingImageUrl}
           onCancel={() => setShowCreateModal(false)}
           onCreate={async (name) => {
+            const token = await getToken();
+            if (!token) return;
+          
+            // 1. create collection
             const res = await fetch(`${API_BASE_URL}/api/collections`, {
               method: 'POST',
-              credentials: 'include',
-              headers: { 'Content-Type': 'application/json' },
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+              },
               body: JSON.stringify({ name }),
             });
-
+          
+            if (!res.ok) {
+              console.error('Create collection failed');
+              return;
+            }
+          
             const collection = await res.json();
-
-            await fetch(
-              `${API_BASE_URL}/api/collections/${collection.id}/items`,
-              {
-                method: 'POST',
-                credentials: 'include',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ resource_fk: pendingResourceId }),
-              }
-            );
-
+          
+            // 2. add resource to collection
+            let createdItemId: string | null = null;
+          
+            if (pendingResourceId) {
+              const itemRes = await fetch(
+                `${API_BASE_URL}/api/collections/${collection.id}/items`,
+                {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                  },
+                  body: JSON.stringify({ resource_fk: pendingResourceId }),
+                }
+              );
+          
+              const item = await itemRes.json();
+              createdItemId = item.id;
+            }
+          
+            // 3. toast + undo
             onSaved?.({
               collectionName: collection.name,
               imageUrl: pendingImageUrl,
               undo: async () => {
+                if (!createdItemId) return;
+          
+                const token = await getToken();
+                if (!token) return;
+          
                 await fetch(
-                  `${API_BASE_URL}/api/collections/items/${collection.id}`,
+                  `${API_BASE_URL}/api/collections/items/${createdItemId}`,
                   {
                     method: 'DELETE',
-                    credentials: 'include',
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                    },
                   }
                 );
               },
             });
+          
             onBookmarkChange?.(true);
-
             setShowCreateModal(false);
             setShowSavePopup(false);
           }}
+          
         />
 
 

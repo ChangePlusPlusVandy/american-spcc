@@ -75,13 +75,20 @@ function SaveResource({
         const token = await getToken();
 
         const res = await fetch(`${API_BASE_URL}/api/collections`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        
-        const data = await res.json();
-        setCollections(data);
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          
+          if (!res.ok) {
+            console.error('Failed to fetch collections:', res.status);
+            setCollections([]);
+            return;
+          }
+          
+          const data = await res.json();
+          setCollections(data);
+          
       } catch (err) {
         console.error(err);
       } finally {
