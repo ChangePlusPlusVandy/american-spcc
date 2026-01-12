@@ -294,25 +294,30 @@ function FilterPage() {
   }, [selectedTopics, searchParams]);
 
   const filteredResources = useMemo(() => {
-    const baseResources =
-    searchQuery.trim().length > 0
-      ? resourceSearchResults
-      : resources;
-
-      return baseResources.filter((resource) => {
-      if (searchQuery && resourceSearchResults === baseResources) {
-        return true;
+    return resources.filter((resource) => {
+      // 🔍 AND: text search within filtered resources
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        const matchesTitle = resource.title.toLowerCase().includes(q);
+        const matchesDescription =
+          resource.description?.toLowerCase().includes(q) ?? false;
+  
+        if (!matchesTitle && !matchesDescription) {
+          return false;
+        }
       }
-
-
+  
+      // Format filter
       if (selectedFormats.length > 0 && !selectedFormats.includes(resource.resource_type)) {
         return false;
       }
-
+  
+      // Language filter
       if (selectedLanguage && resource.language !== selectedLanguage) {
         return false;
       }
-
+  
+      // Time-to-read filter
       if (selectedTimeRanges.length > 0) {
         const time = resource.time_to_read;
         const matchesAnyRange = selectedTimeRanges.some((range) => {
@@ -323,16 +328,29 @@ function FilterPage() {
         });
         if (!matchesAnyRange) return false;
       }
-
+  
+      // Age filter
       if (selectedAges.length > 0) {
-        const ageEnums = selectedAges.map((age) => AGE_TO_ENUM[age]).filter(Boolean);
-        const hasMatchingAge = ageEnums.some((ageEnum) => resource.age_groups.includes(ageEnum));
+        const ageEnums = selectedAges
+          .map((age) => AGE_TO_ENUM[age])
+          .filter(Boolean);
+        const hasMatchingAge = ageEnums.some((ageEnum) =>
+          resource.age_groups.includes(ageEnum)
+        );
         if (!hasMatchingAge) return false;
       }
-
+  
       return true;
     });
-  }, [resources, resourceSearchResults, searchQuery, selectedFormats, selectedLanguage, selectedTimeRanges, selectedAges]);
+  }, [
+    resources,
+    searchQuery,
+    selectedFormats,
+    selectedLanguage,
+    selectedTimeRanges,
+    selectedAges,
+  ]);
+
 
   const handleLearnMore = (resource: Resource) => {
     if (resource.hosting_type !== 'EXTERNAL') {
