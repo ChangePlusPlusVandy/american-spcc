@@ -13,6 +13,7 @@ import bookmarkFilled from '@/assets/bookmark-filled.png';
 import CreateCollection from '@/components/CreateCollectionComponent/CreateCollection';
 import { API_BASE_URL } from '@/config/api';
 import SaveResource from '@/components/SaveResourceComponent/SaveResource';
+import { useAuth } from '@clerk/clerk-react';
 
 interface ResourceGridCardProps {
   id: string;
@@ -33,7 +34,7 @@ interface ResourceGridCardProps {
   onCreateCollection?: (imageUrl?: string) => void;
 }
 const CATEGORY_DISPLAY_MAP: Record<string, string> = {
-  PARENTING_SKILLS_RELATIONSHIPS: 'Safety & Protection',
+  PARENTING_SKILLS_RELATIONSHIPS: 'Parenting Skills & Relationships',
   CHILD_DEVELOPMENT: 'Child Development',
   MENTAL_EMOTIONAL_HEALTH: 'Mental & Emotional Health',
   SAFETY_PROTECTION: 'Safety & Protection',
@@ -77,7 +78,30 @@ function ResourceGridCard({
   const [collections, setCollections] = useState<{ id: string; name: string }[]>(
     []
   );
+  const { getToken } = useAuth();
 
+  useEffect(() => {
+    async function fetchCollections() {
+      const token = await getToken();
+      if (!token) return;
+  
+      const res = await fetch(`${API_BASE_URL}/api/collections`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      if (!res.ok) return;
+  
+      const data = await res.json();
+      setCollections(data);
+    }
+  
+    if (showCreateModal) {
+      fetchCollections();
+    }
+  }, [showCreateModal, getToken]);
+  
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -148,38 +172,68 @@ function ResourceGridCard({
               onCancel={() => setShowCreateModal(false)}
               onCreate={async (name) => {
 
+                const token = await getToken();
+                if (!token) return;
+                
+                // 1. create collection
                 const res = await fetch(`${API_BASE_URL}/api/collections`, {
                   method: 'POST',
-                  credentials: 'include',
-                  headers: { 'Content-Type': 'application/json' },
+                  headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                  },
                   body: JSON.stringify({ name }),
                 });
-
+                
+                if (!res.ok) {
+                  console.error('Create collection failed', res.status);
+                  return;
+                }
+                
                 const collection = await res.json();
-
-                await fetch(
-                  `${API_BASE_URL}/api/collections/${collection.id}/items`,
-                  {
-                    method: 'POST',
-                    credentials: 'include',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ resource_fk: pendingResourceId }),
-                  }
-                );
+                
+                // 2. add resource to collection
+                let createdItemId: string | null = null;
+                
+                if (pendingResourceId) {
+                  const itemRes = await fetch(
+                    `${API_BASE_URL}/api/collections/${collection.id}/items`,
+                    {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                      },
+                      body: JSON.stringify({ resource_fk: pendingResourceId }),
+                    }
+                  );
+                
+                  const item = await itemRes.json();
+                  createdItemId = item.id;
+                }
+                
 
                 onSaved?.({
                   collectionName: collection.name,
                   imageUrl: pendingImageUrl,
                   resourceId: pendingResourceId!,
                   undo: async () => {
+                    if (!createdItemId) return;
+                  
+                    const token = await getToken();
+                    if (!token) return;
+                  
                     await fetch(
-                      `${API_BASE_URL}/api/collections/items/${collection.id}`,
+                      `${API_BASE_URL}/api/collections/items/${createdItemId}`,
                       {
                         method: 'DELETE',
-                        credentials: 'include',
+                        headers: {
+                          Authorization: `Bearer ${token}`,
+                        },
                       }
                     );
                   },
+                  
                 });
 
                 onBookmarkChange?.(true);

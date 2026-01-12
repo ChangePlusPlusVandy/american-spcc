@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import homepageBackground from '../../assets/SPCC - Homepage.png';
 import searchIcon from '../../assets/search_icon.png';
@@ -16,6 +16,8 @@ function Landing() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Resource[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const searchRef = useRef<HTMLDivElement | null>(null);
+
 
   // API call to search resource titles
   const searchResources = async (query: string) => {
@@ -56,6 +58,20 @@ function Landing() {
     return () => clearTimeout(timeoutId);
   }, [searchQuery]);
 
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (
+        searchRef.current &&
+        !searchRef.current.contains(e.target as Node)
+      ) {
+        setSearchResults([]);
+      }
+    }
+  
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+  
   // Debug effect to log state changes
   useEffect(() => {
     console.log('State updated - searchQuery:', searchQuery);
@@ -87,7 +103,7 @@ function Landing() {
       {/* Search bar */}
       <div className="relative p-2 z-40">
         <div className="w-57/100 -mt-12 mx-auto px-4">
-          <div className="relative">
+        <div ref={searchRef} className="relative">
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -140,7 +156,7 @@ function Landing() {
                   className="rounded-lg shadow-lg border-2 border-[#C8DC59] overflow-hidden"
                   style={{ backgroundColor: '#FFFFFF' }}
                 >
-                  {searchResults.map((resource, index) => (
+                  {searchResults.slice(0, 5).map((resource, index) => (
                     <div key={resource.id}>
                       <button
                         type="button"

@@ -36,7 +36,7 @@ interface ResourceListCardProps {
 }
 
 const CATEGORY_DISPLAY_MAP: Record<string, string> = {
-  PARENTING_SKILLS_RELATIONSHIPS: 'Parenting & Relationships',
+  PARENTING_SKILLS_RELATIONSHIPS: 'Parenting Skills & Relationships',
   CHILD_DEVELOPMENT: 'Child Development',
   MENTAL_EMOTIONAL_HEALTH: 'Mental & Emotional Health',
   SAFETY_PROTECTION: 'Safety & Protection',
