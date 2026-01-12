@@ -176,17 +176,18 @@ function FilterPage() {
   useEffect(() => {
     const categoryParam = searchParams.get('category');
   
-    if (categoryParam) {
+    if (categoryParam && selectedTopics.length === 0) {
       setSelectedTopics([categoryParam]);
   
       setSelectedAges([]);
       setSelectedFormats([]);
       setSelectedTimeRanges([]);
+  
       if (!searchParams.get('q')) {
         setSearchQuery('');
       }
     }
-  }, [searchParams]);
+  }, [searchParams, selectedTopics.length]);
   
 
 
@@ -256,13 +257,6 @@ function FilterPage() {
           allResources = await response.json();
         }
         
-        else if (categoryParam) {
-          const response = await fetch(
-            `${API_BASE_URL}/api/resources?category=${categoryParam}`
-          );
-          allResources = await response.json();
-        }
-        
         else if (selectedTopics.length > 0) {
           const promises = selectedTopics.map((category) =>
             fetch(`${API_BASE_URL}/api/resources?category=${category}`).then((res) =>
@@ -272,6 +266,14 @@ function FilterPage() {
           const results = await Promise.all(promises);
           allResources = results.flat();
         }
+        
+        else if (categoryParam) {
+          const response = await fetch(
+            `${API_BASE_URL}/api/resources?category=${categoryParam}`
+          );
+          allResources = await response.json();
+        }
+        
         
         else {
           const response = await fetch(`${API_BASE_URL}/api/resources`);
