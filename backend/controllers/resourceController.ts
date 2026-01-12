@@ -2,10 +2,11 @@ import { Request, Response } from 'express';
 import { GetObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { getS3 } from '../config/s3'
+import { CATEGORY_TYPE } from '@prisma/client';
 
 
 const getSignedImageUrl = async (key: string) => {
-  const s3 = getS3(); // ✅ SAFE
+  const s3 = getS3();
   const command = new GetObjectCommand({
     Bucket: process.env.S3_BUCKET_NAME!,
     Key: key,
@@ -68,9 +69,13 @@ export const getAllResources = async (req: Request, res: Response) => {
     const { category, label_id } = req.query;
     const where: any = {};
 
-    if (category) {
-      where.category = category;
+    if (
+      typeof category === 'string' &&
+      Object.values(CATEGORY_TYPE).includes(category as CATEGORY_TYPE)
+    ) {
+      where.category = category as CATEGORY_TYPE;
     }
+    
 
     if (label_id) {
       where.labels = {
@@ -86,7 +91,6 @@ export const getAllResources = async (req: Request, res: Response) => {
       },
     });
 
-    // Attach signed S3 image URLs (if present)
     const resourcesWithImages = await Promise.all(
       resources.map(async (resource) => {
         let imageUrl: string | null = null;
@@ -241,7 +245,7 @@ export const searchResources = async (req: Request, res: Response) => {
         ...rest,
         imageUrl: image_s3_key
         ? await (() => {
-            const s3 = getS3(); // ✅ ADD THIS
+            const s3 = getS3();
             return getSignedUrl(
               s3,
               new GetObjectCommand({
