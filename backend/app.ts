@@ -40,6 +40,13 @@ app.use(
 
 app.use(express.json());
 app.use(clerkMiddleware());
+import { getAuth } from '@clerk/express';
+
+app.get('/api/debug/auth', (req, res) => {
+  const auth = getAuth(req);
+  res.json(auth);
+});
+
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/collections', collectionRoutes);
