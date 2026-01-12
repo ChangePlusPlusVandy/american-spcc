@@ -72,6 +72,11 @@ export default function AccountPage() {
     if (!user) return;
 
     const token = await getToken();
+    if (!token) {
+      console.error('No auth token, aborting fetchDbUser');
+      return;
+    }
+
 
     const res = await fetch(
       `${API_BASE_URL}/api/users/clerk/${user.id}`,
@@ -90,22 +95,34 @@ export default function AccountPage() {
     if (!user) return;
 
     const token = await getToken();
+      if (!token) {
+        console.error('No auth token, aborting save');
+        return;
+      }
 
-    await fetch(`${API_BASE_URL}/api/users/me`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        first_name: editForm.first_name,
-        last_name: editForm.last_name,
-        relationship: editForm.relationship || null,
-        household_type: editForm.household_type || null,
-        kids_age_groups: editForm.kids_age_groups,
-        topics_of_interest: editForm.topics_of_interest,
-      }),
-    });
+
+      const res = await fetch(`${API_BASE_URL}/api/users/me`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          first_name: editForm.first_name,
+          last_name: editForm.last_name,
+          relationship: editForm.relationship || null,
+          household_type: editForm.household_type || null,
+          kids_age_groups: editForm.kids_age_groups,
+          topics_of_interest: editForm.topics_of_interest,
+        }),
+      });
+      
+      if (!res.ok) {
+        const text = await res.text();
+        console.error('Profile update failed:', res.status, text);
+        return;
+      }
+      
 
     await fetchDbUser();
     setIsEditOpen(false);
