@@ -13,6 +13,8 @@ import CreateCollection from '@/components/CreateCollectionComponent/CreateColle
 import { API_BASE_URL } from '@/config/api';
 import { useState, useRef, useEffect } from 'react';
 import SaveResource from '@/components/SaveResourceComponent/SaveResource';
+import { useAuth } from '@clerk/clerk-react';
+
 interface ResourceListCardProps {
   id: string;
   title: string;
@@ -74,11 +76,13 @@ function ResourceListCard({
   const [showCreateCollection, setShowCreateCollection] = useState(false);
   const [collections, setCollections] = useState<{ name: string }[]>([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
-const [pendingResourceId, setPendingResourceId] = useState<string | null>(null);
-const [pendingImageUrl, setPendingImageUrl] = useState<string | undefined>();
+  const [pendingResourceId, setPendingResourceId] = useState<string | null>(null);
+  const [pendingImageUrl, setPendingImageUrl] = useState<string | undefined>();
+  const { isSignedIn } = useAuth();
 
   useEffect(() => {
     if (!showCreateCollection) return;
+    if (!isSignedIn) return;
   
     fetch(`${API_BASE_URL}/api/collections`, {
       credentials: 'include',
@@ -86,7 +90,8 @@ const [pendingImageUrl, setPendingImageUrl] = useState<string | undefined>();
       .then(res => res.json())
       .then(setCollections)
       .catch(console.error);
-  }, [showCreateCollection]);
+  }, [showCreateCollection, isSignedIn]);
+  
   
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
