@@ -119,42 +119,44 @@ function FilterPage() {
   ];
 
   useEffect(() => {
-    const fetchCollections = async () => {
+    const sidebarCategory = searchParams.get('category');
+  
+    // ⛔ Prevent fetch-all before sidebar category initializes
+    if (sidebarCategory && !hasInitializedCategory.current) {
+      return;
+    }
+  
+    const fetchResources = async () => {
+      setLoading(true);
+      setError(null);
+  
       try {
-        const token = await getToken();
-        if (!token) return;
+        let allResources: Resource[] = [];
   
-        const res = await fetch(`${API_BASE_URL}/api/collections`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-  
-        if (!res.ok) {
-          console.error('Collections fetch failed:', res.status);
-          return;
+        if (selectedTopics.length > 0) {
+          const results = await Promise.all(
+            selectedTopics.map((category) =>
+              fetch(`${API_BASE_URL}/api/resources?category=${category}`).then((res) =>
+                res.json()
+              )
+            )
+          );
+          allResources = results.flat();
+        } else {
+          const response = await fetch(`${API_BASE_URL}/api/resources`);
+          allResources = await response.json();
         }
   
-        const data = await res.json();
-  
-        setCollectionNames(data.map((c: { name: string }) => c.name));
-  
-        const ids = new Set<string>();
-        data.forEach((collection: any) => {
-          collection.items?.forEach((item: any) => {
-            ids.add(item.resource_fk);
-          });
-        });
-  
-        setBookmarkedResourceIds(ids);
+        setResources(allResources);
       } catch (err) {
-        console.error('Failed to fetch collections', err);
+        setError('Failed to fetch resources. Please try again later.');
+      } finally {
+        setLoading(false);
       }
     };
   
-    fetchCollections();
-  }, [getToken]);
-  
+    fetchResources();
+  }, [selectedTopics]);
   
   useEffect(() => {
     const queryParam = searchParams.get('q');
@@ -166,8 +168,6 @@ function FilterPage() {
 
   useEffect(() => {
     const categoryParam = searchParams.get('category');
-  
-    // Apply sidebar category ONLY once on initial load
     if (categoryParam && !hasInitializedCategory.current) {
       setSelectedTopics([categoryParam]);
       hasInitializedCategory.current = true;
@@ -205,70 +205,6 @@ function FilterPage() {
 
     return () => clearTimeout(timeoutId);
   }, [searchQuery]);
-
-  const handleLabelClick = async (labelId: string) => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/resources?label_id=${labelId}`);
-      if (!response.ok) throw new Error('Failed to fetch resources');
-      const data = await response.json();
-      setResources(data);
-    } catch (err) {
-      setError('Failed to fetch resources for this label.');
-      console.error('Error fetching resources by label:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    const labelIdParam = searchParams.get('label_id');
-
-    const fetchResources = async () => {
-      setLoading(true);
-      setError(null);
-
-      try {
-        let allResources: Resource[] = [];
-
-        const categoryParam = searchParams.get('category');
-
-        if (labelIdParam) {
-          const response = await fetch(
-            `${API_BASE_URL}/api/resources?label_id=${labelIdParam}`
-          );
-          allResources = await response.json();
-        }
-        
-        else if (selectedTopics.length > 0) {
-          const promises = selectedTopics.map((category) =>
-            fetch(`${API_BASE_URL}/api/resources?category=${category}`).then((res) =>
-              res.json()
-            )
-          );
-          const results = await Promise.all(promises);
-          allResources = results.flat();
-        }
-        
-        else {
-          const response = await fetch(`${API_BASE_URL}/api/resources`);
-          allResources = await response.json();
-        }
-        
-
-        setResources(allResources);
-      } catch (err) {
-        setError('Failed to fetch resources. Please try again later.');
-        console.error('Error fetching resources:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchResources();
-  }, [selectedTopics]);
 
   const filteredResources = useMemo(() => {
     return resources.filter((resource) => {
