@@ -313,11 +313,19 @@ function FilterPage() {
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              if (searchQuery.trim()) {
-                navigate(`/filter?q=${encodeURIComponent(searchQuery)}`);
-                setIsTyping(false);
+
+              const trimmed = searchQuery.trim();
+
+              if (trimmed) {
+                navigate(`/filter?q=${encodeURIComponent(trimmed)}`);
+              } else {
+                navigate('/filter');
+                setSearchQuery('');
               }
+
+              setIsTyping(false);
             }}
+
 
             className="relative"
           >
