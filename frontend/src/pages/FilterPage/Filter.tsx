@@ -62,7 +62,7 @@ function FilterPage() {
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [selectedAges, setSelectedAges] = useState<string[]>([]);
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
-  const [selectedLanguage, setSelectedLanguage] = useState<string | null>('ENGLISH');
+  const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
   const [selectedFormats, setSelectedFormats] = useState<string[]>([]);
   const [selectedTimeRanges, setSelectedTimeRanges] = useState<string[]>([]);
   const [resources, setResources] = useState<Resource[]>([]);
@@ -120,13 +120,7 @@ function FilterPage() {
     { value: 'MEDIUM', label: 'Medium 5-15 min' },
     { value: 'LONG', label: 'Long >15 min' },
   ];
-  useEffect(() => {
-    const q = searchParams.get('q');
-    if (q) {
-      searchResources(q);
-    }
-  }, [searchParams]);
-  
+
   useEffect(() => {
     const fetchCollections = async () => {
       try {
@@ -238,7 +232,6 @@ function FilterPage() {
   };
 
   useEffect(() => {
-    if (searchParams.get('q')) return;
     const labelIdParam = searchParams.get('label_id');
 
     const fetchResources = async () => {
