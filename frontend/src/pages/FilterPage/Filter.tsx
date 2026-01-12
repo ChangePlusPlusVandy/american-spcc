@@ -159,45 +159,10 @@ function FilterPage() {
   
   
     
-  
   useEffect(() => {
-    const queryParam = searchParams.get('q');
-    if (queryParam) {
-      setSearchQuery(queryParam);
-      setIsTyping(false);
-    }
+    setSearchQuery(searchParams.get('q') ?? '');
   }, [searchParams]);
-
-
-
-  const searchResources = async (query: string) => {
-    if (!query.trim()) {
-      setResourceSearchResults([]);
-      return;
-    }
-
-    setIsSearching(true);
-    try {
-      const response = await fetch(
-        `${API_BASE_URL}/api/resources/search?q=${encodeURIComponent(query)}`
-      );
-      const data = await response.json();
-      setResourceSearchResults(data);
-    } catch (error) {
-      console.error('Resource search error:', error);
-      setResourceSearchResults([]);
-    } finally {
-      setIsSearching(false);
-    }
-  };
-
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      searchResources(searchQuery);
-    }, 300);
-
-    return () => clearTimeout(timeoutId);
-  }, [searchQuery]);
+  
 
   const filteredResources = useMemo(() => {
     return resources.filter((resource) => {
@@ -310,25 +275,23 @@ function FilterPage() {
               e.preventDefault();
 
               const trimmed = searchQuery.trim();
+              const params = new URLSearchParams(searchParams);
 
               if (trimmed) {
-                navigate(`/filter?q=${encodeURIComponent(trimmed)}`);
+                params.set('q', trimmed);
               } else {
-                navigate('/filter');
+                params.delete('q');
                 setSearchQuery('');
               }
 
-              setIsTyping(false);
+              navigate(`/filter?${params.toString()}`);
             }}
-
-
             className="relative"
-          >
+            >
             <SearchBar
               value={searchQuery}
               onChange={(value) => {
                 setSearchQuery(value);
-                setIsTyping(true);
               }}
               placeholder="Search..."
               size="small"
@@ -338,41 +301,6 @@ function FilterPage() {
               fontSize="14px"
               textColor="#000000"
             />
-            {searchQuery && resourceSearchResults.length > 0 && isTyping && (
-              <div className="absolute left-0 right-0 mt-2 z-50">
-                <div className="rounded-lg shadow-lg border-2 border-[#C8DC59] overflow-hidden bg-white">
-                  {resourceSearchResults.map((resource, index) => (
-                    <div key={resource.id}>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (resource.hosting_type !== 'EXTERNAL') return;
-
-                          const url = resource.externalResources?.external_url;
-                          if (!url) return;
-
-                          window.open(url, '_blank', 'noopener,noreferrer');
-                          setSearchQuery('');
-                          setResourceSearchResults([]);
-                        }}
-                        className="w-full text-left py-3 px-5 hover:bg-gray-100"
-                      >
-                        <div className="font-semibold">{resource.title}</div>
-                        {resource.description && (
-                          <div className="text-sm text-gray-500 truncate">
-                            {resource.description}
-                          </div>
-                        )}
-                      </button>
-
-                      {index !== resourceSearchResults.length - 1 && (
-                        <div style={{ height: '2px', backgroundColor: '#C8DC59' }} />
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
           </form>
         </div>
         <div className="flex gap-6 mb-6">
@@ -519,9 +447,6 @@ function FilterPage() {
                           handleBookmarkChange(resource.id, isBookmarked)
                         }
                       />
-
-
-
 
                       );
                     })}
