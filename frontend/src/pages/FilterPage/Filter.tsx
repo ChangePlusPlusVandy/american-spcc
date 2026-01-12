@@ -50,7 +50,10 @@ const GridIcon = () => (
 
 function FilterPage() {
   const [searchParams] = useSearchParams();
-  const sidebarCategory = searchParams.get('category');
+  const selectedTopics = useMemo(() => {
+    return searchParams.getAll('category');
+  }, [searchParams]);
+  
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
@@ -60,7 +63,8 @@ function FilterPage() {
   >([]);
   const [resourceSearchResults, setResourceSearchResults] = useState<Resource[]>([]);
   const [isTyping, setIsTyping] = useState(false);
-  const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
+
+  
   const [selectedAges, setSelectedAges] = useState<string[]>([]);
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
   const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
@@ -118,25 +122,7 @@ function FilterPage() {
     { value: 'LONG', label: 'Long >15 min' },
   ];
 
-  const effectiveTopics = useMemo(() => {
-    if (selectedTopics.length > 0) {
-      return selectedTopics;
-    }
-    if (sidebarCategory) {
-      return [sidebarCategory];
-    }
-    return [];
-  }, [selectedTopics, sidebarCategory]);
-  
-
-  useEffect(() => {
-    if (sidebarCategory) {
-      setSelectedTopics([sidebarCategory]);
-    }
-  }, [sidebarCategory]);
-  
     
-
   useEffect(() => {
     const fetchResources = async () => {
       setLoading(true);
@@ -145,29 +131,33 @@ function FilterPage() {
       try {
         let allResources: Resource[] = [];
   
-        if (effectiveTopics.length > 0) {
+        if (selectedTopics.length > 0) {
           const results = await Promise.all(
-            effectiveTopics.map(category =>
+            selectedTopics.map((category) =>
               fetch(`${API_BASE_URL}/api/resources?category=${category}`)
-                .then(res => res.json())
+                .then((res) => res.json())
             )
           );
+        
           allResources = results.flat();
         } else {
-          const response = await fetch(`${API_BASE_URL}/api/resources`);
-          allResources = await response.json();
+          const res = await fetch(`${API_BASE_URL}/api/resources`);
+          allResources = await res.json();
         }
+        
   
         setResources(allResources);
       } catch {
-        setError('Failed to fetch resources. Please try again later.');
+        setError('Failed to fetch resources.');
       } finally {
         setLoading(false);
       }
     };
   
     fetchResources();
-  }, [effectiveTopics]);
+  }, [selectedTopics]);
+  
+  
     
   
   useEffect(() => {
@@ -177,6 +167,7 @@ function FilterPage() {
       setIsTyping(false);
     }
   }, [searchParams]);
+
 
 
   const searchResources = async (query: string) => {
@@ -221,17 +212,14 @@ function FilterPage() {
         }
       }
   
-      // Format filter
       if (selectedFormats.length > 0 && !selectedFormats.includes(resource.resource_type)) {
         return false;
       }
   
-      // Language filter
       if (selectedLanguage && resource.language !== selectedLanguage) {
         return false;
       }
-  
-      // Time-to-read filter
+
       if (selectedTimeRanges.length > 0) {
         const time = resource.time_to_read;
         const matchesAnyRange = selectedTimeRanges.some((range) => {
@@ -243,7 +231,6 @@ function FilterPage() {
         if (!matchesAnyRange) return false;
       }
   
-      // Age filter
       if (selectedAges.length > 0) {
         const ageEnums = selectedAges
           .map((age) => AGE_TO_ENUM[age])
@@ -431,12 +418,25 @@ function FilterPage() {
         </div>
         <div className="flex gap-6">
           <div className="flex-shrink-0 mr-4">
-            <FilterComponent
-              selectedTopics={selectedTopics}
-              selectedAges={selectedAges}
-              onTopicChange={setSelectedTopics}
-              onAgeChange={setSelectedAges}
-            />
+          <FilterComponent
+            selectedTopics={selectedTopics}
+            selectedAges={selectedAges}
+            onTopicChange={(topics) => {
+              const params = new URLSearchParams(searchParams);
+            
+              params.delete('category');
+            
+              topics.forEach((t) => {
+                params.append('category', t);
+              });
+            
+              navigate(`/filter?${params.toString()}`, { replace: true });
+            }}
+            
+            onAgeChange={setSelectedAges}
+          />
+
+
           </div>
 
           <div className="flex-1">
@@ -489,11 +489,6 @@ function FilterPage() {
                           })
                         }
                       />
-
-
-
-
-
 
                     ))}
                   </div>

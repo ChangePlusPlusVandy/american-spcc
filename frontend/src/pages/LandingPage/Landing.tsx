@@ -17,9 +17,6 @@ function Landing() {
   const [searchResults, setSearchResults] = useState<Resource[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const searchRef = useRef<HTMLDivElement | null>(null);
-
-
-  // API call to search resource titles
   const searchResources = async (query: string) => {
 
     if (!query.trim()) {
@@ -48,13 +45,11 @@ function Landing() {
     }
   };
 
-  // Debounced search effect
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       searchResources(searchQuery);
-    }, 300); // 300ms debounce delay
+    }, 300);
 
-    // Cleanup function to cancel the previous timeout
     return () => clearTimeout(timeoutId);
   }, [searchQuery]);
 
@@ -72,7 +67,6 @@ function Landing() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
   
-  // Debug effect to log state changes
   useEffect(() => {
     console.log('State updated - searchQuery:', searchQuery);
     console.log('State updated - searchResults:', searchResults);
@@ -107,12 +101,19 @@ function Landing() {
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                if (searchQuery.trim()) {
-                  navigate(`/filter?q=${encodeURIComponent(searchQuery)}`);
-                  setSearchQuery('');
-                  setSearchResults([]);
+
+                const trimmed = searchQuery.trim();
+
+                if (trimmed) {
+                  navigate(`/filter?q=${encodeURIComponent(trimmed)}`);
+                } else {
+                  navigate('/filter');
                 }
+
+                setSearchQuery('');
+                setSearchResults([]);
               }}
+
             >
               <div className="relative">
                 <input

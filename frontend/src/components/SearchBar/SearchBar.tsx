@@ -4,7 +4,7 @@ interface SearchBarProps {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
-  // Customization props with defaults
+  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   size?: 'small' | 'medium' | 'large';
   borderColor?: string;
   borderWidth?: string;
@@ -17,6 +17,7 @@ function SearchBar({
   value,
   onChange,
   placeholder = 'Search...',
+  onKeyDown,
   size = 'large',
   borderColor = '#55C3C0',
   borderWidth = '5px',
@@ -38,6 +39,7 @@ function SearchBar({
       type="text"
       value={value}
       onChange={(e) => onChange(e.target.value)}
+      onKeyDown={onKeyDown}
       className="mx-auto w-full rounded-full focus:outline-none shadow-[0px_4px_4px_0px_#00000040] placeholder:text-black placeholder:font-bold"
       placeholder={placeholder}
       style={{
@@ -49,6 +51,7 @@ function SearchBar({
         fontSize: fontSize || styles.fontSize,
       }}
     />
+
   );
 }
 
