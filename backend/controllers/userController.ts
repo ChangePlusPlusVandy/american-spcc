@@ -9,7 +9,7 @@ export const syncUser = async (req: Request, res: Response) => {
   console.log('syncUser HIT');
 
   try {
-    const userId = (req as any).auth?.userId;
+    const { userId } = getAuth(req);
     console.log('userId:', userId);
 
     if (!userId) {

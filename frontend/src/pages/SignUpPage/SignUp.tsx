@@ -69,6 +69,9 @@ export default function SignUp() {
       await fetch(`${API_BASE_URL}/api/auth/sync-user`, {
         method: 'POST',
         credentials: 'include',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
       
       
@@ -101,6 +104,9 @@ export default function SignUp() {
         await fetch(`${API_BASE_URL}/api/auth/sync-user`, {
           method: 'POST',
           credentials: 'include',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
         
         
@@ -138,14 +144,16 @@ export default function SignUp() {
   const handleCompleteSignup = async () => {
     if (!user || processing) return;
     setProcessing(true);
+  
     try {
-
-
+      const token = await getToken(); // ✅ THIS LINE
+  
       const response = await fetch(`${API_BASE_URL}/api/users/me`, {
         method: 'PATCH',
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`, // ✅ REQUIRED
         },
         body: JSON.stringify({
           relationship,
@@ -156,21 +164,23 @@ export default function SignUp() {
           onboarding_complete: true,
         }),
       });
-      
-      
+  
       if (!response.ok) {
         throw new Error('Failed to update user');
       }
+  
       await user.update({
         unsafeMetadata: {
           onboarding_complete: true,
         },
       });
+  
       navigate('/');
     } finally {
       setProcessing(false);
     }
   };
+  
 
   return (
     <SignupForm
