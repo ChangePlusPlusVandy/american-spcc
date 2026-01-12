@@ -247,30 +247,37 @@ function FilterPage() {
       try {
         let allResources: Resource[] = [];
 
+        const categoryParam = searchParams.get('category');
+
         if (labelIdParam) {
           const response = await fetch(
             `${API_BASE_URL}/api/resources?label_id=${labelIdParam}`
           );
-          if (!response.ok) throw new Error('Failed to fetch resources');
           allResources = await response.json();
         }
+        
+        else if (categoryParam) {
+          const response = await fetch(
+            `${API_BASE_URL}/api/resources?category=${categoryParam}`
+          );
+          allResources = await response.json();
+        }
+        
         else if (selectedTopics.length > 0) {
           const promises = selectedTopics.map((category) =>
-            fetch(`${API_BASE_URL}/api/resources?category=${category}`).then((res) => {
-              if (!res.ok) throw new Error('Failed to fetch resources');
-              return res.json();
-            })
+            fetch(`${API_BASE_URL}/api/resources?category=${category}`).then((res) =>
+              res.json()
+            )
           );
-
           const results = await Promise.all(promises);
           allResources = results.flat();
         }
-
+        
         else {
           const response = await fetch(`${API_BASE_URL}/api/resources`);
-          if (!response.ok) throw new Error('Failed to fetch resources');
           allResources = await response.json();
         }
+        
 
         setResources(allResources);
       } catch (err) {
