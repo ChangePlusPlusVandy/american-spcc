@@ -122,7 +122,22 @@ function FilterPage() {
     { value: 'LONG', label: 'Long >15 min' },
   ];
 
-    
+  useEffect(() => {
+    const fetchCollections = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/collections`, {
+          credentials: 'include',
+        });
+        if (!res.ok) return;
+  
+        const collections = await res.json();
+        setCollectionNames(collections.map((c: any) => c.name));
+      } catch {}
+    };
+  
+    fetchCollections();
+  }, []);
+  
   useEffect(() => {
     const fetchResources = async () => {
       setLoading(true);
@@ -472,17 +487,16 @@ function FilterPage() {
         onCancel={() => setShowCreateCollection(false)}
         onCreate={async (name) => {
           try {
-            const token = await getToken();
-            if (!token) return;
         
             const res = await fetch(`${API_BASE_URL}/api/collections`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
               },
+              credentials: 'include', // ✅ REQUIRED FOR CLERK
               body: JSON.stringify({ name }),
             });
+            
         
             if (!res.ok) throw new Error('Create collection failed');
         
@@ -496,13 +510,14 @@ function FilterPage() {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
                   },
+                  credentials: 'include', // ✅ TOP LEVEL
                   body: JSON.stringify({
                     resource_fk: createCollectionResourceId,
                   }),
                 }
               );
+              
         
               const createdItem = await itemRes.json();
               createdItemId = createdItem.id;
@@ -515,18 +530,14 @@ function FilterPage() {
               undo: async () => {
                 if (!createdItemId) return;
         
-                const token = await getToken();
-                if (!token) return;
-        
                 await fetch(
                   `${API_BASE_URL}/api/collections/items/${createdItemId}`,
                   {
                     method: 'DELETE',
-                    headers: {
-                      Authorization: `Bearer ${token}`,
-                    },
+                    credentials: 'include', // ✅ TOP LEVEL
                   }
                 );
+                
               },
             });
         
