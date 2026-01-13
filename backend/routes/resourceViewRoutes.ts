@@ -1,4 +1,4 @@
-/*import express from 'express';
+import express from 'express';
 import {
   recordResourceView,
   getAllResourceViews,
@@ -12,4 +12,4 @@ router.post('/', recordResourceView);
 router.get('/', getAllResourceViews);
 router.get('/:id', getResourceViewById);
 router.delete('/:id', deleteResourceView);
-export default router;*/
+export default router;
