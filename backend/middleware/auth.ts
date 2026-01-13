@@ -4,8 +4,7 @@ import { clerkClient } from '@clerk/clerk-sdk-node';
 import prisma from '../config/prisma';
 
 /**
- * AUTHENTICATION & AUTHORIZATION TEMPLATE
- * ---------------------------------------
+ * AUTHENTICATION & AUTHORIZATION
  * Roles: PARENT, ADMIN
  */
 
@@ -32,29 +31,35 @@ export const syncUserWithDB = async (
     const { userId: clerkId } = getAuth(req);
 
     if (!clerkId) {
-      return res.status(401).json({ error: 'No Clerk user ID found' });
+      return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    let user = await prisma.user.findUnique({
+    let parent = await prisma.parent.findUnique({
       where: { clerk_id: clerkId },
     });
 
-    if (!user) {
+    if (!parent) {
       const clerkUser = await clerkClient.users.getUser(clerkId);
 
-      user = await prisma.user.create({
+      const email =
+        clerkUser.emailAddresses.find(
+          (e) => e.id === clerkUser.primaryEmailAddressId
+        )?.emailAddress ??
+        clerkUser.emailAddresses[0]?.emailAddress ??
+        '';
+
+      parent = await prisma.parent.create({
         data: {
           clerk_id: clerkId,
-          email: clerkUser.emailAddresses[0]?.emailAddress ?? '',
-          role: 'PARENT',
+          email,
         },
       });
     }
 
-    (req as any).user = user;
+    (req as any).parent = parent;
     next();
   } catch (error) {
-    console.error('Error syncing user with database:', error);
+    console.error('Error syncing parent with database:', error);
     res.status(500).json({ error: 'Failed to sync user with database' });
   }
 };
@@ -64,19 +69,17 @@ export const requireParent = (
   res: Response,
   next: NextFunction
 ) => {
-  const user = (req as any).user;
+  const parent = (req as any).parent;
 
-  if (!user) {
-    return res.status(401).json({ error: 'User not found' });
+  if (!parent) {
+    return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  if (user.role === 'PARENT' || user.role === 'ADMIN') {
+  if (parent.role === 'PARENT' || parent.role === 'ADMIN') {
     return next();
   }
 
-  return res.status(403).json({
-    error: 'Forbidden: Requires PARENT or ADMIN role',
-  });
+  return res.status(403).json({ error: 'Forbidden' });
 };
 
 export const requireAdmin = (
@@ -84,17 +87,15 @@ export const requireAdmin = (
   res: Response,
   next: NextFunction
 ) => {
-  const user = (req as any).user;
+  const parent = (req as any).parent;
 
-  if (!user) {
-    return res.status(401).json({ error: 'User not found' });
+  if (!parent) {
+    return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  if (user.role === 'ADMIN') {
+  if (parent.role === 'ADMIN') {
     return next();
   }
 
-  return res.status(403).json({
-    error: 'Forbidden: Requires ADMIN role',
-  });
+  return res.status(403).json({ error: 'Forbidden' });
 };
