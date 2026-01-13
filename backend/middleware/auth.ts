@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { Parent, AdminUser } from '@prisma/client';
 import { getAuth } from '@clerk/express';
-import { clerkClient } from '@clerk/clerk-sdk-node';
+import { clerkClient } from '@clerk/express';
+
 import prisma from '../config/prisma';
 
 type AuthedRequest = Request & {

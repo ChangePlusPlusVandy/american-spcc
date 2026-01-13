@@ -1,7 +1,8 @@
 import { Request, Response } from 'express';
 import { getAuth } from '@clerk/express';
 import { prisma } from '../config/prisma';
-import { clerkClient } from '@clerk/clerk-sdk-node';
+import { clerkClient } from '@clerk/express';
+
 
 async function getOrCreateParent(clerkId: string) {
   const clerkUser = await clerkClient.users.getUser(clerkId);
