@@ -74,7 +74,10 @@ export const getUserByClerkId = async (req: Request, res: Response) => {
   try {
     const clerk_id = req.params.clerkId;
 
-    // Fetch user from Clerk
+    if (!clerk_id) {
+      return res.status(400).json({ error: 'Missing clerkId param' });
+    }
+
     const clerkUser = await clerkClient.users.getUser(clerk_id);
     const email = clerkUser.emailAddresses[0]?.emailAddress;
 
@@ -93,12 +96,13 @@ export const getUserByClerkId = async (req: Request, res: Response) => {
       },
     });
 
-    res.json(parent);
+    return res.json(parent);
   } catch (error) {
     console.error('Error fetching parent by Clerk ID:', error);
-    res.status(500).json({ error: 'Failed to fetch parent' });
+    return res.status(500).json({ error: 'Failed to fetch parent' });
   }
 };
+
 
 
 // Update user

@@ -1,6 +1,27 @@
 import { Request, Response } from 'express';
 import { getAuth } from '@clerk/express';
 import { prisma } from '../config/prisma';
+import { clerkClient } from '@clerk/clerk-sdk-node';
+
+async function getOrCreateParent(clerkId: string) {
+  const clerkUser = await clerkClient.users.getUser(clerkId);
+  const email = clerkUser.emailAddresses[0]?.emailAddress;
+
+  if (!email) {
+    throw new Error('User has no email');
+  }
+
+  return prisma.parent.upsert({
+    where: { clerk_id: clerkId },
+    update: {},
+    create: {
+      clerk_id: clerkId,
+      email,
+      first_name: clerkUser.firstName ?? null,
+      last_name: clerkUser.lastName ?? null,
+    },
+  });
+}
 
 /* ============================
    Create Collection
@@ -15,13 +36,8 @@ export const createCollection = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'name is required.' });
     }
 
-    const parent = await prisma.parent.findUnique({
-      where: { clerk_id: clerkId },
-    });
+    const parent = await getOrCreateParent(clerkId);
 
-    if (!parent) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
 
     const collection = await prisma.collection.create({
       data: {
@@ -51,10 +67,8 @@ export const getCollectionsByUser = async (req: Request, res: Response) => {
     const { userId: clerkId } = getAuth(req);
     if (!clerkId) return res.status(401).json({ error: 'Unauthorized' });
 
-    const parent = await prisma.parent.findUnique({
-      where: { clerk_id: clerkId },
-    });
-    if (!parent) return res.status(401).json({ error: 'Unauthorized' });
+    const parent = await getOrCreateParent(clerkId);
+
 
     const collections = await prisma.collection.findMany({
       where: { parent_fk: parent.id },
@@ -93,9 +107,8 @@ export const getCollectionById = async (req: Request, res: Response) => {
 
     const { id } = req.params;
 
-    const parent = await prisma.parent.findUnique({
-      where: { clerk_id: clerkId },
-    });
+    const parent = await getOrCreateParent(clerkId);
+
 
     const collection = await prisma.collection.findUnique({
       where: { id },
@@ -129,9 +142,8 @@ export const renameCollection = async (req: Request, res: Response) => {
     const { name } = req.body;
     if (!name) return res.status(400).json({ error: 'New name is required.' });
 
-    const parent = await prisma.parent.findUnique({
-      where: { clerk_id: clerkId },
-    });
+    const parent = await getOrCreateParent(clerkId);
+
 
     const collection = await prisma.collection.findUnique({
       where: { id },
@@ -169,9 +181,8 @@ export const deleteCollection = async (req: Request, res: Response) => {
 
     const { id } = req.params;
 
-    const parent = await prisma.parent.findUnique({
-      where: { clerk_id: clerkId },
-    });
+    const parent = await getOrCreateParent(clerkId);
+
 
     const collection = await prisma.collection.findUnique({
       where: { id },
@@ -204,9 +215,8 @@ export const addResourceToCollection = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'resource_fk is required' });
     }
 
-    const parent = await prisma.parent.findUnique({
-      where: { clerk_id: clerkId },
-    });
+    const parent = await getOrCreateParent(clerkId);
+
 
     const collection = await prisma.collection.findUnique({
       where: { id: collectionId },
@@ -246,9 +256,8 @@ export const removeResourceFromCollection = async (req: Request, res: Response) 
 
     const { itemId } = req.params;
 
-    const parent = await prisma.parent.findUnique({
-      where: { clerk_id: clerkId },
-    });
+    const parent = await getOrCreateParent(clerkId);
+
 
     const item = await prisma.collectionItem.findUnique({
       where: { id: itemId },
