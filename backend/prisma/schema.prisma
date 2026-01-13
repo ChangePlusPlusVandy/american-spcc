@@ -1,277 +1,206 @@
-import { Request, Response } from 'express';
-import { getAuth } from '@clerk/express';
-import { prisma } from '../config/prisma';
+generator client {
+  provider = "prisma-client-js"
+}
 
-/* ============================
-   Create Collection
-============================ */
-export const createCollection = async (req: Request, res: Response) => {
-  try {
-    const { userId: clerkId } = getAuth(req);
-    if (!clerkId) return res.status(401).json({ error: 'Unauthorized' });
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
 
-    const { name } = req.body;
-    if (!name) {
-      return res.status(400).json({ error: 'name is required.' });
-    }
+enum RESOURCE_TYPE {
+  PDF
+  TXT
+  VIDEO
+  WEBINAR
+  WEBPAGE
+  INTERACTIVE_QUIZ
+  OTHER
+}
 
-    const parent = await prisma.parent.findUnique({
-      where: { clerk_id: clerkId },
-    });
+enum HOSTING_TYPE {
+  INTERNAL
+  EXTERNAL
+  OTHER
+}
 
-    if (!parent) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
+enum CATEGORY_TYPE {
+  PARENTING_SKILLS_RELATIONSHIPS
+  CHILD_DEVELOPMENT
+  MENTAL_EMOTIONAL_HEALTH
+  SAFETY_PROTECTION
+  EDUCATION_LEARNING
+  HEALTH_WELLBEING
+  LIFE_SKILLS_INDEPENDENCE
+  FAMILY_SUPPORT_COMMUNITY
+}
 
-    const collection = await prisma.collection.create({
-      data: {
-        parent_fk: parent.id,
-        name,
-      },
-    });
+enum AGE_GROUP {
+  AGE_0_3
+  AGE_4_6
+  AGE_7_10
+  AGE_10_13
+  AGE_14_18
+  AGE_18_ABOVE
+}
 
-    res.status(201).json(collection);
-  } catch (error: any) {
-    if (error.code === 'P2002') {
-      return res
-        .status(409)
-        .json({ error: 'A collection with this name already exists.' });
-    }
+enum LANGUAGE {
+  ENGLISH
+  SPANISH
+  CHINESE
+  OTHER
+}
 
-    console.error('Error creating collection:', error);
-    res.status(500).json({ error: 'Failed to create collection' });
-  }
-};
+model CategoryLabel {
+  id         String          @id @default(cuid())
+  label_name String          @unique
+  category   CATEGORY_TYPE
+  resources  ResourceLabel[]
 
-/* ============================
-   Get Collections for Current Parent
-============================ */
-export const getCollectionsByUser = async (req: Request, res: Response) => {
-  try {
-    const { userId: clerkId } = getAuth(req);
-    if (!clerkId) return res.status(401).json({ error: 'Unauthorized' });
+  @@map("categorylabel")
+}
 
-    const parent = await prisma.parent.findUnique({
-      where: { clerk_id: clerkId },
-    });
-    if (!parent) return res.status(401).json({ error: 'Unauthorized' });
+model Resource {
+  id                String                   @id @default(cuid())
+  title             String                   @unique
+  description       String?
+  resource_type     RESOURCE_TYPE
+  hosting_type      HOSTING_TYPE
+  category          CATEGORY_TYPE
+  age_groups        AGE_GROUP[]
+  language          LANGUAGE
+  time_to_read      Int
+  created_at        DateTime                 @default(now())
+  updated_at        DateTime                 @updatedAt
+  labels            ResourceLabel[]
+  externalResources ExternalResources?
+  collectionItems   CollectionItem[]
+  internalResource  InternalHostedResources?
+  image_s3_key  String? 
 
-    const collections = await prisma.collection.findMany({
-      where: { parent_fk: parent.id },
-      orderBy: { created_at: 'desc' },
-      include: {
-        items: {
-          include: {
-            resource: {
-              select: {
-                id: true,
-                title: true,
-                externalResources: {
-                  select: { external_url: true },
-                },
-              },
-            },
-          },
-        },
-      },
-    });
+  @@map("resource")
+}
 
-    res.json(collections);
-  } catch (error) {
-    console.error('Error fetching collections:', error);
-    res.status(500).json({ error: 'Failed to fetch collections' });
-  }
-};
+model ResourceLabel {
+  id          String        @id @default(cuid())
+  resource_id String
+  label_id    String
+  resource    Resource      @relation(fields: [resource_id], references: [id])
+  label       CategoryLabel @relation(fields: [label_id], references: [id])
 
-/* ============================
-   Get Collection by ID
-============================ */
-export const getCollectionById = async (req: Request, res: Response) => {
-  try {
-    const { userId: clerkId } = getAuth(req);
-    if (!clerkId) return res.status(401).json({ error: 'Unauthorized' });
+  @@unique([resource_id, label_id])
+  @@map("resourcelabel")
+}
 
-    const { id } = req.params;
+model ExternalResources {
+  id           String   @id @default(cuid())
+  resource_fk  String   @unique
+  external_url String
+  resource     Resource @relation(fields: [resource_fk], references: [id])
 
-    const parent = await prisma.parent.findUnique({
-      where: { clerk_id: clerkId },
-    });
+  @@map("externalResources")
+}
 
-    const collection = await prisma.collection.findUnique({
-      where: { id },
-      include: {
-        items: {
-          include: { resource: true },
-        },
-      },
-    });
+enum RELATIONSHIP_TYPE {
+  MOTHER
+  FATHER
+  GUARDIAN
+  GRANDPARENT
+  OTHER
+  PREFER_NOT_TO_SAY
+}
 
-    if (!parent || !collection || collection.parent_fk !== parent.id) {
-      return res.status(403).json({ error: 'Forbidden' });
-    }
+enum HOUSEHOLD_TYPE {
+  MARRIED
+  SINGLE_PARENT
+  DIVORCED_SEPARATED
+  WIDOWED
+  OTHER
+  PREFER_NOT_TO_SAY
+}
 
-    res.json(collection);
-  } catch (error) {
-    console.error('Error fetching collection:', error);
-    res.status(500).json({ error: 'Failed to fetch collection' });
-  }
-};
+model Parent {
+  id         String @id @default(cuid())
+  clerk_id   String @unique
+  first_name String?
+  last_name  String?
+  email      String @unique
 
-/* ============================
-   Rename Collection
-============================ */
-export const renameCollection = async (req: Request, res: Response) => {
-  try {
-    const { userId: clerkId } = getAuth(req);
-    if (!clerkId) return res.status(401).json({ error: 'Unauthorized' });
+  relationship          RELATIONSHIP_TYPE?
+  household_type        HOUSEHOLD_TYPE?
+  topics_of_interest    CATEGORY_TYPE[]
+  kids_age_groups       AGE_GROUP[]
+  subscribed_newsletter Boolean            @default(false)
 
-    const { id } = req.params;
-    const { name } = req.body;
-    if (!name) return res.status(400).json({ error: 'New name is required.' });
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  onboarding_complete Boolean @default(false)
 
-    const parent = await prisma.parent.findUnique({
-      where: { clerk_id: clerkId },
-    });
 
-    const collection = await prisma.collection.findUnique({
-      where: { id },
-    });
+  collections   Collection[]
+}
 
-    if (!parent || !collection || collection.parent_fk !== parent.id) {
-      return res.status(403).json({ error: 'Forbidden' });
-    }
+model Collection {
+  id         String   @id @default(cuid())
+  parent_fk  String?
+  name       String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
-    const updated = await prisma.collection.update({
-      where: { id },
-      data: { name },
-    });
+  parent  Parent?            @relation(fields: [parent_fk], references: [id], onDelete: Cascade)
+  items CollectionItem[]
 
-    res.json(updated);
-  } catch (error: any) {
-    if (error.code === 'P2002') {
-      return res
-        .status(409)
-        .json({ error: 'A collection with this name already exists.' });
-    }
+  @@unique([parent_fk, name])
+  @@map("collection")
+}
 
-    console.error('Error renaming collection:', error);
-    res.status(500).json({ error: 'Failed to rename collection' });
-  }
-};
+model CollectionItem {
+  id            String   @id @default(cuid())
+  collection_fk String
+  resource_fk   String
+  created_at    DateTime @default(now())
 
-/* ============================
-   Delete Collection
-============================ */
-export const deleteCollection = async (req: Request, res: Response) => {
-  try {
-    const { userId: clerkId } = getAuth(req);
-    if (!clerkId) return res.status(401).json({ error: 'Unauthorized' });
+  collection Collection @relation(fields: [collection_fk], references: [id], onDelete: Cascade)
+  resource   Resource   @relation(fields: [resource_fk], references: [id], onDelete: Cascade)
 
-    const { id } = req.params;
+  @@unique([collection_fk, resource_fk])
+  @@map("collection_item")
+}
 
-    const parent = await prisma.parent.findUnique({
-      where: { clerk_id: clerkId },
-    });
+model InternalHostedResources {
+  id          String   @id @default(cuid())
+  resource_fk String   @unique
+  s3_key      String
+  resource    Resource @relation(fields: [resource_fk], references: [id])
 
-    const collection = await prisma.collection.findUnique({
-      where: { id },
-    });
+  @@map("internalHostedResources")
+}
 
-    if (!parent || !collection || collection.parent_fk !== parent.id) {
-      return res.status(403).json({ error: 'Forbidden' });
-    }
 
-    await prisma.collection.delete({ where: { id } });
+model AdminUser {
+  id         String  @id @default(cuid())
+  clerk_id   String  @unique
+  email      String  @unique
+  first_name String?
+  last_name  String?
+  is_active  Boolean @default(true)
 
-    res.json({ message: 'Collection deleted successfully' });
-  } catch (error) {
-    console.error('Error deleting collection:', error);
-    res.status(500).json({ error: 'Failed to delete collection' });
-  }
-};
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
-/* ============================
-   Add Resource to Collection
-============================ */
-export const addResourceToCollection = async (req: Request, res: Response) => {
-  try {
-    const { userId: clerkId } = getAuth(req);
-    if (!clerkId) return res.status(401).json({ error: 'Unauthorized' });
+  adminLogs AdminLog[]
 
-    const { collectionId } = req.params;
-    const { resource_fk } = req.body;
-    if (!resource_fk) {
-      return res.status(400).json({ error: 'resource_fk is required' });
-    }
+  @@map("admin_users")
+}
 
-    const parent = await prisma.parent.findUnique({
-      where: { clerk_id: clerkId },
-    });
+model AdminLog {
+  id         String    @id @default(cuid())
+  admin_fk   String
+  admin      AdminUser @relation(fields: [admin_fk], references: [id], onDelete: Cascade)
+  action     String
+  details    String?
+  created_at DateTime  @default(now())
 
-    const collection = await prisma.collection.findUnique({
-      where: { id: collectionId },
-    });
-
-    if (!parent || !collection || collection.parent_fk !== parent.id) {
-      return res.status(403).json({ error: 'Forbidden' });
-    }
-
-    const item = await prisma.collectionItem.create({
-      data: {
-        collection_fk: collectionId,
-        resource_fk,
-      },
-    });
-
-    res.status(201).json(item);
-  } catch (error: any) {
-    if (error.code === 'P2002') {
-      return res
-        .status(409)
-        .json({ error: 'Resource already exists in this collection.' });
-    }
-
-    console.error('Error adding resource to collection:', error);
-    res.status(500).json({ error: 'Failed to add resource to collection' });
-  }
-};
-
-/* ============================
-   Remove Resource from Collection
-============================ */
-export const removeResourceFromCollection = async (req: Request, res: Response) => {
-  try {
-    const { userId: clerkId } = getAuth(req);
-    if (!clerkId) return res.status(401).json({ error: 'Unauthorized' });
-
-    const { itemId } = req.params;
-
-    const parent = await prisma.parent.findUnique({
-      where: { clerk_id: clerkId },
-    });
-
-    const item = await prisma.collectionItem.findUnique({
-      where: { id: itemId },
-      include: {
-        collection: true,
-      },
-    });
-
-    if (
-      !parent ||
-      !item ||
-      item.collection.parent_fk !== parent.id
-    ) {
-      return res.status(403).json({ error: 'Forbidden' });
-    }
-
-    await prisma.collectionItem.delete({
-      where: { id: itemId },
-    });
-
-    res.json({ message: 'Resource removed from collection' });
-  } catch (error) {
-    console.error('Error removing item:', error);
-    res.status(500).json({ error: 'Failed to remove item' });
-  }
-};
+  @@index([admin_fk])
+  @@map("adminlog")
+}
