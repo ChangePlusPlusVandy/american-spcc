@@ -6,6 +6,8 @@ import { clerkClient } from '@clerk/clerk-sdk-node';
 
 
 async function getOrCreateParent(clerkId: string) {
+  console.log('PRISMA VALUE:', prisma);
+
   const clerkUser = await clerkClient.users.getUser(clerkId);
 
   const email =
