@@ -43,7 +43,15 @@ export const syncParentWithDB = async (
 
     if (!parent) {
       const clerkUser = await clerkClient.users.getUser(clerkId);
-      const email = clerkUser.emailAddresses[0]?.emailAddress;
+      const email =
+        clerkUser.primaryEmailAddress?.emailAddress ??
+        clerkUser.emailAddresses?.[0]?.emailAddress;
+
+      if (!email) {
+        return res.status(400).json({
+          error: 'Clerk user has no email address',
+        });
+      }
 
       if (!email) {
         return res.status(400).json({ error: 'User has no email' });

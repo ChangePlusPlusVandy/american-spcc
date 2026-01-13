@@ -16,7 +16,16 @@ export const syncUser = async (req: Request, res: Response) => {
     }
 
     const clerkUser = await clerkClient.users.getUser(userId);
-    const email = clerkUser.emailAddresses[0]?.emailAddress;
+    const email =
+      clerkUser.primaryEmailAddress?.emailAddress ??
+      clerkUser.emailAddresses?.[0]?.emailAddress;
+
+    if (!email) {
+      return res.status(400).json({
+        error: 'Clerk user has no email address',
+      });
+    }
+
 
     const parent = await prisma.parent.upsert({
       where: { clerk_id: userId },
@@ -80,7 +89,16 @@ export const getUserByClerkId = async (req: Request, res: Response) => {
     }
 
     const clerkUser = await clerkClient.users.getUser(clerk_id);
-    const email = clerkUser.emailAddresses[0]?.emailAddress;
+    const email =
+      clerkUser.primaryEmailAddress?.emailAddress ??
+      clerkUser.emailAddresses?.[0]?.emailAddress;
+
+    if (!email) {
+      return res.status(400).json({
+        error: 'Clerk user has no email address',
+      });
+    }
+
 
     if (!email) {
       return res.status(400).json({ error: 'User has no email' });

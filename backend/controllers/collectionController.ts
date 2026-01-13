@@ -1,15 +1,19 @@
 import { Request, Response } from 'express';
 import { getAuth } from '@clerk/express';
-import { prisma } from '../config/prisma';
-import { clerkClient } from '@clerk/express';
+import prisma from '../config/prisma';
+import { clerkClient } from '@clerk/clerk-sdk-node';
+
 
 
 async function getOrCreateParent(clerkId: string) {
   const clerkUser = await clerkClient.users.getUser(clerkId);
-  const email = clerkUser.emailAddresses[0]?.emailAddress;
+
+  const email =
+    clerkUser.primaryEmailAddress?.emailAddress ??
+    clerkUser.emailAddresses?.[0]?.emailAddress;
 
   if (!email) {
-    throw new Error('User has no email');
+    throw new Error('Clerk user has no email address');
   }
 
   return prisma.parent.upsert({
@@ -23,6 +27,7 @@ async function getOrCreateParent(clerkId: string) {
     },
   });
 }
+
 
 /* ============================
    Create Collection
