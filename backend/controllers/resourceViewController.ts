@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+/*import { Request, Response } from 'express';
 
 export const recordResourceView = async (req: Request, res: Response) => {
   try {
@@ -83,4 +83,4 @@ export const deleteResourceView = async (req: Request, res: Response) => {
     console.error('Error deleting resource view:', error);
     res.status(500).json({ error: 'Failed to delete resource view' });
   }
-};
+};*/

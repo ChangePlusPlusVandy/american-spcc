@@ -1,32 +1,31 @@
 import { Request, Response } from 'express';
 import { getAuth } from '@clerk/express';
+import { prisma } from '../config/prisma';
 
+/* ============================
+   Create Collection
+============================ */
 export const createCollection = async (req: Request, res: Response) => {
   try {
-    const { prisma } = await import('../config/prisma');
-
     const { userId: clerkId } = getAuth(req);
-
-    if (!clerkId) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
+    if (!clerkId) return res.status(401).json({ error: 'Unauthorized' });
 
     const { name } = req.body;
     if (!name) {
       return res.status(400).json({ error: 'name is required.' });
     }
 
-    const user = await prisma.user.findUnique({
+    const parent = await prisma.parent.findUnique({
       where: { clerk_id: clerkId },
     });
 
-    if (!user) {
+    if (!parent) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
     const collection = await prisma.collection.create({
       data: {
-        user_fk: user.id,
+        parent_fk: parent.id,
         name,
       },
     });
@@ -34,7 +33,9 @@ export const createCollection = async (req: Request, res: Response) => {
     res.status(201).json(collection);
   } catch (error: any) {
     if (error.code === 'P2002') {
-      return res.status(409).json({ error: 'A collection with this name already exists.' });
+      return res
+        .status(409)
+        .json({ error: 'A collection with this name already exists.' });
     }
 
     console.error('Error creating collection:', error);
@@ -42,20 +43,21 @@ export const createCollection = async (req: Request, res: Response) => {
   }
 };
 
+/* ============================
+   Get Collections for Current Parent
+============================ */
 export const getCollectionsByUser = async (req: Request, res: Response) => {
   try {
-    const { prisma } = await import('../config/prisma');
-
     const { userId: clerkId } = getAuth(req);
     if (!clerkId) return res.status(401).json({ error: 'Unauthorized' });
 
-    const user = await prisma.user.findUnique({
+    const parent = await prisma.parent.findUnique({
       where: { clerk_id: clerkId },
     });
-    if (!user) return res.status(401).json({ error: 'Unauthorized' });
+    if (!parent) return res.status(401).json({ error: 'Unauthorized' });
 
     const collections = await prisma.collection.findMany({
-      where: { user_fk: user.id },
+      where: { parent_fk: parent.id },
       orderBy: { created_at: 'desc' },
       include: {
         items: {
@@ -65,9 +67,7 @@ export const getCollectionsByUser = async (req: Request, res: Response) => {
                 id: true,
                 title: true,
                 externalResources: {
-                  select: {
-                    external_url: true,
-                  },
+                  select: { external_url: true },
                 },
               },
             },
@@ -75,7 +75,6 @@ export const getCollectionsByUser = async (req: Request, res: Response) => {
         },
       },
     });
-    
 
     res.json(collections);
   } catch (error) {
@@ -84,17 +83,17 @@ export const getCollectionsByUser = async (req: Request, res: Response) => {
   }
 };
 
+/* ============================
+   Get Collection by ID
+============================ */
 export const getCollectionById = async (req: Request, res: Response) => {
   try {
-    const { prisma } = await import('../config/prisma');
-
     const { userId: clerkId } = getAuth(req);
-    
-    const { id } = req.params;
-
     if (!clerkId) return res.status(401).json({ error: 'Unauthorized' });
 
-    const user = await prisma.user.findUnique({
+    const { id } = req.params;
+
+    const parent = await prisma.parent.findUnique({
       where: { clerk_id: clerkId },
     });
 
@@ -107,7 +106,7 @@ export const getCollectionById = async (req: Request, res: Response) => {
       },
     });
 
-    if (!user || !collection || collection.user_fk !== user.id) {
+    if (!parent || !collection || collection.parent_fk !== parent.id) {
       return res.status(403).json({ error: 'Forbidden' });
     }
 
@@ -118,17 +117,19 @@ export const getCollectionById = async (req: Request, res: Response) => {
   }
 };
 
+/* ============================
+   Rename Collection
+============================ */
 export const renameCollection = async (req: Request, res: Response) => {
   try {
-    const { prisma } = await import('../config/prisma');
     const { userId: clerkId } = getAuth(req);
+    if (!clerkId) return res.status(401).json({ error: 'Unauthorized' });
+
     const { id } = req.params;
     const { name } = req.body;
-
-    if (!clerkId) return res.status(401).json({ error: 'Unauthorized' });
     if (!name) return res.status(400).json({ error: 'New name is required.' });
 
-    const user = await prisma.user.findUnique({
+    const parent = await prisma.parent.findUnique({
       where: { clerk_id: clerkId },
     });
 
@@ -136,7 +137,7 @@ export const renameCollection = async (req: Request, res: Response) => {
       where: { id },
     });
 
-    if (!user || !collection || collection.user_fk !== user.id) {
+    if (!parent || !collection || collection.parent_fk !== parent.id) {
       return res.status(403).json({ error: 'Forbidden' });
     }
 
@@ -148,7 +149,9 @@ export const renameCollection = async (req: Request, res: Response) => {
     res.json(updated);
   } catch (error: any) {
     if (error.code === 'P2002') {
-      return res.status(409).json({ error: 'A collection with this name already exists.' });
+      return res
+        .status(409)
+        .json({ error: 'A collection with this name already exists.' });
     }
 
     console.error('Error renaming collection:', error);
@@ -156,15 +159,17 @@ export const renameCollection = async (req: Request, res: Response) => {
   }
 };
 
+/* ============================
+   Delete Collection
+============================ */
 export const deleteCollection = async (req: Request, res: Response) => {
   try {
-    const { prisma } = await import('../config/prisma');
     const { userId: clerkId } = getAuth(req);
-    const { id } = req.params;
-
     if (!clerkId) return res.status(401).json({ error: 'Unauthorized' });
 
-    const user = await prisma.user.findUnique({
+    const { id } = req.params;
+
+    const parent = await prisma.parent.findUnique({
       where: { clerk_id: clerkId },
     });
 
@@ -172,7 +177,7 @@ export const deleteCollection = async (req: Request, res: Response) => {
       where: { id },
     });
 
-    if (!user || !collection || collection.user_fk !== user.id) {
+    if (!parent || !collection || collection.parent_fk !== parent.id) {
       return res.status(403).json({ error: 'Forbidden' });
     }
 
@@ -185,17 +190,21 @@ export const deleteCollection = async (req: Request, res: Response) => {
   }
 };
 
+/* ============================
+   Add Resource to Collection
+============================ */
 export const addResourceToCollection = async (req: Request, res: Response) => {
   try {
-    const { prisma } = await import('../config/prisma');
     const { userId: clerkId } = getAuth(req);
+    if (!clerkId) return res.status(401).json({ error: 'Unauthorized' });
+
     const { collectionId } = req.params;
     const { resource_fk } = req.body;
+    if (!resource_fk) {
+      return res.status(400).json({ error: 'resource_fk is required' });
+    }
 
-    if (!clerkId) return res.status(401).json({ error: 'Unauthorized' });
-    if (!resource_fk) return res.status(400).json({ error: 'resource_fk is required' });
-
-    const user = await prisma.user.findUnique({
+    const parent = await prisma.parent.findUnique({
       where: { clerk_id: clerkId },
     });
 
@@ -203,7 +212,7 @@ export const addResourceToCollection = async (req: Request, res: Response) => {
       where: { id: collectionId },
     });
 
-    if (!user || !collection || collection.user_fk !== user.id) {
+    if (!parent || !collection || collection.parent_fk !== parent.id) {
       return res.status(403).json({ error: 'Forbidden' });
     }
 
@@ -217,7 +226,9 @@ export const addResourceToCollection = async (req: Request, res: Response) => {
     res.status(201).json(item);
   } catch (error: any) {
     if (error.code === 'P2002') {
-      return res.status(409).json({ error: 'Resource already exists in this collection.' });
+      return res
+        .status(409)
+        .json({ error: 'Resource already exists in this collection.' });
     }
 
     console.error('Error adding resource to collection:', error);
@@ -225,26 +236,26 @@ export const addResourceToCollection = async (req: Request, res: Response) => {
   }
 };
 
+/* ============================
+   Remove Resource from Collection
+============================ */
 export const removeResourceFromCollection = async (req: Request, res: Response) => {
   try {
-    const { prisma } = await import('../config/prisma');
     const { userId: clerkId } = getAuth(req);
-    const { itemId } = req.params;
-
     if (!clerkId) return res.status(401).json({ error: 'Unauthorized' });
 
-    const user = await prisma.user.findUnique({
+    const { itemId } = req.params;
+
+    const parent = await prisma.parent.findUnique({
       where: { clerk_id: clerkId },
     });
 
     const item = await prisma.collectionItem.findUnique({
       where: { id: itemId },
-      include: {
-        collection: true,
-      },
+      include: { collection: true },
     });
 
-    if (!user || !item || item.collection.user_fk !== user.id) {
+    if (!parent || !item || item.collection.parent_fk !== parent.id) {
       return res.status(403).json({ error: 'Forbidden' });
     }
 

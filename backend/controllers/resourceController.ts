@@ -130,7 +130,6 @@ export const getResourceById = async (req: Request, res: Response) => {
       include: {
         labels: { include: { label: true } },
         collectionItems: true,
-        resourceViews: true,
       },
     });
     if (!resource) return res.status(404).json({ error: 'Resource not found' });

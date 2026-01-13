@@ -1,21 +1,23 @@
 import { Request, Response } from 'express';
+import { prisma } from '../config/prisma';
 
+/* ============================
+   Create Admin Log
+============================ */
 export const createAdminLog = async (req: Request, res: Response) => {
   try {
-    const { prisma } = await import('../config/prisma');
-
     const { admin_id, action, details } = req.body;
 
     if (!admin_id || !action) {
       return res.status(400).json({ error: 'admin_id and action are required' });
     }
 
-    const admin = await prisma.user.findUnique({
+    const admin = await prisma.adminUser.findUnique({
       where: { id: admin_id },
     });
 
-    if (!admin || admin.role !== 'ADMIN') {
-      return res.status(404).json({ error: 'Admin not found or invalid role' });
+    if (!admin) {
+      return res.status(404).json({ error: 'Admin not found' });
     }
 
     const log = await prisma.adminLog.create({
@@ -26,7 +28,12 @@ export const createAdminLog = async (req: Request, res: Response) => {
       },
       include: {
         admin: {
-          select: { id: true, first_name: true, last_name: true, email: true },
+          select: {
+            id: true,
+            first_name: true,
+            last_name: true,
+            email: true,
+          },
         },
       },
     });
@@ -38,14 +45,20 @@ export const createAdminLog = async (req: Request, res: Response) => {
   }
 };
 
+/* ============================
+   Get All Admin Logs
+============================ */
 export const getAllAdminLogs = async (_req: Request, res: Response) => {
   try {
-    const { prisma } = await import('../config/prisma');
-
     const logs = await prisma.adminLog.findMany({
       include: {
         admin: {
-          select: { id: true, first_name: true, last_name: true, email: true },
+          select: {
+            id: true,
+            first_name: true,
+            last_name: true,
+            email: true,
+          },
         },
       },
       orderBy: { created_at: 'desc' },
