@@ -73,11 +73,25 @@ export const getUserById = async (req: Request, res: Response) => {
 export const getUserByClerkId = async (req: Request, res: Response) => {
   try {
     const clerk_id = req.params.clerkId;
-    const parent = await prisma.parent.findUnique({ where: { clerk_id } });
 
-    if (!parent) {
-      return res.status(404).json({ error: 'Parent not found' });
+    // Fetch user from Clerk
+    const clerkUser = await clerkClient.users.getUser(clerk_id);
+    const email = clerkUser.emailAddresses[0]?.emailAddress;
+
+    if (!email) {
+      return res.status(400).json({ error: 'User has no email' });
     }
+
+    const parent = await prisma.parent.upsert({
+      where: { clerk_id },
+      update: {},
+      create: {
+        clerk_id,
+        email,
+        first_name: clerkUser.firstName ?? null,
+        last_name: clerkUser.lastName ?? null,
+      },
+    });
 
     res.json(parent);
   } catch (error) {
@@ -192,12 +206,17 @@ export const updateCurrentUser = async (req: Request, res: Response) => {
       data.onboarding_complete = onboarding_complete;
     }
 
-    const updatedParent = await prisma.parent.update({
+    const updatedParent = await prisma.parent.upsert({
       where: { clerk_id: userId },
-      data,
+      update: data,
+      create: {
+        clerk_id: userId,
+        ...data,
+      },
     });
-
+    
     return res.json(updatedParent);
+    
   } catch (err) {
     console.error('updateCurrentUser error:', err);
     return res.status(500).json({ error: 'Failed to update parent' });

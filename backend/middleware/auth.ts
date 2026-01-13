@@ -22,14 +22,13 @@ export const authenticateUser = (
   next();
 };
 
-export const syncUserWithDB = async (
+export const syncParentWithDB = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
     const { userId: clerkId } = getAuth(req);
-
     if (!clerkId) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
@@ -41,26 +40,19 @@ export const syncUserWithDB = async (
     if (!parent) {
       const clerkUser = await clerkClient.users.getUser(clerkId);
 
-      const email =
-        clerkUser.emailAddresses.find(
-          (e) => e.id === clerkUser.primaryEmailAddressId
-        )?.emailAddress ??
-        clerkUser.emailAddresses[0]?.emailAddress ??
-        '';
-
       parent = await prisma.parent.create({
         data: {
           clerk_id: clerkId,
-          email,
+          email: clerkUser.emailAddresses[0]?.emailAddress ?? '',
         },
       });
     }
 
     (req as any).parent = parent;
     next();
-  } catch (error) {
-    console.error('Error syncing parent with database:', error);
-    res.status(500).json({ error: 'Failed to sync user with database' });
+  } catch (err) {
+    console.error('syncParentWithDB failed:', err);
+    return res.status(500).json({ error: 'Auth sync failed' });
   }
 };
 
