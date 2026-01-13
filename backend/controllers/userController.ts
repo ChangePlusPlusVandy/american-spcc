@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { getAuth } from '@clerk/express';
 import { clerkClient } from '@clerk/clerk-sdk-node';
-import { prisma } from '../config/prisma';
+import prisma from '../config/prisma';
 import { RELATIONSHIP_TYPE, HOUSEHOLD_TYPE } from '@prisma/client';
 
 /* ============================
