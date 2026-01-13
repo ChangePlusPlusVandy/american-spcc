@@ -1,33 +1,27 @@
 import { Request, Response } from 'express';
 import { getAuth } from '@clerk/express';
-import { clerkClient } from '@clerk/express';
-
-import prisma from '../config/prisma';
+import { clerkClient } from '@clerk/clerk-sdk-node';
+import { prisma } from '../config/prisma';
 import { RELATIONSHIP_TYPE, HOUSEHOLD_TYPE } from '@prisma/client';
 
-// sync user
+/* ============================
+   Sync user (now Parent)
+============================ */
 export const syncUser = async (req: Request, res: Response) => {
   console.log('syncUser HIT');
 
   try {
     const { userId } = getAuth(req);
+    console.log('userId:', userId);
+
     if (!userId) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
     const clerkUser = await clerkClient.users.getUser(userId);
-    const email =
-      clerkUser.primaryEmailAddress?.emailAddress ??
-      clerkUser.emailAddresses?.[0]?.emailAddress;
+    const email = clerkUser.emailAddresses[0]?.emailAddress ?? null;
 
-    if (!email) {
-      return res.status(400).json({
-        error: 'Clerk user has no email address',
-      });
-    }
-
-
-    const parent = await prisma.parent.upsert({
+    const user = await prisma.parent.upsert({
       where: { clerk_id: userId },
       update: {},
       create: {
@@ -38,7 +32,7 @@ export const syncUser = async (req: Request, res: Response) => {
       },
     });
 
-    console.log('Parent synced:', parent.id);
+    console.log('DB parent synced:', user.id);
     return res.json({ ok: true });
   } catch (err) {
     console.error('syncUser FAILED:', err);
@@ -46,88 +40,59 @@ export const syncUser = async (req: Request, res: Response) => {
   }
 };
 
-
-// Get all users
+/* ============================
+   Get all users (parents)
+============================ */
 export const getAllUsers = async (_req: Request, res: Response) => {
   try {
-    const parents = await prisma.parent.findMany({
+    const users = await prisma.parent.findMany({
       orderBy: { created_at: 'desc' },
     });
-    res.json(parents);
+    res.json(users);
   } catch (error) {
-    console.error('Error fetching parents:', error);
-    res.status(500).json({ error: 'Failed to fetch parents' });
+    console.error('Error fetching users:', error);
+    res.status(500).json({ error: 'Failed to fetch users' });
   }
 };
 
-
-// Get user by ID
+/* ============================
+   Get user by ID
+============================ */
 export const getUserById = async (req: Request, res: Response) => {
   try {
-    const id = req.params.id;
-    const parent = await prisma.parent.findUnique({ where: { id } });
+    const id = req.params.id as string;
+    const user = await prisma.parent.findUnique({ where: { id } });
 
-    if (!parent) {
-      return res.status(404).json({ error: 'Parent not found' });
-    }
-
-    res.json(parent);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    res.json(user);
   } catch (error) {
-    console.error('Error fetching parent:', error);
-    res.status(500).json({ error: 'Failed to fetch parent' });
+    console.error('Error fetching user:', error);
+    res.status(500).json({ error: 'Failed to fetch user' });
   }
 };
 
-
-// Get user by Clerk ID
+/* ============================
+   Get user by Clerk ID
+============================ */
 export const getUserByClerkId = async (req: Request, res: Response) => {
   try {
-    const clerk_id = req.params.clerkId;
+    const clerk_id = req.params.clerkId as string;
+    const user = await prisma.parent.findUnique({ where: { clerk_id } });
 
-    if (!clerk_id) {
-      return res.status(400).json({ error: 'Missing clerkId param' });
-    }
-
-    const clerkUser = await clerkClient.users.getUser(clerk_id);
-    const email =
-      clerkUser.primaryEmailAddress?.emailAddress ??
-      clerkUser.emailAddresses?.[0]?.emailAddress;
-
-    if (!email) {
-      return res.status(400).json({
-        error: 'Clerk user has no email address',
-      });
-    }
-
-
-    if (!email) {
-      return res.status(400).json({ error: 'User has no email' });
-    }
-
-    const parent = await prisma.parent.upsert({
-      where: { clerk_id },
-      update: {},
-      create: {
-        clerk_id,
-        email,
-        first_name: clerkUser.firstName ?? null,
-        last_name: clerkUser.lastName ?? null,
-      },
-    });
-
-    return res.json(parent);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    res.json(user);
   } catch (error) {
-    console.error('Error fetching parent by Clerk ID:', error);
-    return res.status(500).json({ error: 'Failed to fetch parent' });
+    console.error('Error fetching user by Clerk ID:', error);
+    res.status(500).json({ error: 'Failed to fetch user' });
   }
 };
 
-
-
-// Update user
+/* ============================
+   Update user by ID
+============================ */
 export const updateUser = async (req: Request, res: Response) => {
   try {
-    const id = req.params.id;
+    const id = req.params.id as string;
 
     const {
       first_name,
@@ -156,28 +121,32 @@ export const updateUser = async (req: Request, res: Response) => {
 
     res.json(updated);
   } catch (error) {
-    console.error('Error updating parent:', error);
-    res.status(500).json({ error: 'Failed to update parent' });
+    console.error('Error updating user:', error);
+    res.status(500).json({ error: 'Failed to update user' });
   }
 };
 
-// Delete user
+/* ============================
+   Delete user
+============================ */
 export const deleteUser = async (req: Request, res: Response) => {
   try {
-    const id = req.params.id;
+    const id = req.params.id as string;
     await prisma.parent.delete({ where: { id } });
-
-    res.json({ message: 'Parent deleted successfully' });
+    res.json({ message: 'User deleted successfully' });
   } catch (error) {
-    console.error('Error deleting parent:', error);
-    res.status(500).json({ error: 'Failed to delete parent' });
+    console.error('Error deleting user:', error);
+    res.status(500).json({ error: 'Failed to delete user' });
   }
 };
 
-
-
+/* ============================
+   Update current user (/me)
+============================ */
 export const updateCurrentUser = async (req: Request, res: Response) => {
   try {
+    console.log('PATCH /api/users/me HIT');
+
     const { userId } = getAuth(req);
     if (!userId) {
       return res.status(401).json({ error: 'Unauthorized' });
@@ -229,19 +198,14 @@ export const updateCurrentUser = async (req: Request, res: Response) => {
       data.onboarding_complete = onboarding_complete;
     }
 
-    const updatedParent = await prisma.parent.upsert({
+    const updatedUser = await prisma.parent.update({
       where: { clerk_id: userId },
-      update: data,
-      create: {
-        clerk_id: userId,
-        ...data,
-      },
+      data,
     });
-    
-    return res.json(updatedParent);
-    
+
+    return res.json(updatedUser);
   } catch (err) {
     console.error('updateCurrentUser error:', err);
-    return res.status(500).json({ error: 'Failed to update parent' });
+    return res.status(500).json({ error: 'Failed to update user' });
   }
 };

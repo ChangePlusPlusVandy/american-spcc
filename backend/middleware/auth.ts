@@ -1,41 +1,38 @@
 import { Request, Response, NextFunction } from 'express';
-import { Parent, AdminUser } from '@prisma/client';
 import { getAuth } from '@clerk/express';
-import { clerkClient } from '@clerk/express';
-
+import { clerkClient } from '@clerk/clerk-sdk-node';
 import prisma from '../config/prisma';
-
-type AuthedRequest = Request & {
-  parent?: Parent;
-  admin?: AdminUser;
-};
 
 /**
  * AUTHENTICATION & AUTHORIZATION
+ * Roles: PARENT, ADMIN
  */
 
-// ✅ This one is fine with plain Request
 export const authenticateUser = (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   const { userId } = getAuth(req);
+
   if (!userId) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
+
   next();
 };
 
-// ✅ MUST use AuthedRequest
 export const syncParentWithDB = async (
-  req: AuthedRequest,
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
     const { userId: clerkId } = getAuth(req);
-    if (!clerkId) return res.status(401).json({ error: 'Unauthorized' });
+
+    if (!clerkId) {
+      return res.status(401).json({ error: 'No Clerk user ID found' });
+    }
 
     let parent = await prisma.parent.findUnique({
       where: { clerk_id: clerkId },
@@ -48,13 +45,7 @@ export const syncParentWithDB = async (
         clerkUser.emailAddresses?.[0]?.emailAddress;
 
       if (!email) {
-        return res.status(400).json({
-          error: 'Clerk user has no email address',
-        });
-      }
-
-      if (!email) {
-        return res.status(400).json({ error: 'User has no email' });
+        return res.status(400).json({ error: 'Clerk user has no email' });
       }
 
       parent = await prisma.parent.create({
@@ -65,43 +56,24 @@ export const syncParentWithDB = async (
       });
     }
 
-    req.parent = parent; // ✅ now typed
+    (req as any).parent = parent;
     next();
-  } catch (err) {
-    console.error('syncParentWithDB failed:', err);
-    return res.status(500).json({ error: 'Auth sync failed' });
+  } catch (error) {
+    console.error('Error syncing parent with database:', error);
+    res.status(500).json({ error: 'Failed to sync parent with database' });
   }
 };
 
-// ✅ MUST use AuthedRequest
 export const requireParent = (
-  req: AuthedRequest,
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  if (!req.parent) {
-    return res.status(403).json({ error: 'Parent access required' });
-  }
-  next();
-};
+  const parent = (req as any).parent;
 
-// ✅ async + AuthedRequest + no duplicate variable
-export const requireAdmin = async (
-  req: AuthedRequest,
-  res: Response,
-  next: NextFunction
-) => {
-  const { userId } = getAuth(req);
-  if (!userId) return res.status(401).json({ error: 'Unauthorized' });
-
-  const admin = await prisma.adminUser.findUnique({
-    where: { clerk_id: userId },
-  });
-
-  if (!admin || !admin.is_active) {
-    return res.status(403).json({ error: 'Admin access required' });
+  if (!parent) {
+    return res.status(401).json({ error: 'Parent not found' });
   }
 
-  req.admin = admin; // ✅ typed
   next();
 };
