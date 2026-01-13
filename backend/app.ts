@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import 'dotenv/config';
 import { clerkMiddleware } from '@clerk/express';
-
+import adminUserRoutes from './routes/adminUserRoutes';
 import authRoutes from './routes/authRoutes';
 import userRoutes from './routes/userRoutes';
 import collectionRoutes from './routes/collectionRoutes';
@@ -12,7 +12,6 @@ import externalResourcesRoutes from './routes/externalResourcesRoutes';
 import internalHostedResourceRoutes from './routes/internalHostedResourcesRoutes';
 import adminLogsRoutes from './routes/adminLogsRoutes';
 import testS3Routes from './routes/testS3Routes';
-
 const app = express();
 
 const allowedOrigins = ['http://localhost:5173', process.env.FRONTEND_URL].filter(Boolean);
@@ -45,7 +44,7 @@ app.get('/api/debug/auth', (req, res) => {
   const auth = getAuth(req);
   res.json(auth);
 });
-
+app.use('/api/admin', adminUserRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/collections', collectionRoutes);

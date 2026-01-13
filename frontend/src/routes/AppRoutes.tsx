@@ -11,6 +11,8 @@ import Login from '@pages/LoginPage/Login';
 import Signup from '@pages/SignUpPage/SignUp';
 import Account from '@pages/AccountPage/Account';
 import ResetPassword from '@pages/ResetPasswordPage/ResetPassword';
+import AdminLanding from '@/pages/AdminPages/AdminLandingPage/AdminLanding';
+import AdminRoute from '@/components/AdminRouteComponent/AdminRoute';
 
 function AccountRoute() {
   const { user, isLoaded } = useUser();
@@ -28,7 +30,9 @@ export default function AppRoutes() {
   return (
     <Routes>
       {/* PUBLIC */}
+      
       <Route path="/" element={<Landing />} />
+      <Route path="/login/*" element={<Login />} />
       <Route path="/filter" element={<FilterPage />} />
       <Route path="/sign-in/*" element={<Login />} />
       <Route path="/sign-up/*" element={<Signup />} />
@@ -40,6 +44,17 @@ export default function AppRoutes() {
 
       {/* PROTECTED */}
       <Route path="/account" element={<AccountRoute />} />
+
+      {/* ADMIN */}
+      <Route
+        path="/admin"
+        element={
+          <AdminRoute>
+            <AdminLanding />
+          </AdminRoute>
+        }
+      />
+
     </Routes>
   );
 }

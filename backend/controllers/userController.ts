@@ -4,9 +4,6 @@ import { clerkClient } from '@clerk/clerk-sdk-node';
 import prisma from '../config/prisma';
 import { RELATIONSHIP_TYPE, HOUSEHOLD_TYPE } from '@prisma/client';
 
-/* ============================
-   Sync user (now Parent)
-============================ */
 export const syncUser = async (req: Request, res: Response) => {
   console.log('syncUser HIT');
 
@@ -20,7 +17,16 @@ export const syncUser = async (req: Request, res: Response) => {
 
     const clerkUser = await clerkClient.users.getUser(userId);
     const email = clerkUser.emailAddresses[0]?.emailAddress ?? null;
+    const currentRole = clerkUser.publicMetadata?.role;
 
+    if (!currentRole) {
+      await clerkClient.users.updateUser(userId, {
+        publicMetadata: {
+          role: 'USER',
+        },
+      });
+      console.log('Assigned default role USER');
+    }
     const user = await prisma.parent.upsert({
       where: { clerk_id: userId },
       update: {},
@@ -40,9 +46,6 @@ export const syncUser = async (req: Request, res: Response) => {
   }
 };
 
-/* ============================
-   Get all users (parents)
-============================ */
 export const getAllUsers = async (_req: Request, res: Response) => {
   try {
     const users = await prisma.parent.findMany({
@@ -55,9 +58,6 @@ export const getAllUsers = async (_req: Request, res: Response) => {
   }
 };
 
-/* ============================
-   Get user by ID
-============================ */
 export const getUserById = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;
@@ -71,9 +71,6 @@ export const getUserById = async (req: Request, res: Response) => {
   }
 };
 
-/* ============================
-   Get user by Clerk ID
-============================ */
 export const getUserByClerkId = async (req: Request, res: Response) => {
   try {
     const clerk_id = req.params.clerkId as string;
@@ -87,9 +84,6 @@ export const getUserByClerkId = async (req: Request, res: Response) => {
   }
 };
 
-/* ============================
-   Update user by ID
-============================ */
 export const updateUser = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;
@@ -126,9 +120,6 @@ export const updateUser = async (req: Request, res: Response) => {
   }
 };
 
-/* ============================
-   Delete user
-============================ */
 export const deleteUser = async (req: Request, res: Response) => {
   try {
     const id = req.params.id as string;
@@ -140,9 +131,6 @@ export const deleteUser = async (req: Request, res: Response) => {
   }
 };
 
-/* ============================
-   Update current user (/me)
-============================ */
 export const updateCurrentUser = async (req: Request, res: Response) => {
   try {
     console.log('PATCH /api/users/me HIT');

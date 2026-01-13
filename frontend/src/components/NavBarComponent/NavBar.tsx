@@ -11,7 +11,7 @@ import Sidebar from '../SidebarComponent/Sidebar';
 import Button from '../ButtonComponent/Button';
 import { ButtonColor, ButtonVariant } from '../ButtonComponent/ButtonDefinitions';
 
-export default function DefaultNav() {
+export default function DefaultNav({ isAdmin = false }: { isAdmin?: boolean }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -21,10 +21,29 @@ export default function DefaultNav() {
 
   return (
     <>
+      {!isAdmin && (
       <Sidebar isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
+    )}
+
       <nav className="sticky top-0 z-50 w-full bg-[#FFF9F0] px-4 py-4 flex items-center justify-between">
         <div className="flex items-center gap-x-10">
-          {/* Left: Hamburger */}
+          {!isAdmin && (
+            <button
+              style={{
+                background: 'transparent',
+                border: 'none',
+                padding: 0,
+                margin: 0,
+                boxShadow: 'none',
+                appearance: 'none',
+                outline: 'none',
+              }}
+              onClick={() => setMenuOpen(true)}
+            >
+              <img src={navSidebar} alt="Menu" className="relative left-4 h-5 w-5" />
+            </button>
+          )}
+
           <button
             style={{
               background: 'transparent',
@@ -35,31 +54,14 @@ export default function DefaultNav() {
               appearance: 'none',
               outline: 'none',
             }}
-            onClick={() => setMenuOpen(true)}
-          >
-            <img src={navSidebar} alt="Menu" className="relative left-4 h-5 w-5" />
-          </button>
-          <button
-            style={{
-              background: 'transparent',
-              border: 'none',
-              padding: 0,
-              margin: 0,
-              boxShadow: 'none',
-              appearance: 'none',
-              outline: 'none',
-            }}
-            onClick={() => navigate('/')}
+            onClick={() => navigate(isAdmin ? '/admin' : '/')}
           >
             <img src={aspccLogoTurqoise} alt="logo" className="relative h-10" />
           </button>
-        </div>
 
-        {/* Center: Navigation Links */}
-        {/* Center: Navigation Links */}
+        </div>
         <div className="flex items-center gap-x-6 font-semibold text-sm">
           <div className="relative group inline-block">
-            {/* About button */}
             <button
               className="flex items-center !text-[#566273]"
               style={{
@@ -74,11 +76,7 @@ export default function DefaultNav() {
             >
               About <img src={chevron} alt="" className="ml-1 mt-1 h-3 w-3 inline-block" />
             </button>
-
-            {/* Invisible hover buffer (THIS is what you were missing) */}
             <div className="absolute left-0 top-full h-2 w-full"></div>
-
-            {/* Dropdown */}
             <div
               className="
                 absolute left-0 top-[calc(100%+8px)]
@@ -159,7 +157,6 @@ export default function DefaultNav() {
             </div>
           </div>
                   <div className="relative group inline-block">
-          {/* Get Involved button */}
           <button
             className="flex items-center !text-[#566273]"
             style={{
@@ -175,11 +172,7 @@ export default function DefaultNav() {
             Get Involved
             <img src={chevron} alt="" className="ml-1 mt-1 h-3 w-3 inline-block" />
           </button>
-
-          {/* Invisible hover buffer */}
           <div className="absolute left-0 top-full h-2 w-full"></div>
-
-          {/* Dropdown */}
           <div
             className="
               absolute left-0 top-[calc(100%+8px)]
@@ -250,10 +243,6 @@ export default function DefaultNav() {
             </a>
           </div>
         </div>
-
-
-
-          {/* Right: Donate button and logo */}
           <div className="w-auto">
             <Button
               variant={ButtonVariant.Small}
@@ -271,9 +260,6 @@ export default function DefaultNav() {
               </span>
             </Button>
           </div>
-
-
-
 
 
           <SignedOut>
@@ -294,18 +280,23 @@ export default function DefaultNav() {
             </button>
           </SignedOut>
           <SignedIn>
-          <UserButton
-            userProfileUrl="/account"
-            appearance={{
-              elements: {
-                userButtonPopoverFooter: {
-                  display: 'none',
+            <UserButton
+              afterSignOutUrl="/sign-in"
+              appearance={{
+                elements: {
+                  userButtonPopoverActionButton__manageAccount: {
+                    display: 'none',
+                  },
+                  userButtonPopoverFooter: {
+                    display: 'none',
+                  },
                 },
-              },
-            }}
-          />
-
+              }}
+            />
           </SignedIn>
+
+
+
         </div>
       </nav>
     </>

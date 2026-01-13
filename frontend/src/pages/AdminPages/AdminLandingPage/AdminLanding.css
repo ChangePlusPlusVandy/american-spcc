@@ -1,0 +1,97 @@
+.admin-page {
+  min-height: calc(100vh - 80px);
+  background: #fff7ea;
+  padding: 32px;
+}
+
+.admin-title {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 24px;
+  color: #4b5563;
+}
+
+.admin-row {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+}
+
+.admin-card {
+  width: 300px;
+  background: #5b6474;
+  border-radius: 28px;
+  padding: 24px;
+  color: white;
+}
+
+.admin-info {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.admin-avatar {
+  display: flex;
+  align-items: center;
+}
+
+.admin-avatar-image {
+  display: block;
+  line-height: 0;
+}
+
+
+.admin-name {
+  font-weight: 600;
+}
+
+.admin-email {
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+/* BUTTONS */
+.admin-btn {
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: none;
+  background: #fff7ea;
+  color: #5b6474;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+}
+
+.admin-btn.active {
+  background: white;
+}
+
+.admin-panel {
+  flex: 1;
+  background: #fffaf1;
+  border-radius: 24px;
+  padding: 32px;
+  min-height: 420px;
+  border: 2px solid #5b6474;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.admin-panel h3 {
+  color: #57c5c1;
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center; 
+  margin-bottom: 12px;
+}
+
+.admin-panel p {
+  text-align: center;
+  font-size: 15px;
+  color: #6b7280;
+}
