@@ -60,6 +60,7 @@ export default function DefaultNav({ isAdmin = false }: { isAdmin?: boolean }) {
           </button>
 
         </div>
+
         <div className="flex items-center gap-x-6 font-semibold text-sm">
           <div className="relative group inline-block">
             <button
@@ -260,8 +261,6 @@ export default function DefaultNav({ isAdmin = false }: { isAdmin?: boolean }) {
               </span>
             </Button>
           </div>
-
-
           <SignedOut>
             <button
               className="flex items-center !text-[#566273] hover:text-[#566273]"
@@ -281,12 +280,9 @@ export default function DefaultNav({ isAdmin = false }: { isAdmin?: boolean }) {
           </SignedOut>
           <SignedIn>
             <UserButton
-              afterSignOutUrl="/sign-in"
+              {...(!isAdmin && { userProfileUrl: '/account' })}
               appearance={{
                 elements: {
-                  userButtonPopoverActionButton__manageAccount: {
-                    display: 'none',
-                  },
                   userButtonPopoverFooter: {
                     display: 'none',
                   },
@@ -294,7 +290,6 @@ export default function DefaultNav({ isAdmin = false }: { isAdmin?: boolean }) {
               }}
             />
           </SignedIn>
-
 
 
         </div>
