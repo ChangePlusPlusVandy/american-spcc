@@ -9,21 +9,15 @@ import {
   removeResourceFromCollection,
 } from '../controllers/collectionController';
 
-import {
-  authenticateUser,
-  syncParentWithDB,
-  requireParent,
-} from '../middleware/auth';
+import { authenticateUser } from '../middleware/auth';
 
 const router = Router();
 
 /**
- * All collection routes require:
- * 1. Clerk auth
- * 2. Parent synced to DB
- * 3. Parent authorization
+ * Only require Clerk auth.
+ * Parent is resolved inside controllers.
  */
-router.use(authenticateUser, syncParentWithDB, requireParent);
+router.use(authenticateUser);
 
 router.post('/', createCollection);
 router.get('/', getCollectionsByUser);
