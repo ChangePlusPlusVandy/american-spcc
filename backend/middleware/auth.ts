@@ -35,17 +35,18 @@ export const syncUserWithDB = async (
       return res.status(401).json({ error: 'No Clerk user ID found' });
     }
 
-    let user = await prisma.parent.findUnique({
+    let user = await prisma.user.findUnique({
       where: { clerk_id: clerkId },
     });
 
     if (!user) {
       const clerkUser = await clerkClient.users.getUser(clerkId);
 
-      user = await prisma.parent.create({
+      user = await prisma.user.create({
         data: {
           clerk_id: clerkId,
           email: clerkUser.emailAddresses[0]?.emailAddress ?? '',
+          role: 'PARENT',
         },
       });
     }
