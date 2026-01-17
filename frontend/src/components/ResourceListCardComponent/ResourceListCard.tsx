@@ -23,6 +23,7 @@ interface ResourceListCardProps {
   category: string;
   imageUrl?: string;
   isBookmarked: boolean;
+  isAdmin?: boolean;
   onBookmarkChange?: (isBookmarked: boolean) => void;
   onLearnMore?: () => void;
   onSaved?: (payload: {
@@ -65,6 +66,7 @@ function ResourceListCard({
   category,
   imageUrl,
   isBookmarked,
+  isAdmin = false,
   onBookmarkChange,
   onLearnMore,
   onSaved,
@@ -121,6 +123,7 @@ function ResourceListCard({
           onClose={() => setShowSavePopup(false)}
           resourceId={id}
           resourceImage={imageUrl}
+          canSave={!isAdmin}
           onSaved={onSaved}
           onBookmarkChange={onBookmarkChange}
           onCreateCollection={(imageUrl, resourceId) => {
@@ -138,8 +141,6 @@ function ResourceListCard({
           onCreate={async (name) => {
             const token = await getToken();
             if (!token) return;
-          
-            // 1. create collection
             const res = await fetch(`${API_BASE_URL}/api/collections`, {
               method: 'POST',
               headers: {
@@ -155,8 +156,6 @@ function ResourceListCard({
             }
           
             const collection = await res.json();
-          
-            // 2. add resource to collection
             let createdItemId: string | null = null;
           
             if (pendingResourceId) {
@@ -175,8 +174,6 @@ function ResourceListCard({
               const item = await itemRes.json();
               createdItemId = item.id;
             }
-          
-            // 3. toast + undo
             onSaved?.({
               collectionName: collection.name,
               imageUrl: pendingImageUrl,
@@ -204,10 +201,6 @@ function ResourceListCard({
           }}
           
         />
-
-
-
-
       </div>
       <div className={styles.content}>
         <div className={styles.titleRow}>
@@ -233,7 +226,6 @@ function ResourceListCard({
             </>
           )}
         </div>
-
         <p className={styles.description}>{description}</p>
         {onLearnMore && (
           <button className={styles.learnMoreButton} onClick={onLearnMore}>

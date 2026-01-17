@@ -1,13 +1,15 @@
 import { Navigate } from 'react-router-dom';
 import type { ReactNode } from 'react';
-import { useAdminMe } from '@/hooks/useAdminMe';
+import { useUser } from '@clerk/clerk-react';
 
 export default function AdminRoute({ children }: { children: ReactNode }) {
-  const { me, loading } = useAdminMe();
+  const { user, isLoaded } = useUser();
 
-  if (loading) return null;
+  if (!isLoaded) return null;
 
-  if (!me) {
+  const isAdmin = user?.publicMetadata?.role === 'ADMIN';
+
+  if (!isAdmin) {
     return <Navigate to="/" replace />;
   }
 

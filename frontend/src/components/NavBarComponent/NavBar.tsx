@@ -1,49 +1,46 @@
 import { useState } from 'react';
+import { useUser } from '@clerk/clerk-react';
 
 import navSidebar from '../../assets/nav_sidebar_button.png';
 import aspccLogoTurqoise from '../../assets/aspcc_logo_turqois.png';
 import chevron from '../../assets/chevron.png';
-import { useNavigate } from 'react-router-dom';
 import { Heart } from 'lucide-react';
-
+import { useNavigate } from 'react-router-dom';
 import { SignedIn, SignedOut, UserButton } from '@clerk/clerk-react';
 import Sidebar from '../SidebarComponent/Sidebar';
 import Button from '../ButtonComponent/Button';
 import { ButtonColor, ButtonVariant } from '../ButtonComponent/ButtonDefinitions';
-
+import { Shield } from 'lucide-react';
 export default function DefaultNav({ isAdmin = false }: { isAdmin?: boolean }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
-
   const handleSignInClick = () => {
     navigate('/sign-in');
   };
 
   return (
     <>
-      {!isAdmin && (
-      <Sidebar isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
-    )}
-
+    <Sidebar isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
       <nav className="sticky top-0 z-50 w-full bg-[#FFF9F0] px-4 py-4 flex items-center justify-between">
         <div className="flex items-center gap-x-10">
-          {!isAdmin && (
-            <button
-              style={{
-                background: 'transparent',
-                border: 'none',
-                padding: 0,
-                margin: 0,
-                boxShadow: 'none',
-                appearance: 'none',
-                outline: 'none',
-              }}
-              onClick={() => setMenuOpen(true)}
-            >
-              <img src={navSidebar} alt="Menu" className="relative left-4 h-5 w-5" />
-            </button>
-          )}
-
+        <button
+          style={{
+            background: 'transparent',
+            border: 'none',
+            padding: 0,
+            margin: 0,
+            boxShadow: 'none',
+            appearance: 'none',
+            outline: 'none',
+          }}
+          onClick={() => setMenuOpen(true)}
+        >
+          <img
+            src={navSidebar}
+            alt="Menu"
+            className="relative left-4 h-5 w-5"
+          />
+        </button>
           <button
             style={{
               background: 'transparent',
@@ -54,13 +51,11 @@ export default function DefaultNav({ isAdmin = false }: { isAdmin?: boolean }) {
               appearance: 'none',
               outline: 'none',
             }}
-            onClick={() => navigate(isAdmin ? '/admin' : '/')}
+            onClick={() => navigate( '/')}
           >
             <img src={aspccLogoTurqoise} alt="logo" className="relative h-10" />
           </button>
-
         </div>
-
         <div className="flex items-center gap-x-6 font-semibold text-sm">
           <div className="relative group inline-block">
             <button
@@ -92,7 +87,6 @@ export default function DefaultNav({ isAdmin = false }: { isAdmin?: boolean }) {
                 transition-opacity duration-150
               "
             >
-
               <a
                 href="https://americanspcc.org/about/#what"
                 target="_blank"
@@ -110,7 +104,6 @@ export default function DefaultNav({ isAdmin = false }: { isAdmin?: boolean }) {
               >
                 Our Reach
               </a>
-
               <a
                 href="https://americanspcc.org/about/#team"
                 target="_blank"
@@ -119,7 +112,6 @@ export default function DefaultNav({ isAdmin = false }: { isAdmin?: boolean }) {
               >
                 Our Team
               </a>
-
               <a
                 href="https://americanspcc.org/about/#partners"
                 target="_blank"
@@ -128,7 +120,6 @@ export default function DefaultNav({ isAdmin = false }: { isAdmin?: boolean }) {
               >
                 Parents & Sponsors
               </a>
-
               <a
                 href="https://americanspcc.org/our-impact/"
                 target="_blank"
@@ -137,7 +128,6 @@ export default function DefaultNav({ isAdmin = false }: { isAdmin?: boolean }) {
               >
                 Our Impact
               </a>
-
               <a
                 href="https://americanspcc.org/in-the-media/"
                 target="_blank"
@@ -146,7 +136,6 @@ export default function DefaultNav({ isAdmin = false }: { isAdmin?: boolean }) {
               >
                 In the Media
               </a>
-
               <a
                 href="https://americanspcc.org/championforchildrenawards/"
                 target="_blank"
@@ -157,7 +146,7 @@ export default function DefaultNav({ isAdmin = false }: { isAdmin?: boolean }) {
               </a>
             </div>
           </div>
-                  <div className="relative group inline-block">
+          <div className="relative group inline-block">
           <button
             className="flex items-center !text-[#566273]"
             style={{
@@ -188,7 +177,6 @@ export default function DefaultNav({ isAdmin = false }: { isAdmin?: boolean }) {
               transition-opacity duration-150
             "
           >
-
             <a
               href="https://americanspcc.org/community/"
               target="_blank"
@@ -197,7 +185,6 @@ export default function DefaultNav({ isAdmin = false }: { isAdmin?: boolean }) {
             >
               Community
             </a>
-
             <a
               href="https://americanspcc.org/donate/"
               target="_blank"
@@ -206,7 +193,6 @@ export default function DefaultNav({ isAdmin = false }: { isAdmin?: boolean }) {
             >
               Take Action
             </a>
-
             <a
               href="https://americanspcc.org/parentcoaching/"
               target="_blank"
@@ -215,7 +201,6 @@ export default function DefaultNav({ isAdmin = false }: { isAdmin?: boolean }) {
             >
               Support Peaceful Discipline
             </a>
-
             <a
               href="https://americanspcc.org/advocacy/"
               target="_blank"
@@ -224,7 +209,6 @@ export default function DefaultNav({ isAdmin = false }: { isAdmin?: boolean }) {
             >
               Advocate
             </a>
-
             <a
               href="https://americanspcc.org/virtual-volunteer-application/"
               target="_blank"
@@ -279,19 +263,30 @@ export default function DefaultNav({ isAdmin = false }: { isAdmin?: boolean }) {
             </button>
           </SignedOut>
           <SignedIn>
-            <UserButton
-              {...(!isAdmin && { userProfileUrl: '/account' })}
-              appearance={{
-                elements: {
-                  userButtonPopoverFooter: {
+          <UserButton
+            userProfileUrl="/account"
+            appearance={{
+              elements: {
+                userButtonPopoverFooter: { display: 'none' },
+                ...(isAdmin && {
+                  userButtonPopoverActionButton__manageAccount: {
                     display: 'none',
                   },
-                },
-              }}
-            />
+                }),
+              },
+            }}
+          >
+            <UserButton.MenuItems>
+              {isAdmin && (
+                <UserButton.Link
+                  label="Admin Center"
+                  labelIcon={<Shield size={16} />}
+                  href="/admin/admin-center"
+                />
+              )}
+            </UserButton.MenuItems>
+          </UserButton>
           </SignedIn>
-
-
         </div>
       </nav>
     </>

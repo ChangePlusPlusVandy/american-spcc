@@ -1,26 +1,30 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@clerk/clerk-react';
 import { API_BASE_URL } from '@/config/api';
-import './AdminLanding.css';
+import './AdminCenter.css';
 import { useUser } from '@clerk/clerk-react';
 
 type Tab = 'profile' | 'content' | 'analytics';
 
-type Admin = {
+type User = {
   id: string;
   email: string;
-  first_name?: string;
-  last_name?: string;
-  full_name: string;
-  is_active: boolean;
+  first_name: string | null;
+  last_name: string | null;
+  role: 'PARENT' | 'ADMIN' | 'SUPER_ADMIN';
 };
 
-export default function AdminLanding() {
+export default function AdminCenter() {
   const [activeTab, setActiveTab] = useState<Tab>('content');
-  const [admin, setAdmin] = useState<Admin | null>(null);
+  const [dbUser, setDbUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const { getToken } = useAuth();
   const { user, isLoaded } = useUser();
+  const isAdmin =
+  isLoaded &&
+  (user?.publicMetadata?.role === 'ADMIN' ||
+   user?.publicMetadata?.role === 'SUPER_ADMIN');
+
 
 
   useEffect(() => {
@@ -29,16 +33,16 @@ export default function AdminLanding() {
         const token = await getToken();
         if (!token) return;
 
-        const res = await fetch(`${API_BASE_URL}/api/admin/me`, {
+        const res = await fetch(`${API_BASE_URL}/api/users/me`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
+        
+        const data: User = await res.json();
 
-        if (!res.ok) throw new Error('Not an admin');
+        setDbUser(data);
 
-        const data = await res.json();
-        setAdmin(data);
       } catch (err) {
         console.error('Failed to load admin:', err);
       } finally {
@@ -49,20 +53,20 @@ export default function AdminLanding() {
     fetchAdmin();
   }, []);
 
-  if (loading) {
-    return <div className="admin-page">Loading admin dashboard…</div>;
-  }
+  if (!isLoaded) return null;
 
-  if (!admin) {
+  if (!isAdmin) {
     return <div className="admin-page">Access denied</div>;
+  }
+  
+  if (loading || !dbUser) {
+    return <div className="admin-page">Loading admin dashboard…</div>;
   }
 
   return (
     <div className="admin-page">
       <h2 className="admin-title">Admin Center</h2>
-
       <div className="admin-row">
-        {/* LEFT CARD */}
         <aside className="admin-card">
           <div className="admin-info">
             <div className="admin-avatar">
@@ -76,8 +80,10 @@ export default function AdminLanding() {
 
             </div>
             <div>
-              <div className="admin-name">{admin.full_name}</div>
-              <div className="admin-email">{admin.email}</div>
+            <div className="admin-name">
+              {dbUser.first_name} {dbUser.last_name}
+            </div>
+            <div className="admin-email">{dbUser.email}</div>
             </div>
           </div>
 
@@ -102,8 +108,6 @@ export default function AdminLanding() {
             Data Analytics
           </button>
         </aside>
-
-        {/* RIGHT CARD */}
         <main className="admin-panel">
           {activeTab === 'profile' && <h3>Admin Profile</h3>}
           {activeTab === 'content' && <h3>Content Management</h3>}

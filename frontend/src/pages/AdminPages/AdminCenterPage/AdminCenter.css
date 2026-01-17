@@ -1,6 +1,6 @@
 .admin-page {
   min-height: calc(100vh - 80px);
-  background: #fff7ea;
+  background: #FFF9F0;
   padding: 32px;
 }
 
@@ -52,7 +52,6 @@
   opacity: 0.9;
 }
 
-/* BUTTONS */
 .admin-btn {
   width: 100%;
   margin-top: 12px;

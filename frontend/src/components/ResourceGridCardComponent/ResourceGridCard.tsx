@@ -23,6 +23,7 @@ interface ResourceGridCardProps {
   category: string;
   imageUrl?: string;
   isBookmarked: boolean;
+  isAdmin?: boolean;
   onLearnMore?: () => void;
   onSaved?: (payload: {
     collectionName: string;
@@ -63,6 +64,7 @@ function ResourceGridCard({
   category,
   imageUrl,
   isBookmarked,
+  isAdmin = false,
   onLearnMore,
   onSaved,  
   onBookmarkChange,
@@ -149,6 +151,7 @@ function ResourceGridCard({
               onClose={() => setShowSavePopup(false)}
               resourceId={id}
               resourceImage={imageUrl}
+              canSave={!isAdmin}
               onSaved={(payload) => {
                 onSaved?.({
                   ...payload,

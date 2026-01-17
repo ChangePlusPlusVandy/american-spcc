@@ -32,6 +32,7 @@ interface SignupFormProps {
   relationshipOptions: readonly SelectOption[];
   householdOptions: readonly SelectOption[];
   goToStep3: () => void;
+  onSkipStep2: () => void;
   topics: string[];
   setTopics: (v: string[]) => void;
   ageGroups: string[];
@@ -61,6 +62,7 @@ export default function SignupForm({
   relationshipOptions,
   householdOptions,
   goToStep3,
+  onSkipStep2,
   topics,
   setTopics,
   ageGroups,
@@ -171,7 +173,9 @@ export default function SignupForm({
                     className={`${styles.choiceButton} ${
                       relationship === opt.value ? styles.selected : ''
                     }`}
-                    onClick={() => setRelationship(opt.value)}
+                    onClick={() =>
+                      setRelationship(relationship === opt.value ? '' : opt.value)
+                    }                    
                   >
                     {opt.label}
                   </button>
@@ -186,7 +190,10 @@ export default function SignupForm({
                     className={`${styles.choiceButton} ${
                       householdType === opt.value ? styles.selected : ''
                     }`}
-                    onClick={() => setHouseholdType(opt.value)}
+                    onClick={() =>
+                      setHouseholdType(householdType === opt.value ? '' : opt.value)
+                    }
+                    
                   >
                     {opt.label}
                   </button>
@@ -201,9 +208,9 @@ export default function SignupForm({
               >
                 Next
               </Button>
-                <button className={styles.skip} onClick={goToStep3} type="button">
-                  Skip
-                </button>
+              <button className={styles.skip} onClick={onSkipStep2} type="button">
+                Skip
+              </button>
               </div>
             </div>
           )}

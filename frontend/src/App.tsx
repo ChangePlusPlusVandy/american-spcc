@@ -1,14 +1,17 @@
 import Navbar from '@/components/NavBarComponent/NavBar';
 import AppRoutes from './routes/AppRoutes';
-import { useLocation } from 'react-router-dom';
+import { useUser } from '@clerk/clerk-react';
 
 function App() {
-  const location = useLocation();
-  const isAdminRoute = location.pathname.startsWith('/admin');
+  const { user, isLoaded } = useUser();
+
+  const isAdmin =
+    isLoaded && user?.publicMetadata?.role === 'ADMIN';
+  
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar isAdmin={isAdminRoute} />
+      <Navbar isAdmin={isAdmin} />
 
       <main className="flex-grow">
         <AppRoutes />

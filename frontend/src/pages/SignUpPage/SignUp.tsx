@@ -106,16 +106,8 @@ export default function SignUp() {
             Authorization: `Bearer ${token}`,
           },
         });
-        
-        
-        
-        
-      
         setHasSynced(true);
-      }
-      
-      
-      
+      }  
       navigate('/sign-up?step=2', { replace: true });
       
     } catch (err: any) {
@@ -139,6 +131,14 @@ export default function SignUp() {
     } finally {
       setProcessing(false);
     }
+  };
+  const handleSkipStep2 = () => {
+    setRelationship('');
+    setHouseholdType('');
+    setTopics([]);
+    setAgeGroups([]);
+    setSubscribeNewsletter(false);
+    goToStep(3);
   };
   
   const handleCompleteSignup = async () => {
@@ -206,6 +206,7 @@ export default function SignUp() {
       relationshipOptions={RELATIONSHIP_OPTIONS}
       householdOptions={HOUSEHOLD_OPTIONS}
       goToStep3={() => goToStep(3)}
+      onSkipStep2={handleSkipStep2}
       topics={topics}
       setTopics={setTopics}
       ageGroups={ageGroups}

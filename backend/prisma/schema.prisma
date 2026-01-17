@@ -138,6 +138,7 @@ model Parent {
 
 
   collections   Collection[]
+  @@map("parent")
 }
 
 model Collection {
@@ -190,7 +191,7 @@ model AdminUser {
 
   adminLogs AdminLog[]
 
-  @@map("admin_users")
+  @@map("admin_user")
 }
 
 model AdminLog {

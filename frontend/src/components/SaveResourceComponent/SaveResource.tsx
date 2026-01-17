@@ -11,6 +11,9 @@ interface SaveResourceProps {
   onClose: () => void;
   resourceId: string;
   resourceImage?: string;
+
+  canSave?: boolean; // 👈 NEW
+
   onBookmarkChange?: (isBookmarked: boolean) => void;
   onSaved?: (payload: {
     collectionName: string;
@@ -19,8 +22,8 @@ interface SaveResourceProps {
   }) => void;
 
   onCreateCollection?: (imageUrl?: string, resourceId?: string) => void;
-
 }
+
 
 interface CollectionItem {
     id: string;
@@ -34,15 +37,17 @@ interface CollectionItem {
   }
   
 
-function SaveResource({
-  isOpen,
-  onClose,
-  resourceId,
-  resourceImage,
-  onBookmarkChange,
-  onSaved,
-  onCreateCollection,
-}: SaveResourceProps) {
+  function SaveResource({
+    isOpen,
+    onClose,
+    resourceId,
+    resourceImage,
+    canSave = true,
+    onBookmarkChange,
+    onSaved,
+    onCreateCollection,
+  }: SaveResourceProps) {
+  
   const [collections, setCollections] = useState<Collection[]>([]);
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(isOpen);
@@ -67,8 +72,8 @@ function SaveResource({
   }, [isOpen, visible]);
 
   useEffect(() => {
-    if (!isOpen || !isSignedIn) return;
-
+    if (!isOpen || !isSignedIn || !canSave) return;
+  
     async function fetchCollections() {
       setLoading(true);
       try {
@@ -100,16 +105,26 @@ function SaveResource({
   }, [isOpen, isSignedIn]);
 
   if (!visible) return null;
-
-  if (!isSignedIn) {
-    return (
-      <div className={`save-popover ${closing ? 'closing' : ''}`}>
-        <div className="save-unauth">
-          <a href="/sign-in">Sign in</a> to save resources!
-        </div>
+if (!isSignedIn) {
+  return (
+    <div className={`save-popover ${closing ? 'closing' : ''}`}>
+      <div className="save-unauth">
+        <a href="/sign-in">Sign in</a> to save resources
       </div>
-    );
-  }
+    </div>
+  );
+}
+if (!canSave) {
+  return (
+    <div className={`save-popover ${closing ? 'closing' : ''}`}>
+      <div className="save-unauth">
+        Only parents can save resources!
+      </div>
+    </div>
+  );
+}
+
+  
 
   return (
     <>

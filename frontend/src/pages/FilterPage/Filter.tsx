@@ -14,7 +14,7 @@ import CreateCollection from '@/components/CreateCollectionComponent/CreateColle
 import SaveToast from '@/components/SaveToastComponent/SaveToast';
 import { API_BASE_URL } from '@/config/api';
 import { useAuth } from '@clerk/clerk-react';
-import { useRef } from 'react';
+import { useUser } from '@clerk/clerk-react';
 
 interface Resource {
   id: string;
@@ -49,6 +49,9 @@ const GridIcon = () => (
 );
 
 function FilterPage() {
+  const { user, isLoaded } = useUser();
+  const isAdmin =
+  isLoaded && user?.publicMetadata?.role === 'ADMIN';
   const [searchParams] = useSearchParams();
   const selectedTopics = useMemo(() => {
     return searchParams.getAll('category');
@@ -56,13 +59,7 @@ function FilterPage() {
   
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
-  const [isSearching, setIsSearching] = useState(false);
   const [collectionNames, setCollectionNames] = useState<string[]>([]);
-  const [labelSearchResults, setLabelSearchResults] = useState<
-    Array<{ id: string; label_name: string; category: string }>
-  >([]);
-  const [resourceSearchResults, setResourceSearchResults] = useState<Resource[]>([]);
-  const [isTyping, setIsTyping] = useState(false);
 
   
   const [selectedAges, setSelectedAges] = useState<string[]>([]);
@@ -418,6 +415,7 @@ function FilterPage() {
                         imageUrl={resource.imageUrl ?? undefined}
 
                         isBookmarked={bookmarkedResourceIds.has(resource.id)}
+                        isAdmin={isAdmin}
                         onBookmarkChange={(isBookmarked) =>
                           handleBookmarkChange(resource.id, isBookmarked)
                         }
@@ -449,6 +447,7 @@ function FilterPage() {
                         category={resource.category}
                         imageUrl={resource.imageUrl ?? undefined}
                         isBookmarked={bookmarkedResourceIds.has(resource.id)}
+                        isAdmin={isAdmin}
                         onLearnMore={() => handleLearnMore(resource)}
                         onSaved={({ collectionName, imageUrl, undo }) =>
                           handleResourceSaved({
@@ -493,7 +492,7 @@ function FilterPage() {
               headers: {
                 'Content-Type': 'application/json',
               },
-              credentials: 'include', // ✅ REQUIRED FOR CLERK
+              credentials: 'include',
               body: JSON.stringify({ name }),
             });
             
@@ -511,7 +510,7 @@ function FilterPage() {
                   headers: {
                     'Content-Type': 'application/json',
                   },
-                  credentials: 'include', // ✅ TOP LEVEL
+                  credentials: 'include',
                   body: JSON.stringify({
                     resource_fk: createCollectionResourceId,
                   }),
@@ -534,7 +533,7 @@ function FilterPage() {
                   `${API_BASE_URL}/api/collections/items/${createdItemId}`,
                   {
                     method: 'DELETE',
-                    credentials: 'include', // ✅ TOP LEVEL
+                    credentials: 'include',
                   }
                 );
                 

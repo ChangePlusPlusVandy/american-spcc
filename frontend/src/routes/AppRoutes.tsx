@@ -3,20 +3,17 @@ import {
   useUser,
   AuthenticateWithRedirectCallback,
 } from '@clerk/clerk-react';
-
-
 import Landing from '@pages/LandingPage/Landing';
 import FilterPage from '@pages/FilterPage/Filter';
 import Login from '@pages/LoginPage/Login';
 import Signup from '@pages/SignUpPage/SignUp';
 import Account from '@pages/AccountPage/Account';
 import ResetPassword from '@pages/ResetPasswordPage/ResetPassword';
-import AdminLanding from '@/pages/AdminPages/AdminLandingPage/AdminLanding';
+import AdminCenter from '@/pages/AdminPages/AdminCenterPage/AdminCenter';
 import AdminRoute from '@/components/AdminRouteComponent/AdminRoute';
 
 function AccountRoute() {
   const { user, isLoaded } = useUser();
-
   if (!isLoaded) return null;
   if (!user) return <Navigate to="/sign-in" replace />;
   if (user.unsafeMetadata?.onboarding_complete !== true) {
@@ -30,7 +27,6 @@ export default function AppRoutes() {
   return (
     <Routes>
       {/* PUBLIC */}
-      
       <Route path="/" element={<Landing />} />
       <Route path="/login/*" element={<Login />} />
       <Route path="/filter" element={<FilterPage />} />
@@ -47,10 +43,10 @@ export default function AppRoutes() {
 
       {/* ADMIN */}
       <Route
-        path="/admin"
+        path="/admin/admin-center"
         element={
           <AdminRoute>
-            <AdminLanding />
+            <AdminCenter />
           </AdminRoute>
         }
       />
