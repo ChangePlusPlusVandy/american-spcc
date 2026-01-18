@@ -3,8 +3,7 @@ import { useAuth } from '@clerk/clerk-react';
 import { API_BASE_URL } from '@/config/api';
 import './AdminCenter.css';
 import { useUser } from '@clerk/clerk-react';
-
-type Tab = 'profile' | 'content' | 'analytics';
+import { NavLink, Outlet } from 'react-router-dom';
 
 type User = {
   id: string;
@@ -15,7 +14,6 @@ type User = {
 };
 
 export default function AdminCenter() {
-  const [activeTab, setActiveTab] = useState<Tab>('content');
   const [dbUser, setDbUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const { getToken } = useAuth();
@@ -87,32 +85,38 @@ export default function AdminCenter() {
             </div>
           </div>
 
-          <button
-            className={`admin-btn ${activeTab === 'profile' ? 'active' : ''}`}
-            onClick={() => setActiveTab('profile')}
+          <NavLink
+            to="/admin/admin-center/profile"
+            className={({ isActive }) =>
+              `admin-btn ${isActive ? 'active' : ''}`
+            }
           >
             Admin Profile
-          </button>
+          </NavLink>
 
-          <button
-            className={`admin-btn ${activeTab === 'content' ? 'active' : ''}`}
-            onClick={() => setActiveTab('content')}
+          <NavLink
+            to="/admin/admin-center/content-management"
+            className={({ isActive }) =>
+              `admin-btn ${isActive ? 'active' : ''}`
+            }
           >
             Content Management
-          </button>
+          </NavLink>
 
-          <button
-            className={`admin-btn ${activeTab === 'analytics' ? 'active' : ''}`}
-            onClick={() => setActiveTab('analytics')}
+          <NavLink
+            to="/admin/admin-center/data-analytics"
+            className={({ isActive }) =>
+              `admin-btn ${isActive ? 'active' : ''}`
+            }
           >
             Data Analytics
-          </button>
+          </NavLink>
+
         </aside>
         <main className="admin-panel">
-          {activeTab === 'profile' && <h3>Admin Profile</h3>}
-          {activeTab === 'content' && <h3>Content Management</h3>}
-          {activeTab === 'analytics' && <h3>Data Analytics</h3>}
+          <Outlet />
         </main>
+
       </div>
     </div>
   );

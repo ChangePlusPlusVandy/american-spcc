@@ -11,6 +11,9 @@ import Account from '@pages/AccountPage/Account';
 import ResetPassword from '@pages/ResetPasswordPage/ResetPassword';
 import AdminCenter from '@/pages/AdminPages/AdminCenterPage/AdminCenter';
 import AdminRoute from '@/components/AdminRouteComponent/AdminRoute';
+import AdminProfile from '@/pages/AdminPages/AdminCenterPage/AdminProfile';
+import AdminContent from '@/pages/AdminPages/AdminCenterPage/AdminContent';
+import AdminAnalytics from '@/pages/AdminPages/AdminCenterPage/AdminAnalytics';
 
 function AccountRoute() {
   const { user, isLoaded } = useUser();
@@ -42,14 +45,16 @@ export default function AppRoutes() {
       <Route path="/account" element={<AccountRoute />} />
 
       {/* ADMIN */}
-      <Route
-        path="/admin/admin-center"
-        element={
-          <AdminRoute>
-            <AdminCenter />
-          </AdminRoute>
-        }
-      />
+      <Route path="/admin" element={<AdminRoute />}>
+        <Route path="admin-center" element={<AdminCenter />}>
+          <Route index element={<Navigate to="content-management" replace />} />
+          <Route path="profile" element={<AdminProfile />} />
+          <Route path="content-management" element={<AdminContent />} />
+          <Route path="data-analytics" element={<AdminAnalytics />} />
+        </Route>
+      </Route>
+
+
 
     </Routes>
   );
