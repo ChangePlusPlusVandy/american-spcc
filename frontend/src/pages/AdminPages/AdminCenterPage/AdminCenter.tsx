@@ -22,16 +22,13 @@ export default function AdminCenter() {
   isLoaded &&
   (user?.publicMetadata?.role === 'ADMIN' ||
    user?.publicMetadata?.role === 'SUPER_ADMIN');
-
-
-
-  useEffect(() => {
-    const fetchAdmin = async () => {
+  const fetchAdmin = async () => {
       try {
         const token = await getToken();
         if (!token) return;
+        if (!user) return;
 
-        const res = await fetch(`${API_BASE_URL}/api/users/me`, {
+        const res = await fetch(`${API_BASE_URL}/api/users/clerk/${user.id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -48,6 +45,7 @@ export default function AdminCenter() {
       }
     };
 
+  useEffect(() => {
     fetchAdmin();
   }, []);
 
@@ -114,7 +112,7 @@ export default function AdminCenter() {
 
         </aside>
         <main className="admin-panel">
-          <Outlet />
+          <Outlet context={{ dbUser, loading, fetchAdmin }} />
         </main>
 
       </div>
