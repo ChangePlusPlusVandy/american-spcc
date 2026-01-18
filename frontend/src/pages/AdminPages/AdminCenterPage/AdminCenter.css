@@ -21,34 +21,59 @@
   width: 300px;
   background: #5b6474;
   border-radius: 28px;
-  padding: 24px;
+  padding: 48px 24px;
   color: white;
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+
+  /* for fixed scrolling */
+  position: sticky;
+  top: 80px;
+  z-index: 10;
 }
 
 .admin-info {
   display: flex;
   gap: 12px;
   align-items: center;
-  margin-bottom: 24px;
+  justify-items: center;
+  margin-bottom: 48px;
 }
 
 .admin-avatar {
   display: flex;
   align-items: center;
+  justify-items: center;
+  text-overflow: ellipsis;
+}
+
+.admin-avatar-border {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  overflow: hidden;
+  align-self: center;
+  border: 2px solid white;
+  flex: 0 0 auto;
 }
 
 .admin-avatar-image {
   display: block;
-  line-height: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .admin-name {
   font-weight: 600;
 }
 
-.admin-email {
+.admin-email-group {
   font-size: 12px;
-  opacity: 0.9;
+  font-weight: 600;
+}
+
+.admin-email {
+  color: black;
 }
 
 .admin-btn {
@@ -95,6 +120,13 @@
 }
 .admin-btn {
   display: block; /* makes NavLink behave exactly like button */
+}
+
+.admin-tabs {
+  display: flex;
+  align-items: center;
+  justify-items: center;
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
 }
 /* ===== Content Management Grid ===== */
 
