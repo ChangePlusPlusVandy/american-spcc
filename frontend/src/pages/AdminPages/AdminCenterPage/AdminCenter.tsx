@@ -4,6 +4,7 @@ import { API_BASE_URL } from '@/config/api';
 import './AdminCenter.css';
 import { useUser } from '@clerk/clerk-react';
 import { NavLink, Outlet } from 'react-router-dom';
+import { UserRoundCog, ListPlus, ChartPie } from 'lucide-react';
 
 type User = {
   id: string;
@@ -64,37 +65,42 @@ export default function AdminCenter() {
         <aside className="admin-card">
           <div className="admin-info">
             <div className="admin-avatar">
-              {isLoaded && user && (
-                <img src={user.imageUrl} alt="Admin avatar" className="admin-avatar-image" />
-              )}
+              <div className="admin-avatar-border">
+                {isLoaded && user && (
+                  <img src={user.imageUrl} alt="Admin avatar" className="admin-avatar-image" />
+                )}
+              </div>
             </div>
             <div>
               <div className="admin-name">
                 {dbUser.first_name} {dbUser.last_name}
               </div>
-              <div className="admin-email">{dbUser.email}</div>
+              <div className="admin-email-group">
+                <p>Email:</p>
+                <p className="admin-email">{dbUser.email}</p>
+              </div>
             </div>
           </div>
 
           <NavLink
             to="/admin/admin-center/profile"
-            className={({ isActive }) => `admin-btn ${isActive ? 'active' : ''}`}
+            className={({ isActive }) => `admin-btn ${isActive ? 'active' : ''} admin-tabs`}
           >
-            Admin Profile
+            <UserRoundCog className="mr-2 inline-block" /> Admin Profile
           </NavLink>
 
           <NavLink
             to="/admin/admin-center/content-management"
-            className={({ isActive }) => `admin-btn ${isActive ? 'active' : ''}`}
+            className={({ isActive }) => `admin-btn ${isActive ? 'active' : ''} admin-tabs`}
           >
-            Content Management
+            <ListPlus className="mr-2 inline-block" /> Content Management
           </NavLink>
 
           <NavLink
             to="/admin/admin-center/data-analytics"
-            className={({ isActive }) => `admin-btn ${isActive ? 'active' : ''}`}
+            className={({ isActive }) => `admin-btn ${isActive ? 'active' : ''} admin-tabs`}
           >
-            Data Analytics
+            <ChartPie className="mr-2 inline-block" /> Data Analytics
           </NavLink>
         </aside>
         <main className="admin-panel">
