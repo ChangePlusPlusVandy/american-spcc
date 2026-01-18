@@ -3,20 +3,17 @@
   width: 100%;
   position: relative;
   height: 100%;
-  
 }
 
 .inner {
   display: grid;
-  grid-template-areas: "stack";
+  grid-template-areas: 'stack';
   width: 100%;
 
   transform-style: preserve-3d;
   transition: transform 0.6s ease;
   height: 100%;
-  
 }
-
 
 .flipped {
   transform: rotateY(180deg);
@@ -84,7 +81,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  row-gap: 4px; 
+  row-gap: 4px;
 }
 
 .tag {
@@ -159,9 +156,9 @@
   display: block;
 }
 .tagPrefix {
-  font-size: 0.9rem; 
+  font-size: 0.9rem;
   font-weight: 700;
   color: #000;
   font-family: 'Lato', sans-serif;
-  white-space: nowrap;    
+  white-space: nowrap;
 }

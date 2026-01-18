@@ -5,9 +5,7 @@ import { useUser } from '@clerk/clerk-react';
 function App() {
   const { user, isLoaded } = useUser();
 
-  const isAdmin =
-    isLoaded && user?.publicMetadata?.role === 'ADMIN';
-  
+  const isAdmin = isLoaded && user?.publicMetadata?.role === 'ADMIN';
 
   return (
     <div className="min-h-screen flex flex-col">

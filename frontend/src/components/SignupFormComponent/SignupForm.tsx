@@ -95,46 +95,44 @@ export default function SignupForm({
           {step === 1 && (
             <>
               <form className={styles.form}>
-              <InputField
-                label="Email"
-                type={InputType.Email}
-                placeholder="example@mail.com"
-                value={email}
-                onChange={setEmail}
-                name="email"
-                required
-              />
-              <InputField
-                label="Password"
-                type={InputType.Password}
-                placeholder="************"
-                value={password}
-                onChange={setPassword}
-                name="password"
-                required
-                showPasswordToggle
-              />
-              {(emailError || passwordError) && (
-                <p className={styles.fieldError}>
-                  {emailError ?? passwordError}
-                </p>
-              )}
-              <Button
-                type="button"
-                disabled={processing}
-                onClick={onNext}
-                color={ButtonColor.DarkBlue}
-                variant={ButtonVariant.Regular}
-              >
-                {processing ? (
-                  <span className={styles.processingContent}>
-                    <span className={styles.buttonSpinner} />
-                    Processing…
-                  </span>
-                ) : (
-                  'NEXT'
+                <InputField
+                  label="Email"
+                  type={InputType.Email}
+                  placeholder="example@mail.com"
+                  value={email}
+                  onChange={setEmail}
+                  name="email"
+                  required
+                />
+                <InputField
+                  label="Password"
+                  type={InputType.Password}
+                  placeholder="************"
+                  value={password}
+                  onChange={setPassword}
+                  name="password"
+                  required
+                  showPasswordToggle
+                />
+                {(emailError || passwordError) && (
+                  <p className={styles.fieldError}>{emailError ?? passwordError}</p>
                 )}
-              </Button>
+                <Button
+                  type="button"
+                  disabled={processing}
+                  onClick={onNext}
+                  color={ButtonColor.DarkBlue}
+                  variant={ButtonVariant.Regular}
+                >
+                  {processing ? (
+                    <span className={styles.processingContent}>
+                      <span className={styles.buttonSpinner} />
+                      Processing…
+                    </span>
+                  ) : (
+                    'NEXT'
+                  )}
+                </Button>
               </form>
               <div className={styles.divider}>
                 <div className={styles.line} />
@@ -173,9 +171,7 @@ export default function SignupForm({
                     className={`${styles.choiceButton} ${
                       relationship === opt.value ? styles.selected : ''
                     }`}
-                    onClick={() =>
-                      setRelationship(relationship === opt.value ? '' : opt.value)
-                    }                    
+                    onClick={() => setRelationship(relationship === opt.value ? '' : opt.value)}
                   >
                     {opt.label}
                   </button>
@@ -190,27 +186,24 @@ export default function SignupForm({
                     className={`${styles.choiceButton} ${
                       householdType === opt.value ? styles.selected : ''
                     }`}
-                    onClick={() =>
-                      setHouseholdType(householdType === opt.value ? '' : opt.value)
-                    }
-                    
+                    onClick={() => setHouseholdType(householdType === opt.value ? '' : opt.value)}
                   >
                     {opt.label}
                   </button>
                 ))}
               </div>
               <div className={styles.actions}>
-              <Button
-                type="button"
-                onClick={goToStep3}
-                color={ButtonColor.DarkBlue}
-                variant={ButtonVariant.Regular}
-              >
-                Next
-              </Button>
-              <button className={styles.skip} onClick={onSkipStep2} type="button">
-                Skip
-              </button>
+                <Button
+                  type="button"
+                  onClick={goToStep3}
+                  color={ButtonColor.DarkBlue}
+                  variant={ButtonVariant.Regular}
+                >
+                  Next
+                </Button>
+                <button className={styles.skip} onClick={onSkipStep2} type="button">
+                  Skip
+                </button>
               </div>
             </div>
           )}
@@ -287,22 +280,22 @@ export default function SignupForm({
                 <span>Subscribe to Newsletter?</span>
               </label>
               <div className={styles.actions}>
-              <Button
-                type="button"
-                disabled={processing}
-                onClick={onComplete}
-                color={ButtonColor.DarkBlue}
-                variant={ButtonVariant.Regular}
-              >
-                {processing ? (
-                  <span className={styles.processingContent}>
-                    <span className={styles.buttonSpinner} />
-                    Processing…
-                  </span>
-                ) : (
-                  'DONE'
-                )}
-              </Button>
+                <Button
+                  type="button"
+                  disabled={processing}
+                  onClick={onComplete}
+                  color={ButtonColor.DarkBlue}
+                  variant={ButtonVariant.Regular}
+                >
+                  {processing ? (
+                    <span className={styles.processingContent}>
+                      <span className={styles.buttonSpinner} />
+                      Processing…
+                    </span>
+                  ) : (
+                    'DONE'
+                  )}
+                </Button>
               </div>
             </div>
           )}

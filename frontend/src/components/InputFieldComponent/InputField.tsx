@@ -20,7 +20,6 @@ export enum InputType {
   Password = 'password',
 }
 
-
 function InputField({
   label,
   type,

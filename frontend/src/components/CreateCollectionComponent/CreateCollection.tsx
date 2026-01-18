@@ -26,9 +26,7 @@ function CreateCollection({
     }
   }, [isOpen]);
 
-  const normalizedExisting = existingNames.map(n =>
-    n.trim().toLowerCase()
-  );
+  const normalizedExisting = existingNames.map((n) => n.trim().toLowerCase());
 
   const handleCreate = () => {
     const trimmed = name.trim();
@@ -46,13 +44,10 @@ function CreateCollection({
 
   return (
     <div className="create-overlay" onClick={onCancel}>
-      <div
-        className="create-modal"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="create-modal" onClick={(e) => e.stopPropagation()}>
         <div className="create-content">
           <h2>New Collection</h2>
-  
+
           <label>
             Title
             <input
@@ -64,19 +59,15 @@ function CreateCollection({
               autoFocus
             />
           </label>
-  
+
           {error && <div className="fieldError">{error}</div>}
-  
+
           <div className="create-actions">
             <button className="cancel" onClick={onCancel}>
               Cancel
             </button>
-  
-            <button
-              className="create"
-              disabled={!name.trim()}
-              onClick={handleCreate}
-            >
+
+            <button className="create" disabled={!name.trim()} onClick={handleCreate}>
               Create
             </button>
           </div>
@@ -84,7 +75,6 @@ function CreateCollection({
       </div>
     </div>
   );
-  
 }
 
 export default CreateCollection;

@@ -1,100 +1,98 @@
 .create-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.35);
-  
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  
-    z-index: 9999;
-  }
-  
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 9999;
+}
+
 .create-modal {
-    width: 420px;
-    background: #e5736c;
-    border-radius: 6px;
-  
-    padding: 30px 18px 30px; 
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
-  }
-  
-  
-  .create-content {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  .create-content h2 {
-    margin: 0;
-    font-size: 15px;
-    font-weight: 600;
-    color: white;
-  }
-  
-  .create-content label {
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.75);
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-  
-  .create-content input {
-    height: 34px;
-    border-radius: 4px;
-    border: none;
-    outline: none;
-  
-    background: #c95c56;
-    color: white;
-  
-    padding: 0 10px;
-    font-size: 13px;
-  }
-  
-  .create-content input::placeholder {
-    color: rgba(255, 255, 255, 0.7);
-  }
-  
-  .create-actions {
-    margin-top: 10px;
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-  }
-  
-  .create-actions .cancel {
-    background: #c55a54;
-    color: rgba(255, 255, 255, 0.7);
-    border: none;
-  
-    padding: 6px 14px;
-    font-size: 12px;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .create-actions .create {
-    background: white;
-    color: #e5736c;
-    border: none;
-  
-    padding: 6px 16px;
-    font-size: 12px;
-    font-weight: 600;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .create-actions .create:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-  
-  .fieldError {
-    font-size: 11px;
-    color: #4a0f0f;
-  }
-  
+  width: 420px;
+  background: #e5736c;
+  border-radius: 6px;
+
+  padding: 30px 18px 30px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+}
+
+.create-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.create-content h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: white;
+}
+
+.create-content label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.75);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.create-content input {
+  height: 34px;
+  border-radius: 4px;
+  border: none;
+  outline: none;
+
+  background: #c95c56;
+  color: white;
+
+  padding: 0 10px;
+  font-size: 13px;
+}
+
+.create-content input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.create-actions {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.create-actions .cancel {
+  background: #c55a54;
+  color: rgba(255, 255, 255, 0.7);
+  border: none;
+
+  padding: 6px 14px;
+  font-size: 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.create-actions .create {
+  background: white;
+  color: #e5736c;
+  border: none;
+
+  padding: 6px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.create-actions .create:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.fieldError {
+  font-size: 11px;
+  color: #4a0f0f;
+}

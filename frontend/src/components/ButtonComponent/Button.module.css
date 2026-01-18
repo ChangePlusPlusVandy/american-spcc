@@ -39,12 +39,12 @@
 }
 
 .teal {
-  background-color: #6EC6BF;
+  background-color: #6ec6bf;
   color: white;
 }
 
 .teal:hover:not(:disabled) {
-  background-color: #5AB7AF;
+  background-color: #5ab7af;
 }
 
 .small {

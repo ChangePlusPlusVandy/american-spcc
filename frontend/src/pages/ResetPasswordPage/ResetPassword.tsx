@@ -75,9 +75,7 @@ export default function ResetPassword() {
 
         {step === 'email' ? (
           <>
-            <p className={styles.subtitle}>
-              Enter your email and we’ll send you a reset code.
-            </p>
+            <p className={styles.subtitle}>Enter your email and we’ll send you a reset code.</p>
 
             <input
               type="email"
@@ -87,11 +85,7 @@ export default function ResetPassword() {
               className={styles.input}
             />
 
-            <button
-              onClick={handleSendCode}
-              disabled={loading}
-              className={styles.primaryButton}
-            >
+            <button onClick={handleSendCode} disabled={loading} className={styles.primaryButton}>
               {loading ? 'Sending…' : 'Send Code'}
             </button>
           </>
@@ -124,10 +118,7 @@ export default function ResetPassword() {
               {loading ? 'Resetting…' : 'Reset Password'}
             </button>
 
-            <button
-              onClick={() => setStep('email')}
-              className={styles.linkButton}
-            >
+            <button onClick={() => setStep('email')} className={styles.linkButton}>
               Resend code
             </button>
           </>

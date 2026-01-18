@@ -2,9 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@clerk/clerk-react';
 import { API_BASE_URL } from '@/config/api';
 
-type MeResponse =
-  | { role: 'ADMIN'; admin: any }
-  | { role: 'PARENT'; parent: any };
+type MeResponse = { role: 'ADMIN'; admin: any } | { role: 'PARENT'; parent: any };
 
 export function useMe() {
   const { getToken, isLoaded, isSignedIn } = useAuth();
@@ -23,11 +21,10 @@ export function useMe() {
         console.log('CLERK TOKEN:', token);
 
         const res = await fetch(`${API_BASE_URL}/api/auth/me`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         if (!res.ok) throw new Error('Failed to fetch me');
         const data = await res.json();

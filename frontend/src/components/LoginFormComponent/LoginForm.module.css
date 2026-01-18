@@ -148,7 +148,6 @@
   opacity: 0.8;
 }
 
-
 .fieldError {
   margin-top: 6px;
   margin-bottom: 12px;
@@ -160,7 +159,7 @@
 .forgotPassword {
   background: none;
   border: none;
-  color: #6EC6BF;
+  color: #6ec6bf;
   font-size: 0.85rem;
   text-align: right;
   cursor: pointer;

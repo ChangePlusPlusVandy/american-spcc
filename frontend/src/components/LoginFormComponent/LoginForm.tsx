@@ -15,7 +15,6 @@ interface LoginFormProps {
   error: string | null;
 }
 
-
 function LoginForm({
   onSubmit,
   onGoogleLogin,
@@ -23,7 +22,6 @@ function LoginForm({
   onForgotPassword,
   error,
 }: LoginFormProps) {
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -31,7 +29,6 @@ function LoginForm({
     e.preventDefault();
     onSubmit(email, password);
   };
-  
 
   return (
     <div className={styles.loginContainer}>
@@ -70,7 +67,6 @@ function LoginForm({
             >
               Forgot password?
             </button>
-
 
             {error && <p className={styles.fieldError}>{error}</p>}
 
