@@ -36,16 +36,20 @@ export default function AdminProfile() {
   const [avatarStatus, setAvatarStatus] = useState<'idle' | 'uploading' | 'error'>('idle');
   const { getToken } = useAuth();
   const { user, isLoaded } = useUser();
-  
+
   const [editForm, setEditForm] = useState<EditFormState>({
-      first_name: '',
-      last_name: '',
-      avatarFile: null,
-    });
+    first_name: '',
+    last_name: '',
+    avatarFile: null,
+  });
 
   if (loading || !dbUser) return <div>Loading…</div>;
 
-  const isValid = !!(editForm.first_name.trim() && editForm.last_name.trim() && editForm.avatarFile);
+  const isValid = !!(
+    editForm.first_name.trim() &&
+    editForm.last_name.trim() &&
+    editForm.avatarFile
+  );
   const validate = () => {
     if (!editForm.first_name.trim() || !editForm.last_name.trim() || !editForm.avatarFile) {
       console.error('No changes made.');
@@ -68,62 +72,62 @@ export default function AdminProfile() {
 
     const url = URL.createObjectURL(file);
     setAvatarPreview(url);
-    setEditForm(prev => ({ ...prev, avatarFile: file }));
+    setEditForm((prev) => ({ ...prev, avatarFile: file }));
     setAvatarStatus('idle');
   };
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  if (!validate()) return;
-  if (!user) return;
+    if (!validate()) return;
+    if (!user) return;
 
-  setUpdating(true);
-  try {
-    const token = await getToken();
-    if (!token) {
-      console.error('No auth token, aborting save');
-      return;
-    }
-
-    const res = await fetch(`${API_BASE_URL}/api/users/me`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        first_name: editForm.first_name.trim() ?? '',
-        last_name: editForm.last_name.trim() ?? '',
-      }),
-    });
-
-    if (!res.ok) {
-      const text = await res.text();
-      console.error('Profile update failed:', res.status, text);
-      return;
-    }
-
-    if (editForm.avatarFile) {
-      try {
-        await user.setProfileImage({ file: editForm.avatarFile });
-      } catch (err) {
-        console.error('setProfileImage failed', err);
+    setUpdating(true);
+    try {
+      const token = await getToken();
+      if (!token) {
+        console.error('No auth token, aborting save');
+        return;
       }
+
+      const res = await fetch(`${API_BASE_URL}/api/users/me`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          first_name: editForm.first_name.trim() ?? '',
+          last_name: editForm.last_name.trim() ?? '',
+        }),
+      });
+
+      if (!res.ok) {
+        const text = await res.text();
+        console.error('Profile update failed:', res.status, text);
+        return;
+      }
+
+      if (editForm.avatarFile) {
+        try {
+          await user.setProfileImage({ file: editForm.avatarFile });
+        } catch (err) {
+          console.error('setProfileImage failed', err);
+        }
+      }
+
+      await fetchAdmin();
+
+      console.log('Profile saved successfully.');
+      setEditForm({ first_name: '', last_name: '' });
+      setAvatarPreview(null);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    } catch (err: any) {
+      console.error(err?.message ?? 'Save failed');
+    } finally {
+      setUpdating(false);
     }
-
-    await fetchAdmin();
-
-    console.log('Profile saved successfully.');
-    setEditForm({ first_name: '', last_name: '' });
-    setAvatarPreview(null);
-    if (fileInputRef.current) fileInputRef.current.value = '';
-  } catch (err: any) {
-    console.error(err?.message ?? 'Save failed');
-  } finally {
-    setUpdating(false);
-  }
-};
+  };
 
   return (
     <section className="admin-profile w-full px-8">
@@ -137,11 +141,11 @@ const handleSubmit = async (e: React.FormEvent) => {
               className="w-full py-3 px-2 rounded bg-[#57c5c1]"
               type="text"
               value={editForm.first_name}
-                      onChange={(e) =>
-                        setEditForm({
-                          ...editForm,
-                          first_name: e.target.value,
-                        })
+              onChange={(e) =>
+                setEditForm({
+                  ...editForm,
+                  first_name: e.target.value,
+                })
               }
             />
           </div>
@@ -152,76 +156,85 @@ const handleSubmit = async (e: React.FormEvent) => {
               className="w-full py-3 px-2 rounded bg-[#57c5c1]"
               type="text"
               value={editForm.last_name}
-                      onChange={(e) =>
-                        setEditForm({
-                          ...editForm,
-                          last_name: e.target.value,
-                        })
-                      }
+              onChange={(e) =>
+                setEditForm({
+                  ...editForm,
+                  last_name: e.target.value,
+                })
+              }
             />
           </div>
         </div>
 
         <div className="space-y-2">
           <label className="block text-sm font-bold">Email</label>
-            <input
-                    type="email"
-                    value={dbUser.email}
-                    disabled
-                    className="w-full py-3 px-2 cursor-not-allowed readonly-input rounded bg-[#57c5c1]"
-            />
-                  <button
-                    type="button"
-                    className="manage-auth-link"
-                    onClick={() =>
-                      openUserProfile({
-                        appearance: {
-                          variables: {
-                            colorPrimary: '#6EC6BF',
-                            fontFamily: 'Poppins, sans-serif',
-                            borderRadius: '12px',
-                          },
-                          elements: {
-                            navbar: 'hidden',
-                            footer: 'hidden',
-                          },
-                        },
-                      })
-                    }
-                  >
-                    Manage email & password
-                  </button>
+          <input
+            type="email"
+            value={dbUser.email}
+            disabled
+            className="w-full py-3 px-2 cursor-not-allowed readonly-input rounded bg-[#57c5c1]"
+          />
+          <button
+            type="button"
+            className="manage-auth-link"
+            onClick={() =>
+              openUserProfile({
+                appearance: {
+                  variables: {
+                    colorPrimary: '#6EC6BF',
+                    fontFamily: 'Poppins, sans-serif',
+                    borderRadius: '12px',
+                  },
+                  elements: {
+                    navbar: 'hidden',
+                    footer: 'hidden',
+                  },
+                },
+              })
+            }
+          >
+            Manage email & password
+          </button>
         </div>
 
         <div className="h-full space-y-2">
           <label className="block text-sm font-bold text-[#000000]">Profile Photo</label>
           <div className="w-full h-full p-2 rounded bg-[#57c5c1] flex items-center justify-center">
-           <div className="w-32 h-32 rounded overflow-hidden flex items-center justify-center cursor-pointer bg-[#57c5c1]"
+            <div
+              className="w-32 h-32 rounded overflow-hidden flex items-center justify-center cursor-pointer bg-[#57c5c1]"
               role="button"
               onClick={() => fileInputRef.current?.click()}
-              aria-label="Upload profile photo">
-            {avatarPreview ? (
-              <img src={avatarPreview} alt="Profile preview" className="object-cover w-full h-full" />
-            ) : (
-              <img src={cloudUpload} alt="Profile preview" className="object-cover w-full h-full" />
-            )}
-          </div>
+              aria-label="Upload profile photo"
+            >
+              {avatarPreview ? (
+                <img
+                  src={avatarPreview}
+                  alt="Profile preview"
+                  className="object-cover w-full h-full"
+                />
+              ) : (
+                <img
+                  src={cloudUpload}
+                  alt="Profile preview"
+                  className="object-cover w-full h-full"
+                />
+              )}
+            </div>
 
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            style={{ display: 'none' }}
-            onChange={handleFileChange}
-                  />
-                  <p
-                className={`avatar-status ${
-                  avatarStatus === 'uploading' ? 'show' : ''
-                } ${avatarStatus === 'error' ? 'show error' : ''}`}
-              >
-                {avatarStatus === 'error' &&
-                  'Profile picture upload failed'}
-              </p>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              style={{ display: 'none' }}
+              onChange={handleFileChange}
+            />
+            <p
+              className={`avatar-status ${
+                avatarStatus === 'uploading' ? 'show' : ''
+              } ${avatarStatus === 'error' ? 'show error' : ''}`}
+            >
+              {avatarStatus === 'error' && 'Profile picture upload failed'}
+            </p>
           </div>
         </div>
 
@@ -230,7 +243,9 @@ const handleSubmit = async (e: React.FormEvent) => {
             type="submit"
             disabled={!isValid}
             className="px-4 py-2 !bg-[#57c5c1] text-white text-bold rounded disabled:opacity-50"
-          > UPDATE
+          >
+            {' '}
+            UPDATE
           </button>
         </div>
       </form>

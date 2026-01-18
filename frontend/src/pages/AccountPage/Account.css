@@ -239,7 +239,6 @@ button {
   font-weight: 500;
 }
 
-
 .edit-overlay {
   position: fixed;
   inset: 0;
@@ -416,7 +415,9 @@ button {
 
   opacity: 0;
   transform: translateY(-4px);
-  transition: opacity 0.25s ease, transform 0.25s ease;
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
   pointer-events: none;
 }
 

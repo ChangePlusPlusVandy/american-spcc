@@ -18,7 +18,6 @@ function Landing() {
   const [isSearching, setIsSearching] = useState(false);
   const searchRef = useRef<HTMLDivElement | null>(null);
   const searchResources = async (query: string) => {
-
     if (!query.trim()) {
       console.log('Empty query, clearing results');
       setSearchResults([]);
@@ -55,18 +54,15 @@ function Landing() {
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (
-        searchRef.current &&
-        !searchRef.current.contains(e.target as Node)
-      ) {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
         setSearchResults([]);
       }
     }
-  
+
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-  
+
   useEffect(() => {
     console.log('State updated - searchQuery:', searchQuery);
     console.log('State updated - searchResults:', searchResults);
@@ -97,7 +93,7 @@ function Landing() {
       {/* Search bar */}
       <div className="relative p-2 z-40">
         <div className="w-57/100 -mt-12 mx-auto px-4">
-        <div ref={searchRef} className="relative">
+          <div ref={searchRef} className="relative">
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -113,7 +109,6 @@ function Landing() {
                 setSearchQuery('');
                 setSearchResults([]);
               }}
-
             >
               <div className="relative">
                 <input

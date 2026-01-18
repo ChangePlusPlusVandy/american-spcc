@@ -26,14 +26,9 @@ interface ResourceListCardProps {
   isAdmin?: boolean;
   onBookmarkChange?: (isBookmarked: boolean) => void;
   onLearnMore?: () => void;
-  onSaved?: (payload: {
-    collectionName: string;
-    imageUrl?: string;
-    undo: () => void;
-  }) => void;
+  onSaved?: (payload: { collectionName: string; imageUrl?: string; undo: () => void }) => void;
 
   onCreateCollection?: (imageUrl?: string, resourceId?: string) => void;
-
 }
 
 const CATEGORY_DISPLAY_MAP: Record<string, string> = {
@@ -82,16 +77,9 @@ function ResourceListCard({
   const [pendingImageUrl, setPendingImageUrl] = useState<string | undefined>();
   const { isSignedIn, getToken } = useAuth();
 
-
-  
-  
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (
-        showSavePopup &&
-        popupRef.current &&
-        !popupRef.current.contains(e.target as Node)
-      ) {
+      if (showSavePopup && popupRef.current && !popupRef.current.contains(e.target as Node)) {
         setShowSavePopup(false);
       }
     }
@@ -111,12 +99,11 @@ function ResourceListCard({
             setShowSavePopup((prev) => !prev);
           }}
         >
-        <img
-          src={isBookmarked ? bookmarkFilled : bookmarkIcon}
-          alt=""
-          className={styles.bookmarkIcon}
-        />
-
+          <img
+            src={isBookmarked ? bookmarkFilled : bookmarkIcon}
+            alt=""
+            className={styles.bookmarkIcon}
+          />
         </button>
         <SaveResource
           isOpen={showSavePopup}
@@ -149,15 +136,15 @@ function ResourceListCard({
               },
               body: JSON.stringify({ name }),
             });
-          
+
             if (!res.ok) {
               console.error('Create collection failed');
               return;
             }
-          
+
             const collection = await res.json();
             let createdItemId: string | null = null;
-          
+
             if (pendingResourceId) {
               const itemRes = await fetch(
                 `${API_BASE_URL}/api/collections/${collection.id}/items`,
@@ -170,7 +157,7 @@ function ResourceListCard({
                   body: JSON.stringify({ resource_fk: pendingResourceId }),
                 }
               );
-          
+
               const item = await itemRes.json();
               createdItemId = item.id;
             }
@@ -179,27 +166,23 @@ function ResourceListCard({
               imageUrl: pendingImageUrl,
               undo: async () => {
                 if (!createdItemId) return;
-          
+
                 const token = await getToken();
                 if (!token) return;
-          
-                await fetch(
-                  `${API_BASE_URL}/api/collections/items/${createdItemId}`,
-                  {
-                    method: 'DELETE',
-                    headers: {
-                      Authorization: `Bearer ${token}`,
-                    },
-                  }
-                );
+
+                await fetch(`${API_BASE_URL}/api/collections/items/${createdItemId}`, {
+                  method: 'DELETE',
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+                });
               },
             });
-          
+
             onBookmarkChange?.(true);
             setShowCreateModal(false);
             setShowSavePopup(false);
           }}
-          
         />
       </div>
       <div className={styles.content}>
@@ -210,9 +193,7 @@ function ResourceListCard({
           <h3 className={styles.title}>{title}</h3>
         </div>
         <div className={styles.tagsContainer}>
-          <span className={styles.tagPrefix}>
-            {CATEGORY_DISPLAY_MAP[category]}
-          </span>
+          <span className={styles.tagPrefix}>{CATEGORY_DISPLAY_MAP[category]}</span>
 
           {tags.length > 0 && (
             <>

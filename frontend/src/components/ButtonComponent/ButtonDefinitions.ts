@@ -8,12 +8,10 @@ export interface ButtonProps {
   children?: React.ReactNode;
 }
 
-
 export enum ButtonVariant {
   Regular = 'regular',
   Small = 'small',
 }
-
 
 export enum ButtonColor {
   Grey = 'grey',

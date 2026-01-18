@@ -19,31 +19,29 @@ export default function AdminCenter() {
   const { getToken } = useAuth();
   const { user, isLoaded } = useUser();
   const isAdmin =
-  isLoaded &&
-  (user?.publicMetadata?.role === 'ADMIN' ||
-   user?.publicMetadata?.role === 'SUPER_ADMIN');
+    isLoaded &&
+    (user?.publicMetadata?.role === 'ADMIN' || user?.publicMetadata?.role === 'SUPER_ADMIN');
   const fetchAdmin = async () => {
-      try {
-        const token = await getToken();
-        if (!token) return;
-        if (!user) return;
+    try {
+      const token = await getToken();
+      if (!token) return;
+      if (!user) return;
 
-        const res = await fetch(`${API_BASE_URL}/api/users/clerk/${user.id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        
-        const data: User = await res.json();
+      const res = await fetch(`${API_BASE_URL}/api/users/clerk/${user.id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-        setDbUser(data);
+      const data: User = await res.json();
 
-      } catch (err) {
-        console.error('Failed to load admin:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
+      setDbUser(data);
+    } catch (err) {
+      console.error('Failed to load admin:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchAdmin();
@@ -54,7 +52,7 @@ export default function AdminCenter() {
   if (!isAdmin) {
     return <div className="admin-page">Access denied</div>;
   }
-  
+
   if (loading || !dbUser) {
     return <div className="admin-page">Loading admin dashboard…</div>;
   }
@@ -66,55 +64,42 @@ export default function AdminCenter() {
         <aside className="admin-card">
           <div className="admin-info">
             <div className="admin-avatar">
-            {isLoaded && user && (
-                <img
-                    src={user.imageUrl}
-                    alt="Admin avatar"
-                    className="admin-avatar-image"
-                />
-                )}
-
+              {isLoaded && user && (
+                <img src={user.imageUrl} alt="Admin avatar" className="admin-avatar-image" />
+              )}
             </div>
             <div>
-            <div className="admin-name">
-              {dbUser.first_name} {dbUser.last_name}
-            </div>
-            <div className="admin-email">{dbUser.email}</div>
+              <div className="admin-name">
+                {dbUser.first_name} {dbUser.last_name}
+              </div>
+              <div className="admin-email">{dbUser.email}</div>
             </div>
           </div>
 
           <NavLink
             to="/admin/admin-center/profile"
-            className={({ isActive }) =>
-              `admin-btn ${isActive ? 'active' : ''}`
-            }
+            className={({ isActive }) => `admin-btn ${isActive ? 'active' : ''}`}
           >
             Admin Profile
           </NavLink>
 
           <NavLink
             to="/admin/admin-center/content-management"
-            className={({ isActive }) =>
-              `admin-btn ${isActive ? 'active' : ''}`
-            }
+            className={({ isActive }) => `admin-btn ${isActive ? 'active' : ''}`}
           >
             Content Management
           </NavLink>
 
           <NavLink
             to="/admin/admin-center/data-analytics"
-            className={({ isActive }) =>
-              `admin-btn ${isActive ? 'active' : ''}`
-            }
+            className={({ isActive }) => `admin-btn ${isActive ? 'active' : ''}`}
           >
             Data Analytics
           </NavLink>
-
         </aside>
         <main className="admin-panel">
           <Outlet context={{ dbUser, loading, fetchAdmin }} />
         </main>
-
       </div>
     </div>
   );

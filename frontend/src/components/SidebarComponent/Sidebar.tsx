@@ -12,7 +12,6 @@ import { X, Heart } from 'lucide-react';
 import Button from '../ButtonComponent/Button';
 import { ButtonColor, ButtonVariant } from '../ButtonComponent/ButtonDefinitions';
 
-
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
@@ -91,17 +90,15 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       >
         {/* Header */}
         <div className="p-6 pb-2 flex justify-between items-start">
-        <h2
-          className="text-[#6EC6BF] text-[1.4rem]"
-          style={{
-            fontFamily: 'Poppins, sans-serif',
-            fontWeight: 900,
-          }}
-        >
-          Parenting Topics
-        </h2>
-
-
+          <h2
+            className="text-[#6EC6BF] text-[1.4rem]"
+            style={{
+              fontFamily: 'Poppins, sans-serif',
+              fontWeight: 900,
+            }}
+          >
+            Parenting Topics
+          </h2>
 
           <button onClick={onClose} className="text-gray-500 hover:text-gray-700 transition-colors">
             <X size={24} />
@@ -114,13 +111,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             const isTeal = index % 2 === 0;
 
             return (
-            <button
-              key={item.category}
-              onClick={() => {
-                navigate(`/filter?category=${item.category}`);
-                onClose();
-              }}
-              className={`
+              <button
+                key={item.category}
+                onClick={() => {
+                  navigate(`/filter?category=${item.category}`);
+                  onClose();
+                }}
+                className={`
                 w-full flex items-center gap-4 px-6 py-4 text-left
                 ${isTeal ? '!bg-[#55C3C0]' : '!bg-[#FFF9F0]'}
                 ${isTeal ? 'text-white' : 'text-[#566273]'}
@@ -129,18 +126,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                 focus-visible:outline-none
                 !rounded-none
               `}
-              style={{
-                fontFamily: 'Lato, sans-serif',
-                fontWeight: 700, // change to 300, 500, 600, etc.
-              }}
-              
-              
-              
-              
-              
-              
-            >
-
+                style={{
+                  fontFamily: 'Lato, sans-serif',
+                  fontWeight: 700, // change to 300, 500, 600, etc.
+                }}
+              >
                 <img
                   src={item.icon}
                   alt={item.label}
@@ -155,26 +145,23 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
         {/* Footer */}
         <div className="p-6 bg-[#FFF9F0] flex justify-end items-center">
-
-
-        <div className="w-auto">
-          <Button
-            variant={ButtonVariant.Small}
-            color={ButtonColor.Teal}
-            onClick={() =>
-              window.open(
-                'https://americanspcc.org/championforchildrenaward/?form=FUNHJFZUBKZ',
-                '_blank'
-              )
-            }
-          >
-            <span className="flex items-center gap-2">
-              Donate
-              <Heart size={16} className="fill-red-400 text-red-400" />
-            </span>
-          </Button>
-        </div>
-
+          <div className="w-auto">
+            <Button
+              variant={ButtonVariant.Small}
+              color={ButtonColor.Teal}
+              onClick={() =>
+                window.open(
+                  'https://americanspcc.org/championforchildrenaward/?form=FUNHJFZUBKZ',
+                  '_blank'
+                )
+              }
+            >
+              <span className="flex items-center gap-2">
+                Donate
+                <Heart size={16} className="fill-red-400 text-red-400" />
+              </span>
+            </Button>
+          </div>
         </div>
       </div>
     </>

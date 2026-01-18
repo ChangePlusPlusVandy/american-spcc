@@ -7,8 +7,7 @@ export default function AdminRoute() {
   if (!isLoaded) return null;
 
   const isAdmin =
-    user?.publicMetadata?.role === 'ADMIN' ||
-    user?.publicMetadata?.role === 'SUPER_ADMIN';
+    user?.publicMetadata?.role === 'ADMIN' || user?.publicMetadata?.role === 'SUPER_ADMIN';
 
   if (!isAdmin) {
     return <Navigate to="/" replace />;

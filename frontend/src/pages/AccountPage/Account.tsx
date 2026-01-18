@@ -77,13 +77,9 @@ export default function AccountPage() {
       return;
     }
 
-
-    const res = await fetch(
-      `${API_BASE_URL}/api/users/clerk/${user.id}`,
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
+    const res = await fetch(`${API_BASE_URL}/api/users/clerk/${user.id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
     if (!res.ok) return;
 
@@ -95,34 +91,32 @@ export default function AccountPage() {
     if (!user) return;
 
     const token = await getToken();
-      if (!token) {
-        console.error('No auth token, aborting save');
-        return;
-      }
+    if (!token) {
+      console.error('No auth token, aborting save');
+      return;
+    }
 
+    const res = await fetch(`${API_BASE_URL}/api/users/me`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        first_name: editForm.first_name,
+        last_name: editForm.last_name,
+        relationship: editForm.relationship || null,
+        household_type: editForm.household_type || null,
+        kids_age_groups: editForm.kids_age_groups,
+        topics_of_interest: editForm.topics_of_interest,
+      }),
+    });
 
-      const res = await fetch(`${API_BASE_URL}/api/users/me`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          first_name: editForm.first_name,
-          last_name: editForm.last_name,
-          relationship: editForm.relationship || null,
-          household_type: editForm.household_type || null,
-          kids_age_groups: editForm.kids_age_groups,
-          topics_of_interest: editForm.topics_of_interest,
-        }),
-      });
-      
-      if (!res.ok) {
-        const text = await res.text();
-        console.error('Profile update failed:', res.status, text);
-        return;
-      }
-      
+    if (!res.ok) {
+      const text = await res.text();
+      console.error('Profile update failed:', res.status, text);
+      return;
+    }
 
     await fetchDbUser();
     setIsEditOpen(false);
@@ -225,10 +219,7 @@ export default function AccountPage() {
                 Your Profile
               </h2>
 
-              <button
-                className="edit-profile-btn"
-                onClick={() => setIsEditOpen(true)}
-              >
+              <button className="edit-profile-btn" onClick={() => setIsEditOpen(true)}>
                 <span>Edit</span>
                 <span className="edit-icon">✎</span>
               </button>
@@ -236,11 +227,7 @@ export default function AccountPage() {
 
             <div className="flex flex-col items-center text-center">
               <label className="avatar-wrapper">
-                <img
-                  src={user.imageUrl}
-                  alt="Profile"
-                  className="avatar-image"
-                />
+                <img src={user.imageUrl} alt="Profile" className="avatar-image" />
 
                 <div className="avatar-overlay">
                   <span className="avatar-icon">✎</span>
@@ -297,8 +284,7 @@ export default function AccountPage() {
 
             <div className="mt-6 space-y-2 text-sm text-gray-700">
               <p className="profile-field">
-                Email:{' '}
-                <span className="profile-value">{dbUser.email}</span>
+                Email: <span className="profile-value">{dbUser.email}</span>
               </p>
 
               <p className="profile-field">
@@ -330,9 +316,7 @@ export default function AccountPage() {
                 <span className="profile-value">
                   {dbUser.kids_age_groups.length
                     ? dbUser.kids_age_groups
-                        .map((age) =>
-                          age.replace('AGE_', '').replace('_', '–')
-                        )
+                        .map((age) => age.replace('AGE_', '').replace('_', '–'))
                         .join(', ')
                     : '—'}
                 </span>
@@ -366,19 +350,12 @@ export default function AccountPage() {
                 Your Collections
               </h2>
 
-              <button
-                className="new-collection-btn"
-                onClick={() => setIsCreateOpen(true)}
-              >
+              <button className="new-collection-btn" onClick={() => setIsCreateOpen(true)}>
                 + New Collection
               </button>
             </div>
 
-            {loadingCollections && (
-              <p className="text-sm text-gray-500">
-                Loading collections…
-              </p>
-            )}
+            {loadingCollections && <p className="text-sm text-gray-500">Loading collections…</p>}
 
             {!loadingCollections && collections.length === 0 && (
               <p className="text-sm text-gray-500 text-center mt-6">
@@ -388,46 +365,26 @@ export default function AccountPage() {
 
             {!loadingCollections && collections.length > 0 && (
               <div className="mt-4 space-y-3 overflow-y-auto collections-scroll flex-1 min-h-0">
-
                 {collections.map((collection) => {
                   const isOpen = expandedId === collection.id;
 
                   return (
-                    <div
-                      key={collection.id}
-                      className="collection-wrapper"
-                    >
-                      <div
-                        className={`collection-shell ${
-                          isOpen ? 'open' : ''
-                        }`}
-                      >
+                    <div key={collection.id} className="collection-wrapper">
+                      <div className={`collection-shell ${isOpen ? 'open' : ''}`}>
                         <button
-                          className={`collection-header ${
-                            isOpen ? 'expanded' : ''
-                          }`}
-                          onClick={() =>
-                            setExpandedId(
-                              isOpen ? null : collection.id
-                            )
-                          }
+                          className={`collection-header ${isOpen ? 'expanded' : ''}`}
+                          onClick={() => setExpandedId(isOpen ? null : collection.id)}
                         >
                           <span>{collection.name}</span>
 
                           <div className="collection-actions">
-                            <span className="chevron">
-                              {isOpen ? '▲' : '▼'}
-                            </span>
+                            <span className="chevron">{isOpen ? '▲' : '▼'}</span>
 
                             <button
                               className="collection-menu-btn"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                setOpenMenuId(
-                                  openMenuId === collection.id
-                                    ? null
-                                    : collection.id
-                                );
+                                setOpenMenuId(openMenuId === collection.id ? null : collection.id);
                               }}
                             >
                               ⋮
@@ -436,10 +393,7 @@ export default function AccountPage() {
                         </button>
 
                         {openMenuId === collection.id && (
-                          <div
-                            className="collection-menu"
-                            onClick={(e) => e.stopPropagation()}
-                          >
+                          <div className="collection-menu" onClick={(e) => e.stopPropagation()}>
                             <button
                               className="collection-menu-item delete"
                               onClick={() => {
@@ -455,20 +409,13 @@ export default function AccountPage() {
                         <div className="collection-body">
                           <div className="collection-inner">
                             {collection.items.length === 0 ? (
-                              <p className="empty-text">
-                                No resources yet
-                              </p>
+                              <p className="empty-text">No resources yet</p>
                             ) : (
                               <ul className="resource-list">
                                 {collection.items.map((item) => (
-                                  <li
-                                    key={item.resource.id}
-                                  >
+                                  <li key={item.resource.id}>
                                     <a
-                                      href={
-                                        item.resource.externalResources
-                                          ?.external_url
-                                      }
+                                      href={item.resource.externalResources?.external_url}
                                       target="_blank"
                                       rel="noopener noreferrer"
                                       className="resource-link-plain"
@@ -492,33 +439,26 @@ export default function AccountPage() {
 
         <CreateCollection
           isOpen={isCreateOpen}
-          existingNames={collections.map(c => c.name)}
+          existingNames={collections.map((c) => c.name)}
           onCancel={() => setIsCreateOpen(false)}
           onCreate={async (name) => {
             try {
               const token = await getToken();
 
-              const res = await fetch(
-                `${API_BASE_URL}/api/collections`,
-                {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                  },
-                  body: JSON.stringify({ name }),
-                }
-              );
+              const res = await fetch(`${API_BASE_URL}/api/collections`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({ name }),
+              });
 
-              if (!res.ok)
-                throw new Error('Failed to create collection');
+              if (!res.ok) throw new Error('Failed to create collection');
 
               const newCollection: Collection = await res.json();
 
-              setCollections((prev) => [
-                { ...newCollection, items: [] },
-                ...prev,
-              ]);
+              setCollections((prev) => [{ ...newCollection, items: [] }, ...prev]);
 
               setExpandedId(newCollection.id);
               setIsCreateOpen(false);
@@ -529,28 +469,18 @@ export default function AccountPage() {
         />
 
         {deleteTarget && (
-          <div
-            className="create-overlay"
-            onClick={() => setDeleteTarget(null)}
-          >
-            <div
-              className="create-modal"
-              onClick={(e) => e.stopPropagation()}
-            >
+          <div className="create-overlay" onClick={() => setDeleteTarget(null)}>
+            <div className="create-modal" onClick={(e) => e.stopPropagation()}>
               <div className="create-content">
                 <h2>Delete collection</h2>
 
                 <p className="text-sm text-gray-600 mt-2">
-                  Are you sure you want to delete{' '}
-                  <strong>{deleteTarget.name}</strong>? This
-                  cannot be undone.
+                  Are you sure you want to delete <strong>{deleteTarget.name}</strong>? This cannot
+                  be undone.
                 </p>
 
                 <div className="create-actions">
-                  <button
-                    className="cancel"
-                    onClick={() => setDeleteTarget(null)}
-                  >
+                  <button className="cancel" onClick={() => setDeleteTarget(null)}>
                     Cancel
                   </button>
 
@@ -561,21 +491,14 @@ export default function AccountPage() {
                       try {
                         const token = await getToken();
 
-                        await fetch(
-                          `${API_BASE_URL}/api/collections/${deleteTarget.id}`,
-                          {
-                            method: 'DELETE',
-                            headers: {
-                              Authorization: `Bearer ${token}`,
-                            },
-                          }
-                        );
+                        await fetch(`${API_BASE_URL}/api/collections/${deleteTarget.id}`, {
+                          method: 'DELETE',
+                          headers: {
+                            Authorization: `Bearer ${token}`,
+                          },
+                        });
 
-                        setCollections((prev) =>
-                          prev.filter(
-                            (c) => c.id !== deleteTarget.id
-                          )
-                        );
+                        setCollections((prev) => prev.filter((c) => c.id !== deleteTarget.id));
 
                         setExpandedId(null);
                         setDeleteTarget(null);
@@ -593,14 +516,8 @@ export default function AccountPage() {
         )}
 
         {isEditOpen && (
-          <div
-            className="edit-overlay"
-            onClick={() => setIsEditOpen(false)}
-          >
-            <div
-              className="edit-modal"
-              onClick={(e) => e.stopPropagation()}
-            >
+          <div className="edit-overlay" onClick={() => setIsEditOpen(false)}>
+            <div className="edit-modal" onClick={(e) => e.stopPropagation()}>
               <h2>Edit Profile</h2>
 
               <div className="edit-form">
@@ -636,12 +553,7 @@ export default function AccountPage() {
 
                 <label>
                   Email
-                  <input
-                    type="email"
-                    value={dbUser.email}
-                    disabled
-                    className="readonly-input"
-                  />
+                  <input type="email" value={dbUser.email} disabled className="readonly-input" />
                   <button
                     type="button"
                     className="manage-auth-link"
@@ -744,7 +656,6 @@ export default function AccountPage() {
                   />
                 </div>
 
-
                 <div className="edit-label">
                   <span className="edit-label-text">Topics of Interest</span>
 
@@ -758,7 +669,10 @@ export default function AccountPage() {
                       })
                     }
                     options={[
-                      { label: 'Parenting Skills & Relationships', value: 'PARENTING_SKILLS_RELATIONSHIPS' },
+                      {
+                        label: 'Parenting Skills & Relationships',
+                        value: 'PARENTING_SKILLS_RELATIONSHIPS',
+                      },
                       { label: 'Child Development', value: 'CHILD_DEVELOPMENT' },
                       { label: 'Mental & Emotional Health', value: 'MENTAL_EMOTIONAL_HEALTH' },
                       { label: 'Safety & Protection', value: 'SAFETY_PROTECTION' },
@@ -770,17 +684,10 @@ export default function AccountPage() {
                   />
                 </div>
 
-
                 <div className="edit-actions">
-                  <button
-                    onClick={() => setIsEditOpen(false)}
-                  >
-                    Cancel
-                  </button>
+                  <button onClick={() => setIsEditOpen(false)}>Cancel</button>
 
-                  <button onClick={handleSaveProfile}>
-                    Save
-                  </button>
+                  <button onClick={handleSaveProfile}>Save</button>
                 </div>
               </div>
             </div>

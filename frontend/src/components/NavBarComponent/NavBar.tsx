@@ -20,27 +20,9 @@ export default function DefaultNav({ isAdmin = false }: { isAdmin?: boolean }) {
 
   return (
     <>
-    <Sidebar isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
+      <Sidebar isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
       <nav className="sticky top-0 z-50 w-full bg-[#FFF9F0] px-4 py-4 flex items-center justify-between">
         <div className="flex items-center gap-x-10">
-        <button
-          style={{
-            background: 'transparent',
-            border: 'none',
-            padding: 0,
-            margin: 0,
-            boxShadow: 'none',
-            appearance: 'none',
-            outline: 'none',
-          }}
-          onClick={() => setMenuOpen(true)}
-        >
-          <img
-            src={navSidebar}
-            alt="Menu"
-            className="relative left-4 h-5 w-5"
-          />
-        </button>
           <button
             style={{
               background: 'transparent',
@@ -51,7 +33,21 @@ export default function DefaultNav({ isAdmin = false }: { isAdmin?: boolean }) {
               appearance: 'none',
               outline: 'none',
             }}
-            onClick={() => navigate( '/')}
+            onClick={() => setMenuOpen(true)}
+          >
+            <img src={navSidebar} alt="Menu" className="relative left-4 h-5 w-5" />
+          </button>
+          <button
+            style={{
+              background: 'transparent',
+              border: 'none',
+              padding: 0,
+              margin: 0,
+              boxShadow: 'none',
+              appearance: 'none',
+              outline: 'none',
+            }}
+            onClick={() => navigate('/')}
           >
             <img src={aspccLogoTurqoise} alt="logo" className="relative h-10" />
           </button>
@@ -147,24 +143,24 @@ export default function DefaultNav({ isAdmin = false }: { isAdmin?: boolean }) {
             </div>
           </div>
           <div className="relative group inline-block">
-          <button
-            className="flex items-center !text-[#566273]"
-            style={{
-              background: 'transparent',
-              border: 'none',
-              padding: 0,
-              margin: 0,
-              boxShadow: 'none',
-              appearance: 'none',
-              outline: 'none',
-            }}
-          >
-            Get Involved
-            <img src={chevron} alt="" className="ml-1 mt-1 h-3 w-3 inline-block" />
-          </button>
-          <div className="absolute left-0 top-full h-2 w-full"></div>
-          <div
-            className="
+            <button
+              className="flex items-center !text-[#566273]"
+              style={{
+                background: 'transparent',
+                border: 'none',
+                padding: 0,
+                margin: 0,
+                boxShadow: 'none',
+                appearance: 'none',
+                outline: 'none',
+              }}
+            >
+              Get Involved
+              <img src={chevron} alt="" className="ml-1 mt-1 h-3 w-3 inline-block" />
+            </button>
+            <div className="absolute left-0 top-full h-2 w-full"></div>
+            <div
+              className="
               absolute left-0 top-[calc(100%+8px)]
               w-72
               rounded-none
@@ -176,58 +172,58 @@ export default function DefaultNav({ isAdmin = false }: { isAdmin?: boolean }) {
               group-hover:opacity-100 group-hover:visible
               transition-opacity duration-150
             "
-          >
-            <a
-              href="https://americanspcc.org/community/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block px-4 py-2 !text-[#566273] hover:bg-gray-100"
             >
-              Community
-            </a>
-            <a
-              href="https://americanspcc.org/donate/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block px-4 py-2 !text-[#566273] hover:bg-gray-100"
-            >
-              Take Action
-            </a>
-            <a
-              href="https://americanspcc.org/parentcoaching/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block px-4 py-2 !text-[#566273] hover:bg-gray-100"
-            >
-              Support Peaceful Discipline
-            </a>
-            <a
-              href="https://americanspcc.org/advocacy/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block px-4 py-2 !text-[#566273] hover:bg-gray-100"
-            >
-              Advocate
-            </a>
-            <a
-              href="https://americanspcc.org/virtual-volunteer-application/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block px-4 py-2 !text-[#566273] hover:bg-gray-100"
-            >
-              Virtual Volunteer
-            </a>
+              <a
+                href="https://americanspcc.org/community/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block px-4 py-2 !text-[#566273] hover:bg-gray-100"
+              >
+                Community
+              </a>
+              <a
+                href="https://americanspcc.org/donate/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block px-4 py-2 !text-[#566273] hover:bg-gray-100"
+              >
+                Take Action
+              </a>
+              <a
+                href="https://americanspcc.org/parentcoaching/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block px-4 py-2 !text-[#566273] hover:bg-gray-100"
+              >
+                Support Peaceful Discipline
+              </a>
+              <a
+                href="https://americanspcc.org/advocacy/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block px-4 py-2 !text-[#566273] hover:bg-gray-100"
+              >
+                Advocate
+              </a>
+              <a
+                href="https://americanspcc.org/virtual-volunteer-application/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block px-4 py-2 !text-[#566273] hover:bg-gray-100"
+              >
+                Virtual Volunteer
+              </a>
 
-            <a
-              href="https://americanspcc.org/national-child-abuse-prevention-month/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block px-4 py-2 !text-[#566273] hover:bg-gray-100"
-            >
-              Child Abuse Prevention Month
-            </a>
+              <a
+                href="https://americanspcc.org/national-child-abuse-prevention-month/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block px-4 py-2 !text-[#566273] hover:bg-gray-100"
+              >
+                Child Abuse Prevention Month
+              </a>
+            </div>
           </div>
-        </div>
           <div className="w-auto">
             <Button
               variant={ButtonVariant.Small}
@@ -263,29 +259,29 @@ export default function DefaultNav({ isAdmin = false }: { isAdmin?: boolean }) {
             </button>
           </SignedOut>
           <SignedIn>
-          <UserButton
-            userProfileUrl="/account"
-            appearance={{
-              elements: {
-                userButtonPopoverFooter: { display: 'none' },
-                ...(isAdmin && {
-                  userButtonPopoverActionButton__manageAccount: {
-                    display: 'none',
-                  },
-                }),
-              },
-            }}
-          >
-            <UserButton.MenuItems>
-              {isAdmin && (
-                <UserButton.Link
-                  label="Admin Center"
-                  labelIcon={<Shield size={16} />}
-                  href="/admin/admin-center"
-                />
-              )}
-            </UserButton.MenuItems>
-          </UserButton>
+            <UserButton
+              userProfileUrl="/account"
+              appearance={{
+                elements: {
+                  userButtonPopoverFooter: { display: 'none' },
+                  ...(isAdmin && {
+                    userButtonPopoverActionButton__manageAccount: {
+                      display: 'none',
+                    },
+                  }),
+                },
+              }}
+            >
+              <UserButton.MenuItems>
+                {isAdmin && (
+                  <UserButton.Link
+                    label="Admin Center"
+                    labelIcon={<Shield size={16} />}
+                    href="/admin/admin-center"
+                  />
+                )}
+              </UserButton.MenuItems>
+            </UserButton>
           </SignedIn>
         </div>
       </nav>
