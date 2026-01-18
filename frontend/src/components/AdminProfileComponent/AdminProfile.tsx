@@ -1,10 +1,6 @@
-import './AdminCenter.css';
 import { useState, useRef } from 'react';
-import cloudUpload from '@assets/cloud_upload.png';
+import cloudUpload from '../../assets/cloud_upload.png';
 import { useClerk } from '@clerk/clerk-react';
-import { useOutletContext } from 'react-router-dom';
-import { API_BASE_URL } from '@/config/api';
-import { useAuth, useUser } from '@clerk/clerk-react';
 
 type User = {
   id: string;
@@ -14,10 +10,10 @@ type User = {
   role: 'PARENT' | 'ADMIN' | 'SUPER_ADMIN';
 };
 
-type OutletCtx = {
-  dbUser: User | null;
+type Props = {
+  dbUser: User;
   loading: boolean;
-  fetchAdmin: () => Promise<void>;
+  onSave?: (u: Partial<User> & { avatarFile?: File | null }) => Promise<User>;
 };
 
 interface EditFormState {
@@ -26,16 +22,12 @@ interface EditFormState {
   avatarFile?: File | null;
 }
 
-export default function AdminProfile() {
-  const { dbUser, loading, fetchAdmin } = useOutletContext<OutletCtx>();
-
+export default function AdminProfile({ dbUser, loading, onSave }: Props) {
   const { openUserProfile } = useClerk();
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [updating, setUpdating] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [avatarStatus, setAvatarStatus] = useState<'idle' | 'uploading' | 'error'>('idle');
-  const { getToken } = useAuth();
-  const { user, isLoaded } = useUser();
   
   const [editForm, setEditForm] = useState<EditFormState>({
       first_name: '',
@@ -43,7 +35,7 @@ export default function AdminProfile() {
       avatarFile: null,
     });
 
-  if (loading || !dbUser) return <div>Loading…</div>;
+  if (loading) return <div>Loading…</div>;
 
   const isValid = !!(editForm.first_name.trim() && editForm.last_name.trim() && editForm.avatarFile);
   const validate = () => {
@@ -76,44 +68,22 @@ const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
 
   if (!validate()) return;
-  if (!user) return;
+  if (!onSave) {
+    console.error('Save handler not available');
+    return;
+  }
 
   setUpdating(true);
   try {
-    const token = await getToken();
-    if (!token) {
-      console.error('No auth token, aborting save');
-      return;
+    const updates: Partial<User> & { avatarFile?: File | null } = {
+      first_name: editForm.first_name.trim() || null,
+      last_name: editForm.last_name.trim() || null,
+    };
+    if (avatarPreview && fileInputRef.current?.files?.[0]) {
+      updates.avatarFile = fileInputRef.current.files[0];
     }
 
-    const res = await fetch(`${API_BASE_URL}/api/users/me`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        first_name: editForm.first_name.trim() ?? '',
-        last_name: editForm.last_name.trim() ?? '',
-      }),
-    });
-
-    if (!res.ok) {
-      const text = await res.text();
-      console.error('Profile update failed:', res.status, text);
-      return;
-    }
-
-    if (editForm.avatarFile) {
-      try {
-        await user.setProfileImage({ file: editForm.avatarFile });
-      } catch (err) {
-        console.error('setProfileImage failed', err);
-      }
-    }
-
-    await fetchAdmin();
-
+    await onSave(updates);
     console.log('Profile saved successfully.');
     setEditForm({ first_name: '', last_name: '' });
     setAvatarPreview(null);
@@ -127,7 +97,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 
   return (
     <section className="admin-profile w-full px-8">
-      <h3 className="admin-panel-title">Admin Profile</h3>
+      <h3 className="admin-profile-title">Admin Profile</h3>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-2 gap-6">
