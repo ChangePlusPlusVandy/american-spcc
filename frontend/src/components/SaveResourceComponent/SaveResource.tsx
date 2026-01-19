@@ -5,7 +5,6 @@ import bookmarkOutline from '@/assets/small-bookmark.png';
 import bookmarkFilled from '@/assets/small-bookmark-filled.png';
 import { API_BASE_URL } from '@/config/api';
 
-
 interface SaveResourceProps {
   isOpen: boolean;
   onClose: () => void;
@@ -15,48 +14,38 @@ interface SaveResourceProps {
   canSave?: boolean; // 👈 NEW
 
   onBookmarkChange?: (isBookmarked: boolean) => void;
-  onSaved?: (payload: {
-    collectionName: string;
-    imageUrl?: string;
-    undo: () => void;
-  }) => void;
+  onSaved?: (payload: { collectionName: string; imageUrl?: string; undo: () => void }) => void;
 
   onCreateCollection?: (imageUrl?: string, resourceId?: string) => void;
 }
 
-
 interface CollectionItem {
-    id: string;
-    resource_fk: string;
-  }
-  
-  interface Collection {
-    id: string;
-    name: string;
-    items: CollectionItem[];
-  }
-  
+  id: string;
+  resource_fk: string;
+}
 
-  function SaveResource({
-    isOpen,
-    onClose,
-    resourceId,
-    resourceImage,
-    canSave = true,
-    onBookmarkChange,
-    onSaved,
-    onCreateCollection,
-  }: SaveResourceProps) {
-  
+interface Collection {
+  id: string;
+  name: string;
+  items: CollectionItem[];
+}
+
+function SaveResource({
+  isOpen,
+  onClose,
+  resourceId,
+  resourceImage,
+  canSave = true,
+  onBookmarkChange,
+  onSaved,
+  onCreateCollection,
+}: SaveResourceProps) {
   const [collections, setCollections] = useState<Collection[]>([]);
   const [loading, setLoading] = useState(false);
   const [visible, setVisible] = useState(isOpen);
   const [closing, setClosing] = useState(false);
   const { isSignedIn, getToken } = useAuth();
 
-
-  
-  
   useEffect(() => {
     if (isOpen) {
       setVisible(true);
@@ -73,27 +62,26 @@ interface CollectionItem {
 
   useEffect(() => {
     if (!isOpen || !isSignedIn || !canSave) return;
-  
+
     async function fetchCollections() {
       setLoading(true);
       try {
         const token = await getToken();
 
         const res = await fetch(`${API_BASE_URL}/api/collections`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          
-          if (!res.ok) {
-            console.error('Failed to fetch collections:', res.status);
-            setCollections([]);
-            return;
-          }
-          
-          const data = await res.json();
-          setCollections(data);
-          
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) {
+          console.error('Failed to fetch collections:', res.status);
+          setCollections([]);
+          return;
+        }
+
+        const data = await res.json();
+        setCollections(data);
       } catch (err) {
         console.error(err);
       } finally {
@@ -105,26 +93,22 @@ interface CollectionItem {
   }, [isOpen, isSignedIn]);
 
   if (!visible) return null;
-if (!isSignedIn) {
-  return (
-    <div className={`save-popover ${closing ? 'closing' : ''}`}>
-      <div className="save-unauth">
-        <a href="/sign-in">Sign in</a> to save resources
+  if (!isSignedIn) {
+    return (
+      <div className={`save-popover ${closing ? 'closing' : ''}`}>
+        <div className="save-unauth">
+          <a href="/sign-in">Sign in</a> to save resources
+        </div>
       </div>
-    </div>
-  );
-}
-if (!canSave) {
-  return (
-    <div className={`save-popover ${closing ? 'closing' : ''}`}>
-      <div className="save-unauth">
-        Only parents can save resources!
+    );
+  }
+  if (!canSave) {
+    return (
+      <div className={`save-popover ${closing ? 'closing' : ''}`}>
+        <div className="save-unauth">Only parents can save resources!</div>
       </div>
-    </div>
-  );
-}
-
-  
+    );
+  }
 
   return (
     <>
@@ -133,126 +117,109 @@ if (!canSave) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="save-body">
-        {loading && (
+          {loading && (
             <div className="collection-item" style={{ cursor: 'default' }}>
-                Loading collections…
+              Loading collections…
             </div>
-            )}
+          )}
 
-            {!loading && collections.length === 0 && (
+          {!loading && collections.length === 0 && (
             <div className="collection-item" style={{ cursor: 'default' }}>
-                No collections yet
+              No collections yet
             </div>
-            )}
+          )}
 
+          {collections.map((collection) => {
+            const isSaved = collection.items.some((item) => item.resource_fk === resourceId);
 
-            {collections.map((collection) => {
-                const isSaved = collection.items.some(
-                    (item) => item.resource_fk === resourceId
-                );
-
-                return (
-                <button
+            return (
+              <button
                 key={collection.id}
                 className="collection-item"
                 onClick={async (e) => {
-                    e.stopPropagation();
+                  e.stopPropagation();
 
-                    if (isSaved) {
-                    const item = collection.items.find(
-                        (i) => i.resource_fk === resourceId
-                    );
+                  if (isSaved) {
+                    const item = collection.items.find((i) => i.resource_fk === resourceId);
                     if (!item) return;
 
                     const token = await getToken();
 
-                    await fetch(
-                      `${API_BASE_URL}/api/collections/items/${item.id}`,
-                      {
-                        method: 'DELETE',
-                        headers: {
-                          Authorization: `Bearer ${token}`,
-                        },
-                      }
-                    );
-                    
-                    } else {
-                        const token = await getToken();
-
-                        const res = await fetch(
-                          `${API_BASE_URL}/api/collections/${collection.id}/items`,
-                          {
-                            method: 'POST',
-                            headers: {
-                              'Content-Type': 'application/json',
-                              Authorization: `Bearer ${token}`,
-                            },
-                            body: JSON.stringify({ resource_fk: resourceId }),
-                          }
-                        );
-                        
-
-                    const createdItem = await res.json();
-
-                    onSaved?.({
-                        collectionName: collection.name,
-                        imageUrl: resourceImage,
-                        undo: async () => {
-                            const token = await getToken();
-
-                            await fetch(
-                              `${API_BASE_URL}/api/collections/items/${createdItem.id}`,
-                              {
-                                method: 'DELETE',
-                                headers: {
-                                  Authorization: `Bearer ${token}`,
-                                },
-                              }
-                            );
-                            
-                        },
-                    });
-                    }
-
-                    const token = await getToken();
-
-                    const res2 = await fetch(`${API_BASE_URL}/api/collections`, {
+                    await fetch(`${API_BASE_URL}/api/collections/items/${item.id}`, {
+                      method: 'DELETE',
                       headers: {
                         Authorization: `Bearer ${token}`,
                       },
                     });
-                    
-                    const updatedCollections = await res2.json();
+                  } else {
+                    const token = await getToken();
 
-                    if (!Array.isArray(updatedCollections)) {
-                      console.error('Expected collections array, got:', updatedCollections);
-                      return;
-                    }
-                    
-                    setCollections(updatedCollections);
-                    
-
-                    const stillBookmarked = updatedCollections.some(
-                    (c: Collection) =>
-                        c.items.some((i) => i.resource_fk === resourceId)
+                    const res = await fetch(
+                      `${API_BASE_URL}/api/collections/${collection.id}/items`,
+                      {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                          Authorization: `Bearer ${token}`,
+                        },
+                        body: JSON.stringify({ resource_fk: resourceId }),
+                      }
                     );
 
-                    onBookmarkChange?.(stillBookmarked);
+                    const createdItem = await res.json();
 
-                    onClose();
+                    onSaved?.({
+                      collectionName: collection.name,
+                      imageUrl: resourceImage,
+                      undo: async () => {
+                        const token = await getToken();
+
+                        await fetch(`${API_BASE_URL}/api/collections/items/${createdItem.id}`, {
+                          method: 'DELETE',
+                          headers: {
+                            Authorization: `Bearer ${token}`,
+                          },
+                        });
+                      },
+                    });
+                  }
+
+                  const token = await getToken();
+
+                  const res2 = await fetch(`${API_BASE_URL}/api/collections`, {
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                    },
+                  });
+
+                  const updatedCollections = await res2.json();
+
+                  if (!Array.isArray(updatedCollections)) {
+                    console.error('Expected collections array, got:', updatedCollections);
+                    return;
+                  }
+
+                  setCollections(updatedCollections);
+
+                  const stillBookmarked = updatedCollections.some((c: Collection) =>
+                    c.items.some((i) => i.resource_fk === resourceId)
+                  );
+
+                  onBookmarkChange?.(stillBookmarked);
+
+                  onClose();
                 }}
-                >
+              >
                 <span className="collection-name">{collection.name}</span>
 
                 <img
-                    src={isSaved ? bookmarkFilled : bookmarkOutline}
-                    alt=""
-                    className="bookmark-icon"
+                  src={isSaved ? bookmarkFilled : bookmarkOutline}
+                  alt=""
+                  className="bookmark-icon"
                 />
-                </button>
-
-                );
-                })}
+              </button>
+            );
+          })}
         </div>
         <div className="save-footer">
           <button

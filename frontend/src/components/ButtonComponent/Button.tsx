@@ -9,12 +9,10 @@ export interface ButtonProps {
   children?: React.ReactNode;
 }
 
-
 export enum ButtonVariant {
   Regular = 'regular',
   Small = 'small',
 }
-
 
 export enum ButtonColor {
   Grey = 'grey',
@@ -34,16 +32,10 @@ function Button({
   const buttonClassName = `${styles.button} ${styles[variant]} ${styles[color]}`;
 
   return (
-    <button
-      className={buttonClassName}
-      onClick={onClick}
-      type={type}
-      disabled={disabled}
-    >
+    <button className={buttonClassName} onClick={onClick} type={type} disabled={disabled}>
       {children ?? text}
     </button>
   );
 }
-
 
 export default Button;

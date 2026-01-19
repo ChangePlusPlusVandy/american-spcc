@@ -39,7 +39,7 @@ export default function SignUp() {
   const initialStep: Step = stepParam === 2 || stepParam === 3 ? stepParam : 1;
   const [step, setStep] = useState<Step>(initialStep);
   const [emailError, setEmailError] = useState<string | null>(null);
-  const [passwordError, setPasswordError] = useState<string | null>(null);  
+  const [passwordError, setPasswordError] = useState<string | null>(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [hasSynced, setHasSynced] = useState(false);
@@ -62,7 +62,7 @@ export default function SignUp() {
 
   useEffect(() => {
     if (!user || step !== 2 || hasSynced) return;
-  
+
     const syncUser = async () => {
       const token = await getToken();
 
@@ -72,18 +72,13 @@ export default function SignUp() {
           Authorization: `Bearer ${token}`,
         },
       });
-      
-      
-  
+
       setHasSynced(true);
     };
-  
+
     syncUser();
   }, [user, step, hasSynced, getToken]);
 
-  
-  
-  
   const handleEmailSignup = async () => {
     if (!isLoaded || !signUp || processing) return;
     setProcessing(true);
@@ -107,9 +102,8 @@ export default function SignUp() {
           },
         });
         setHasSynced(true);
-      }  
+      }
       navigate('/sign-up?step=2', { replace: true });
-      
     } catch (err: any) {
       if (!Array.isArray(err?.errors)) {
         setPasswordError('Something went wrong. Please try again.');
@@ -140,14 +134,14 @@ export default function SignUp() {
     setSubscribeNewsletter(false);
     goToStep(3);
   };
-  
+
   const handleCompleteSignup = async () => {
     if (!user || processing) return;
     setProcessing(true);
-  
+
     try {
       const token = await getToken();
-  
+
       const response = await fetch(`${API_BASE_URL}/api/users/me`, {
         method: 'PATCH',
         headers: {
@@ -163,23 +157,22 @@ export default function SignUp() {
           onboarding_complete: true,
         }),
       });
-  
+
       if (!response.ok) {
         throw new Error('Failed to update user');
       }
-  
+
       await user.update({
         unsafeMetadata: {
           onboarding_complete: true,
         },
       });
-  
+
       navigate('/');
     } finally {
       setProcessing(false);
     }
   };
-  
 
   return (
     <SignupForm

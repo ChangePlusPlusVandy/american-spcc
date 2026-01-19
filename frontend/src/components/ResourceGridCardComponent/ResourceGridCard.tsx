@@ -66,7 +66,7 @@ function ResourceGridCard({
   isBookmarked,
   isAdmin = false,
   onLearnMore,
-  onSaved,  
+  onSaved,
   onBookmarkChange,
   onCreateCollection,
 }: ResourceGridCardProps) {
@@ -77,51 +77,44 @@ function ResourceGridCard({
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [pendingResourceId, setPendingResourceId] = useState<string | null>(null);
   const [pendingImageUrl, setPendingImageUrl] = useState<string | undefined>();
-  const [collections, setCollections] = useState<{ id: string; name: string }[]>(
-    []
-  );
+  const [collections, setCollections] = useState<{ id: string; name: string }[]>([]);
   const { getToken } = useAuth();
 
   useEffect(() => {
     async function fetchCollections() {
       const token = await getToken();
       if (!token) return;
-  
+
       const res = await fetch(`${API_BASE_URL}/api/collections`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-  
+
       if (!res.ok) return;
-  
+
       const data = await res.json();
       setCollections(data);
     }
-  
+
     if (showCreateModal) {
       fetchCollections();
     }
   }, [showCreateModal, getToken]);
-  
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (
-        showSavePopup &&
-        popupRef.current &&
-        !popupRef.current.contains(e.target as Node)
-      ) {
+      if (showSavePopup && popupRef.current && !popupRef.current.contains(e.target as Node)) {
         setShowSavePopup(false);
       }
     }
-  
+
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [showSavePopup]);
-  
+
   return (
     <div
       className={styles.card}
@@ -137,14 +130,14 @@ function ResourceGridCard({
               aria-label="Save to collection"
               onClick={(e) => {
                 e.stopPropagation();
-              setShowSavePopup((prev) => !prev);
+                setShowSavePopup((prev) => !prev);
               }}
             >
-            <img
-              src={isBookmarked ? bookmarkFilled : bookmarkIcon}
-              alt=""
-              className={styles.bookmarkIcon}
-            />
+              <img
+                src={isBookmarked ? bookmarkFilled : bookmarkIcon}
+                alt=""
+                className={styles.bookmarkIcon}
+              />
             </button>
             <SaveResource
               isOpen={showSavePopup}
@@ -170,14 +163,13 @@ function ResourceGridCard({
             />
             <CreateCollection
               isOpen={showCreateModal}
-              existingNames={collections.map(c => c.name)}
+              existingNames={collections.map((c) => c.name)}
               imageUrl={pendingImageUrl}
               onCancel={() => setShowCreateModal(false)}
               onCreate={async (name) => {
-
                 const token = await getToken();
                 if (!token) return;
-                
+
                 // 1. create collection
                 const res = await fetch(`${API_BASE_URL}/api/collections`, {
                   method: 'POST',
@@ -187,17 +179,17 @@ function ResourceGridCard({
                   },
                   body: JSON.stringify({ name }),
                 });
-                
+
                 if (!res.ok) {
                   console.error('Create collection failed', res.status);
                   return;
                 }
-                
+
                 const collection = await res.json();
-                
+
                 // 2. add resource to collection
                 let createdItemId: string | null = null;
-                
+
                 if (pendingResourceId) {
                   const itemRes = await fetch(
                     `${API_BASE_URL}/api/collections/${collection.id}/items`,
@@ -210,11 +202,10 @@ function ResourceGridCard({
                       body: JSON.stringify({ resource_fk: pendingResourceId }),
                     }
                   );
-                
+
                   const item = await itemRes.json();
                   createdItemId = item.id;
                 }
-                
 
                 onSaved?.({
                   collectionName: collection.name,
@@ -222,21 +213,17 @@ function ResourceGridCard({
                   resourceId: pendingResourceId!,
                   undo: async () => {
                     if (!createdItemId) return;
-                  
+
                     const token = await getToken();
                     if (!token) return;
-                  
-                    await fetch(
-                      `${API_BASE_URL}/api/collections/items/${createdItemId}`,
-                      {
-                        method: 'DELETE',
-                        headers: {
-                          Authorization: `Bearer ${token}`,
-                        },
-                      }
-                    );
+
+                    await fetch(`${API_BASE_URL}/api/collections/items/${createdItemId}`, {
+                      method: 'DELETE',
+                      headers: {
+                        Authorization: `Bearer ${token}`,
+                      },
+                    });
                   },
-                  
                 });
 
                 onBookmarkChange?.(true);
@@ -245,10 +232,6 @@ function ResourceGridCard({
                 setShowSavePopup(false);
               }}
             />
-
-
-
-
           </div>
           <div className={styles.titleRow}>
             {categoryIcon && (
@@ -258,34 +241,27 @@ function ResourceGridCard({
             )}
             <h3 className={styles.title}>{title}</h3>
           </div>
-          <div
-            className={styles.imageContainer}
-            onMouseEnter={() => setFlipped(true)}
-          >
+          <div className={styles.imageContainer} onMouseEnter={() => setFlipped(true)}>
             <img src={imageUrl} alt={title} className={styles.image} />
           </div>
           <div className={styles.tagsContainer}>
-          <span className={styles.tagPrefix}>
-            {CATEGORY_DISPLAY_MAP[category]}
-          </span>
+            <span className={styles.tagPrefix}>{CATEGORY_DISPLAY_MAP[category]}</span>
 
-          {tags.length > 0 && (
-            <>
-              <span style={{ flexBasis: '100%', height: 0 }} />
+            {tags.length > 0 && (
+              <>
+                <span style={{ flexBasis: '100%', height: 0 }} />
 
-              {tags.map((tag, index) => (
-                <span key={index} className={styles.tag}>
-                  {tag}
-                </span>
-              ))}
-            </>
-          )}
-        </div>          
+                {tags.map((tag, index) => (
+                  <span key={index} className={styles.tag}>
+                    {tag}
+                  </span>
+                ))}
+              </>
+            )}
+          </div>
         </div>
         <div className={styles.back}>
-          <p className={styles.description}>
-            {description || 'No description available.'}
-          </p>
+          <p className={styles.description}>{description || 'No description available.'}</p>
           {onLearnMore && (
             <button
               className={styles.learnMoreButton}

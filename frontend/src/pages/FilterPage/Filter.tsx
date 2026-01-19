@@ -50,18 +50,16 @@ const GridIcon = () => (
 
 function FilterPage() {
   const { user, isLoaded } = useUser();
-  const isAdmin =
-  isLoaded && user?.publicMetadata?.role === 'ADMIN';
+  const isAdmin = isLoaded && user?.publicMetadata?.role === 'ADMIN';
   const [searchParams] = useSearchParams();
   const selectedTopics = useMemo(() => {
     return searchParams.getAll('category');
   }, [searchParams]);
-  
+
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [collectionNames, setCollectionNames] = useState<string[]>([]);
 
-  
   const [selectedAges, setSelectedAges] = useState<string[]>([]);
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
   const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
@@ -80,25 +78,24 @@ function FilterPage() {
     imageUrl?: string;
     undo?: () => void;
   } | null>(null);
-  
-    const [showCreateCollection, setShowCreateCollection] = useState(false);
-    const [createCollectionImage, setCreateCollectionImage] = useState<string | undefined>();
-    const [createCollectionResourceId, setCreateCollectionResourceId] = useState<string | null>(null);
-    const [toastClosing, setToastClosing] = useState(false);
-    const [bookmarkedResourceIds, setBookmarkedResourceIds] = useState<Set<string>>(new Set());
-    const handleBookmarkChange = (resourceId: string, isBookmarked: boolean) => {
-      setBookmarkedResourceIds(prev => {
-        const next = new Set(prev);
-        if (isBookmarked) {
-          next.add(resourceId);
-        } else {
-          next.delete(resourceId);
-        }
-        return next;
-      });
-    };
-    const { getToken } = useAuth();
 
+  const [showCreateCollection, setShowCreateCollection] = useState(false);
+  const [createCollectionImage, setCreateCollectionImage] = useState<string | undefined>();
+  const [createCollectionResourceId, setCreateCollectionResourceId] = useState<string | null>(null);
+  const [toastClosing, setToastClosing] = useState(false);
+  const [bookmarkedResourceIds, setBookmarkedResourceIds] = useState<Set<string>>(new Set());
+  const handleBookmarkChange = (resourceId: string, isBookmarked: boolean) => {
+    setBookmarkedResourceIds((prev) => {
+      const next = new Set(prev);
+      if (isBookmarked) {
+        next.add(resourceId);
+      } else {
+        next.delete(resourceId);
+      }
+      return next;
+    });
+  };
+  const { getToken } = useAuth();
 
   const formatOptions = [
     { value: 'WEBPAGE', label: 'Webpage' },
@@ -126,38 +123,36 @@ function FilterPage() {
           credentials: 'include',
         });
         if (!res.ok) return;
-  
+
         const collections = await res.json();
         setCollectionNames(collections.map((c: any) => c.name));
       } catch {}
     };
-  
+
     fetchCollections();
   }, []);
-  
+
   useEffect(() => {
     const fetchResources = async () => {
       setLoading(true);
       setError(null);
-  
+
       try {
         let allResources: Resource[] = [];
-  
+
         if (selectedTopics.length > 0) {
           const results = await Promise.all(
             selectedTopics.map((category) =>
-              fetch(`${API_BASE_URL}/api/resources?category=${category}`)
-                .then((res) => res.json())
+              fetch(`${API_BASE_URL}/api/resources?category=${category}`).then((res) => res.json())
             )
           );
-        
+
           allResources = results.flat();
         } else {
           const res = await fetch(`${API_BASE_URL}/api/resources`);
           allResources = await res.json();
         }
-        
-  
+
         setResources(allResources);
       } catch {
         setError('Failed to fetch resources.');
@@ -165,34 +160,30 @@ function FilterPage() {
         setLoading(false);
       }
     };
-  
+
     fetchResources();
   }, [selectedTopics]);
-  
-  
-    
+
   useEffect(() => {
     setSearchQuery(searchParams.get('q') ?? '');
   }, [searchParams]);
-  
 
   const filteredResources = useMemo(() => {
     return resources.filter((resource) => {
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
         const matchesTitle = resource.title.toLowerCase().includes(q);
-        const matchesDescription =
-          resource.description?.toLowerCase().includes(q) ?? false;
-  
+        const matchesDescription = resource.description?.toLowerCase().includes(q) ?? false;
+
         if (!matchesTitle && !matchesDescription) {
           return false;
         }
       }
-  
+
       if (selectedFormats.length > 0 && !selectedFormats.includes(resource.resource_type)) {
         return false;
       }
-  
+
       if (selectedLanguage && resource.language !== selectedLanguage) {
         return false;
       }
@@ -207,28 +198,16 @@ function FilterPage() {
         });
         if (!matchesAnyRange) return false;
       }
-  
+
       if (selectedAges.length > 0) {
-        const ageEnums = selectedAges
-          .map((age) => AGE_TO_ENUM[age])
-          .filter(Boolean);
-        const hasMatchingAge = ageEnums.some((ageEnum) =>
-          resource.age_groups.includes(ageEnum)
-        );
+        const ageEnums = selectedAges.map((age) => AGE_TO_ENUM[age]).filter(Boolean);
+        const hasMatchingAge = ageEnums.some((ageEnum) => resource.age_groups.includes(ageEnum));
         if (!hasMatchingAge) return false;
       }
-  
+
       return true;
     });
-  }, [
-    resources,
-    searchQuery,
-    selectedFormats,
-    selectedLanguage,
-    selectedTimeRanges,
-    selectedAges,
-  ]);
-
+  }, [resources, searchQuery, selectedFormats, selectedLanguage, selectedTimeRanges, selectedAges]);
 
   const handleLearnMore = (resource: Resource) => {
     if (resource.hosting_type !== 'EXTERNAL') {
@@ -252,7 +231,6 @@ function FilterPage() {
     undo: () => void;
     resourceId: string;
   }) => {
-  
     setSaveToast({
       open: true,
       collectionName,
@@ -261,10 +239,8 @@ function FilterPage() {
         await undo();
         handleBookmarkChange(resourceId, false);
       },
-      
-      
     });
-  
+
     setTimeout(() => {
       setToastClosing(true);
       setTimeout(() => {
@@ -273,13 +249,9 @@ function FilterPage() {
       }, 200);
     }, 3000);
   };
-  
-  
-  
 
   return (
     <div className="min-h-screen bg-[#FFF9F0]">
-
       <div className="container mx-auto px-4 py-6 max-w-7xl">
         <div className="mb-6 w-4/5 mx-auto">
           <form
@@ -299,7 +271,7 @@ function FilterPage() {
               navigate(`/filter?${params.toString()}`);
             }}
             className="relative"
-            >
+          >
             <SearchBar
               value={searchQuery}
               onChange={(value) => {
@@ -358,25 +330,22 @@ function FilterPage() {
         </div>
         <div className="flex gap-6">
           <div className="flex-shrink-0 mr-4">
-          <FilterComponent
-            selectedTopics={selectedTopics}
-            selectedAges={selectedAges}
-            onTopicChange={(topics) => {
-              const params = new URLSearchParams(searchParams);
-            
-              params.delete('category');
-            
-              topics.forEach((t) => {
-                params.append('category', t);
-              });
-            
-              navigate(`/filter?${params.toString()}`, { replace: true });
-            }}
-            
-            onAgeChange={setSelectedAges}
-          />
+            <FilterComponent
+              selectedTopics={selectedTopics}
+              selectedAges={selectedAges}
+              onTopicChange={(topics) => {
+                const params = new URLSearchParams(searchParams);
 
+                params.delete('category');
 
+                topics.forEach((t) => {
+                  params.append('category', t);
+                });
+
+                navigate(`/filter?${params.toString()}`, { replace: true });
+              }}
+              onAgeChange={setSelectedAges}
+            />
           </div>
 
           <div className="flex-1">
@@ -413,13 +382,11 @@ function FilterPage() {
                         tags={resource.labels?.map((l) => l.label.label_name) || []}
                         category={resource.category}
                         imageUrl={resource.imageUrl ?? undefined}
-
                         isBookmarked={bookmarkedResourceIds.has(resource.id)}
                         isAdmin={isAdmin}
                         onBookmarkChange={(isBookmarked) =>
                           handleBookmarkChange(resource.id, isBookmarked)
                         }
-
                         onLearnMore={() => handleLearnMore(resource)}
                         onSaved={({ collectionName, imageUrl, undo }) =>
                           handleResourceSaved({
@@ -430,38 +397,35 @@ function FilterPage() {
                           })
                         }
                       />
-
                     ))}
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 gap-4">
                     {filteredResources.map((resource) => {
-
                       return (
-                      <ResourceGridCard
-                        key={resource.id}
-                        id={resource.id}
-                        title={resource.title}
-                        description={resource.description || ''}
-                        tags={resource.labels?.map((l) => l.label.label_name) || []}
-                        category={resource.category}
-                        imageUrl={resource.imageUrl ?? undefined}
-                        isBookmarked={bookmarkedResourceIds.has(resource.id)}
-                        isAdmin={isAdmin}
-                        onLearnMore={() => handleLearnMore(resource)}
-                        onSaved={({ collectionName, imageUrl, undo }) =>
-                          handleResourceSaved({
-                            collectionName,
-                            imageUrl,
-                            undo,
-                            resourceId: resource.id,
-                          })
-                        }
-                        onBookmarkChange={(isBookmarked) =>
-                          handleBookmarkChange(resource.id, isBookmarked)
-                        }
-                      />
-
+                        <ResourceGridCard
+                          key={resource.id}
+                          id={resource.id}
+                          title={resource.title}
+                          description={resource.description || ''}
+                          tags={resource.labels?.map((l) => l.label.label_name) || []}
+                          category={resource.category}
+                          imageUrl={resource.imageUrl ?? undefined}
+                          isBookmarked={bookmarkedResourceIds.has(resource.id)}
+                          isAdmin={isAdmin}
+                          onLearnMore={() => handleLearnMore(resource)}
+                          onSaved={({ collectionName, imageUrl, undo }) =>
+                            handleResourceSaved({
+                              collectionName,
+                              imageUrl,
+                              undo,
+                              resourceId: resource.id,
+                            })
+                          }
+                          onBookmarkChange={(isBookmarked) =>
+                            handleBookmarkChange(resource.id, isBookmarked)
+                          }
+                        />
                       );
                     })}
                   </div>
@@ -478,7 +442,6 @@ function FilterPage() {
         onUndo={saveToast?.undo}
       />
 
-
       <CreateCollection
         isOpen={showCreateCollection}
         existingNames={collectionNames}
@@ -486,7 +449,6 @@ function FilterPage() {
         onCancel={() => setShowCreateCollection(false)}
         onCreate={async (name) => {
           try {
-        
             const res = await fetch(`${API_BASE_URL}/api/collections`, {
               method: 'POST',
               headers: {
@@ -495,13 +457,12 @@ function FilterPage() {
               credentials: 'include',
               body: JSON.stringify({ name }),
             });
-            
-        
+
             if (!res.ok) throw new Error('Create collection failed');
-        
+
             const newCollection = await res.json();
             let createdItemId: string | null = null;
-        
+
             if (createCollectionResourceId) {
               const itemRes = await fetch(
                 `${API_BASE_URL}/api/collections/${newCollection.id}/items`,
@@ -516,30 +477,25 @@ function FilterPage() {
                   }),
                 }
               );
-              
-        
+
               const createdItem = await itemRes.json();
               createdItemId = createdItem.id;
             }
-        
+
             setSaveToast({
               open: true,
               collectionName: newCollection.name,
               imageUrl: createCollectionImage,
               undo: async () => {
                 if (!createdItemId) return;
-        
-                await fetch(
-                  `${API_BASE_URL}/api/collections/items/${createdItemId}`,
-                  {
-                    method: 'DELETE',
-                    credentials: 'include',
-                  }
-                );
-                
+
+                await fetch(`${API_BASE_URL}/api/collections/items/${createdItemId}`, {
+                  method: 'DELETE',
+                  credentials: 'include',
+                });
               },
             });
-        
+
             setTimeout(() => {
               setToastClosing(true);
               setTimeout(() => {
@@ -547,14 +503,13 @@ function FilterPage() {
                 setToastClosing(false);
               }, 200);
             }, 3000);
-        
+
             setShowCreateCollection(false);
             setCreateCollectionResourceId(null);
           } catch (err) {
             console.error('Failed to create collection + save resource', err);
           }
         }}
-        
       />
     </div>
   );

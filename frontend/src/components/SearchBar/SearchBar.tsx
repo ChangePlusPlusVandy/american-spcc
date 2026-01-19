@@ -51,7 +51,6 @@ function SearchBar({
         fontSize: fontSize || styles.fontSize,
       }}
     />
-
   );
 }
 

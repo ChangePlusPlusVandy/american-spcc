@@ -7,19 +7,12 @@ interface SaveToastProps {
   onUndo?: () => void;
 }
 
-export default function SaveToast({
-  open,
-  collectionName,
-  imageUrl,
-  onUndo,
-}: SaveToastProps) {
+export default function SaveToast({ open, collectionName, imageUrl, onUndo }: SaveToastProps) {
   if (!open) return null;
 
   return (
     <div className="save-toast">
-      {imageUrl && (
-        <img src={imageUrl} alt="" className="save-toast-image" />
-      )}
+      {imageUrl && <img src={imageUrl} alt="" className="save-toast-image" />}
 
       <div className="save-toast-text">
         Saved to <strong>{collectionName}</strong>
