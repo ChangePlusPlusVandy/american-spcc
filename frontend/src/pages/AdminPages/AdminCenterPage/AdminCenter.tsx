@@ -27,7 +27,7 @@ export default function AdminCenter() {
       if (!token) return;
       if (!user) return;
 
-      const res = await fetch(`${API_BASE_URL}/api/users/clerk/${user.id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/admin/me`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -44,8 +44,12 @@ export default function AdminCenter() {
   };
 
   useEffect(() => {
+    if (!isLoaded) return;
+    if (!isAdmin) return;
+  
     fetchAdmin();
-  }, []);
+  }, [isLoaded, isAdmin]);
+  
 
   if (!isLoaded) return null;
 

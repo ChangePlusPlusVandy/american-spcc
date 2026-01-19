@@ -5,6 +5,7 @@ import { useClerk } from '@clerk/clerk-react';
 import { useOutletContext } from 'react-router-dom';
 import { API_BASE_URL } from '@/config/api';
 import { useAuth, useUser } from '@clerk/clerk-react';
+import { useEffect } from 'react';
 
 type User = {
   id: string;
@@ -45,18 +46,26 @@ export default function AdminProfile() {
 
   if (loading || !dbUser) return <div>Loading…</div>;
 
-  const isValid = !!(
-    editForm.first_name.trim() &&
-    editForm.last_name.trim() &&
-    editForm.avatarFile
-  );
+  const isValid =
+  editForm.first_name.trim() !== '' ||
+  editForm.last_name.trim() !== '' ||
+  !!editForm.avatarFile;
+
+  const hasChanges =
+  editForm.first_name !== (dbUser.first_name ?? '') ||
+  editForm.last_name !== (dbUser.last_name ?? '') ||
+  !!editForm.avatarFile;
+
+
   const validate = () => {
-    if (!editForm.first_name.trim() || !editForm.last_name.trim() || !editForm.avatarFile) {
+    if (!hasChanges) {
       console.error('No changes made.');
       return false;
     }
     return true;
   };
+  
+  
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] ?? null;
@@ -90,16 +99,16 @@ export default function AdminProfile() {
         return;
       }
 
-      const res = await fetch(`${API_BASE_URL}/api/users/me`, {
+      const res = await fetch(`${API_BASE_URL}/api/admin/me`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          first_name: editForm.first_name.trim() ?? '',
-          last_name: editForm.last_name.trim() ?? '',
-        }),
+          first_name: editForm.first_name.trim() || undefined,
+          last_name: editForm.last_name.trim() || undefined,
+        }),        
       });
 
       if (!res.ok) {
@@ -128,6 +137,16 @@ export default function AdminProfile() {
       setUpdating(false);
     }
   };
+
+  useEffect(() => {
+    if (dbUser) {
+      setEditForm({
+        first_name: dbUser.first_name ?? '',
+        last_name: dbUser.last_name ?? '',
+        avatarFile: null,
+      });
+    }
+  }, [dbUser]);
 
   return (
     <section className="admin-profile w-full px-8">
@@ -241,7 +260,7 @@ export default function AdminProfile() {
         <div className="flex justify-center">
           <button
             type="submit"
-            disabled={!isValid}
+            disabled={!hasChanges}
             className="px-4 py-2 !bg-[#57c5c1] text-white text-bold rounded disabled:opacity-50"
           >
             {' '}
