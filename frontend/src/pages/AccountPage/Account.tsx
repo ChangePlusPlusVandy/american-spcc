@@ -646,10 +646,10 @@ export default function AccountPage() {
                       })
                     }
                     options={[
-                      { label: 'Infant (0–3)', value: 'AGE_0_3' },
+                      { label: 'Infant & Toddler (0–3)', value: 'AGE_0_3' },
                       { label: 'Preschool (4–6)', value: 'AGE_4_6' },
                       { label: 'Elementary (7–10)', value: 'AGE_7_10' },
-                      { label: 'Middle School (11–13)', value: 'AGE_10_13' },
+                      { label: 'Middle School (11–13)', value: 'AGE_11_13' },
                       { label: 'High School (14–18)', value: 'AGE_14_18' },
                       { label: 'University & Above (18+)', value: 'AGE_18_ABOVE' },
                     ]}

@@ -12,10 +12,10 @@ export const TOPIC_TO_CATEGORY: Record<string, string> = {
 };
 
 export const AGE_TO_ENUM: Record<string, string> = {
-  'Infant (0–1)': 'AGE_0_3',
-  'Preschool (3–6)': 'AGE_4_6',
+  'Infant & Toddler (0–3)': 'AGE_0_3',
+  'Preschool (4–6)': 'AGE_4_6',
   'Elementary (7–10)': 'AGE_7_10',
-  'Middle School (11–13)': 'AGE_10_13',
+  'Middle School (11–13)': 'AGE_11_13',
   'High School (14–18)': 'AGE_14_18',
   'University & Above (18+)': 'AGE_18_ABOVE',
 };
@@ -32,10 +32,10 @@ export const CATEGORY_TO_TOPIC: Record<string, string> = {
 };
 
 export const ENUM_TO_AGE: Record<string, string> = {
-  AGE_0_3: 'Infant (0–1)',
-  AGE_4_6: 'Preschool (3–6)',
+  AGE_0_3: 'Infant & Toddler (0–3)',
+  AGE_4_6: 'Preschool (4–6)',
   AGE_7_10: 'Elementary (7–10)',
-  AGE_10_13: 'Middle School (11–13)',
+  AGE_11_13: 'Middle School (11–13)',
   AGE_14_18: 'High School (14–18)',
   AGE_18_ABOVE: 'University & Above (18+)',
 };

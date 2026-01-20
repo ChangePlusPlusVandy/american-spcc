@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import './FilterComponent.css';
+import { AGE_TO_ENUM } from '@/utils/filterMappings';
 
 const TOPICS = [
   { label: 'Parenting Skills & Relationships', value: 'PARENTING_SKILLS_RELATIONSHIPS' },
@@ -28,16 +29,21 @@ export default function FilterComponent({
   const topicInitial = TOPICS.slice(0, 3);
   const topicFull = TOPICS;
 
-  const ageInitial = ['Infant (0–1)', 'Preschool (3–6)', 'Elementary (7–10)'];
-
+  const ageInitial = [
+    'Infant & Toddler (0–3)',
+    'Preschool (4–6)',
+    'Elementary (7–10)',
+  ];
+  
   const ageFull = [
-    'Infant (0–1)',
-    'Preschool (3–6)',
+    'Infant & Toddler (0–3)',
+    'Preschool (4–6)',
     'Elementary (7–10)',
     'Middle School (11–13)',
     'High School (14–18)',
     'University & Above (18+)',
   ];
+  
 
   const [showAllTopics, setShowAllTopics] = useState(false);
   const [showAllAges, setShowAllAges] = useState(false);
@@ -53,6 +59,8 @@ export default function FilterComponent({
   };
 
   const handleAgeClick = (age: string) => {
+    console.log('Clicked age label:', age);
+    console.log('Mapped enum:', AGE_TO_ENUM?.[age]);  
     if (!onAgeChange) return;
 
     if (selectedAges.includes(age)) {

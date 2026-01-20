@@ -34,7 +34,7 @@
   border: 2px solid #007070;
   background-color: #00a0a0;
   border-radius: 16px;
-  padding: 24px;
+  padding: 24px 32px 24px 32px;
 
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }

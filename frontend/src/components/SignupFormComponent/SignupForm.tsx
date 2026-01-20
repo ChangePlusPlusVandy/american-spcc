@@ -249,7 +249,7 @@ export default function SignupForm({
                   { label: 'Ages 0–3', value: 'AGE_0_3' },
                   { label: 'Ages 4–6', value: 'AGE_4_6' },
                   { label: 'Ages 7–10', value: 'AGE_7_10' },
-                  { label: 'Ages 10–13', value: 'AGE_10_13' },
+                  { label: 'Ages 11–13', value: 'AGE_11_13' },
                   { label: 'Ages 14–18', value: 'AGE_14_18' },
                   { label: '18+', value: 'AGE_18_ABOVE' },
                 ].map((opt) => (

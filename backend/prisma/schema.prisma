@@ -39,7 +39,7 @@ enum AGE_GROUP {
   AGE_0_3
   AGE_4_6
   AGE_7_10
-  AGE_10_13
+  AGE_11_13
   AGE_14_18
   AGE_18_ABOVE
 }
@@ -47,7 +47,6 @@ enum AGE_GROUP {
 enum LANGUAGE {
   ENGLISH
   SPANISH
-  CHINESE
   OTHER
 }
 
