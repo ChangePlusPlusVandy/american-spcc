@@ -33,8 +33,6 @@ interface ResourceGridCardProps {
   }) => void;
   onBookmarkChange?: (isBookmarked: boolean) => void;
   onCreateCollection?: (imageUrl?: string) => void;
-  onDelete?: () => void;
-  onEdit?: () => void;
 }
 const CATEGORY_DISPLAY_MAP: Record<string, string> = {
   PARENTING_SKILLS_RELATIONSHIPS: 'Parenting Skills & Relationships',
@@ -71,8 +69,6 @@ function ResourceGridCard({
   onSaved,
   onBookmarkChange,
   onCreateCollection,
-  onDelete,
-  onEdit,
 }: ResourceGridCardProps) {
   const categoryIcon = CATEGORY_ICON_MAP[category];
   const [flipped, setFlipped] = useState(false);
@@ -128,117 +124,115 @@ function ResourceGridCard({
     >
       <div className={`${styles.inner} ${flipped ? styles.flipped : ''}`}>
         <div className={styles.front}>
-          {!isAdmin && (
-            <div className={styles.bookmarkWrapper} ref={popupRef}>
-              <button
-                className={styles.bookmark}
-                aria-label="Save to collection"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowSavePopup((prev) => !prev);
-                }}
-              >
-                <img
-                  src={isBookmarked ? bookmarkFilled : bookmarkIcon}
-                  alt=""
-                  className={styles.bookmarkIcon}
-                />
-              </button>
-              <SaveResource
-                isOpen={showSavePopup}
-                onClose={() => setShowSavePopup(false)}
-                resourceId={id}
-                resourceImage={imageUrl}
-                canSave={!isAdmin}
-                onSaved={(payload) => {
-                  onSaved?.({
-                    ...payload,
-                    resourceId: id,
-                  });
-                }}
-                onBookmarkChange={(isBookmarked) => {
-                  setShowSavePopup(false);
-                  onBookmarkChange?.(isBookmarked);
-                }}
-                onCreateCollection={(imageUrl, resourceId) => {
-                  setPendingResourceId(resourceId ?? null);
-                  setPendingImageUrl(imageUrl);
-                  setShowCreateModal(true);
-                }}
+          <div className={styles.bookmarkWrapper} ref={popupRef}>
+            <button
+              className={styles.bookmark}
+              aria-label="Save to collection"
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowSavePopup((prev) => !prev);
+              }}
+            >
+              <img
+                src={isBookmarked ? bookmarkFilled : bookmarkIcon}
+                alt=""
+                className={styles.bookmarkIcon}
               />
-              <CreateCollection
-                isOpen={showCreateModal}
-                existingNames={collections.map((c) => c.name)}
-                imageUrl={pendingImageUrl}
-                onCancel={() => setShowCreateModal(false)}
-                onCreate={async (name) => {
-                  const token = await getToken();
-                  if (!token) return;
+            </button>
+            <SaveResource
+              isOpen={showSavePopup}
+              onClose={() => setShowSavePopup(false)}
+              resourceId={id}
+              resourceImage={imageUrl}
+              canSave={!isAdmin}
+              onSaved={(payload) => {
+                onSaved?.({
+                  ...payload,
+                  resourceId: id,
+                });
+              }}
+              onBookmarkChange={(isBookmarked) => {
+                setShowSavePopup(false);
+                onBookmarkChange?.(isBookmarked);
+              }}
+              onCreateCollection={(imageUrl, resourceId) => {
+                setPendingResourceId(resourceId ?? null);
+                setPendingImageUrl(imageUrl);
+                setShowCreateModal(true);
+              }}
+            />
+            <CreateCollection
+              isOpen={showCreateModal}
+              existingNames={collections.map((c) => c.name)}
+              imageUrl={pendingImageUrl}
+              onCancel={() => setShowCreateModal(false)}
+              onCreate={async (name) => {
+                const token = await getToken();
+                if (!token) return;
 
-                  // 1. create collection
-                  const res = await fetch(`${API_BASE_URL}/api/collections`, {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                      Authorization: `Bearer ${token}`,
-                    },
-                    body: JSON.stringify({ name }),
-                  });
+                // 1. create collection
+                const res = await fetch(`${API_BASE_URL}/api/collections`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                  },
+                  body: JSON.stringify({ name }),
+                });
 
-                  if (!res.ok) {
-                    console.error('Create collection failed', res.status);
-                    return;
-                  }
+                if (!res.ok) {
+                  console.error('Create collection failed', res.status);
+                  return;
+                }
 
-                  const collection = await res.json();
+                const collection = await res.json();
 
-                  // 2. add resource to collection
-                  let createdItemId: string | null = null;
+                // 2. add resource to collection
+                let createdItemId: string | null = null;
 
-                  if (pendingResourceId) {
-                    const itemRes = await fetch(
-                      `${API_BASE_URL}/api/collections/${collection.id}/items`,
-                      {
-                        method: 'POST',
-                        headers: {
-                          'Content-Type': 'application/json',
-                          Authorization: `Bearer ${token}`,
-                        },
-                        body: JSON.stringify({ resource_fk: pendingResourceId }),
-                      }
-                    );
+                if (pendingResourceId) {
+                  const itemRes = await fetch(
+                    `${API_BASE_URL}/api/collections/${collection.id}/items`,
+                    {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                      },
+                      body: JSON.stringify({ resource_fk: pendingResourceId }),
+                    }
+                  );
 
-                    const item = await itemRes.json();
-                    createdItemId = item.id;
-                  }
+                  const item = await itemRes.json();
+                  createdItemId = item.id;
+                }
 
-                  onSaved?.({
-                    collectionName: collection.name,
-                    imageUrl: pendingImageUrl,
-                    resourceId: pendingResourceId!,
-                    undo: async () => {
-                      if (!createdItemId) return;
+                onSaved?.({
+                  collectionName: collection.name,
+                  imageUrl: pendingImageUrl,
+                  resourceId: pendingResourceId!,
+                  undo: async () => {
+                    if (!createdItemId) return;
 
-                      const token = await getToken();
-                      if (!token) return;
+                    const token = await getToken();
+                    if (!token) return;
 
-                      await fetch(`${API_BASE_URL}/api/collections/items/${createdItemId}`, {
-                        method: 'DELETE',
-                        headers: {
-                          Authorization: `Bearer ${token}`,
-                        },
-                      });
-                    },
-                  });
+                    await fetch(`${API_BASE_URL}/api/collections/items/${createdItemId}`, {
+                      method: 'DELETE',
+                      headers: {
+                        Authorization: `Bearer ${token}`,
+                      },
+                    });
+                  },
+                });
 
-                  onBookmarkChange?.(true);
+                onBookmarkChange?.(true);
 
-                  setShowCreateModal(false);
-                  setShowSavePopup(false);
-                }}
-              />
-            </div>
-          )}
+                setShowCreateModal(false);
+                setShowSavePopup(false);
+              }}
+            />
+          </div>
           <div className={styles.titleRow}>
             {categoryIcon && (
               <div className={styles.categoryIcon}>
@@ -263,39 +257,6 @@ function ResourceGridCard({
                   </span>
                 ))}
               </>
-            )}
-            {isAdmin && (
-              <div
-                style={{
-                  marginTop: 'auto',
-                  display: 'flex',
-                  justifyContent: 'flex-end',
-                  width: '100%',
-                  color: '#FF6B6B',
-                  fontSize: '0.8rem',
-                  gap: '4px',
-                  fontWeight: 500,
-                  cursor: 'pointer',
-                }}
-              >
-                <span
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDelete?.();
-                  }}
-                >
-                  delete
-                </span>
-                <span> | </span>
-                <span
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onEdit?.();
-                  }}
-                >
-                  edit
-                </span>
-              </div>
             )}
           </div>
         </div>

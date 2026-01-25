@@ -40,7 +40,13 @@ export default function AdminContent() {
 
       <div className="cms-grid">
         {categories.map(({ title, img }) => (
-          <Link key={title} to={`${CATEGORY_SLUG_MAP[title]}`} className="cms-card">
+          <Link
+            key={title}
+            to={CATEGORY_SLUG_MAP[title]}
+            className="cms-card"
+          >
+
+       
             <img src={img} alt={title} />
             <div className="cms-card-title">{title}</div>
           </Link>
