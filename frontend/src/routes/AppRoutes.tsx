@@ -11,6 +11,7 @@ import AdminRoute from '@/components/AdminRouteComponent/AdminRoute';
 import AdminProfile from '@/pages/AdminPages/AdminCenterPage/AdminProfile';
 import AdminContent from '@/pages/AdminPages/AdminCenterPage/AdminContent';
 import AdminAnalytics from '@/pages/AdminPages/AdminCenterPage/AdminAnalytics';
+import AdminCategoryContent from '@/pages/AdminPages/AdminCenterPage/AdminCategoryContent';
 
 function AccountRoute() {
   const { user, isLoaded } = useUser();
@@ -44,6 +45,7 @@ export default function AppRoutes() {
           <Route index element={<Navigate to="content-management" replace />} />
           <Route path="profile" element={<AdminProfile />} />
           <Route path="content-management" element={<AdminContent />} />
+          <Route path="content-management/:category" element={<AdminCategoryContent />} />
           <Route path="data-analytics" element={<AdminAnalytics />} />
         </Route>
       </Route>

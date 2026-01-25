@@ -20,6 +20,19 @@ const categories = [
   { title: 'Safety & Protection', img: safetyImg },
 ];
 
+import { Link } from 'react-router-dom';
+
+const CATEGORY_SLUG_MAP: Record<string, string> = {
+  'Parenting Skills & Relationships': 'parenting-skills-relationships',
+  'Child Development': 'child-development',
+  'Mental & Emotional Health': 'mental-emotional-health',
+  'Life Skills & Independence': 'life-skills-independence',
+  'Education & Learning': 'education-learning',
+  'Family Support & Community': 'family-support-community',
+  'Health & Wellbeing': 'health-wellbeing',
+  'Safety & Protection': 'safety-protection',
+};
+
 export default function AdminContent() {
   return (
     <>
@@ -27,10 +40,10 @@ export default function AdminContent() {
 
       <div className="cms-grid">
         {categories.map(({ title, img }) => (
-          <div key={title} className="cms-card">
+          <Link key={title} to={`${CATEGORY_SLUG_MAP[title]}`} className="cms-card">
             <img src={img} alt={title} />
             <div className="cms-card-title">{title}</div>
-          </div>
+          </Link>
         ))}
       </div>
     </>
