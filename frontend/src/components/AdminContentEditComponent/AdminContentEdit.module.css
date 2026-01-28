@@ -1,0 +1,165 @@
+/* admin form name: text-sm font-medium
+
+admin-save-button:  px-6 py-2 bg-teal-400 text-white rounded font-semibold
+admin form input: mt-1 w-full border rounded px-3 py-2 */
+
+.adminFormName {
+  font-size: 0.875rem;
+  font-weight: 700;
+  display: block;
+}
+
+.adminFormInput {
+  margin-top: 0.25rem;
+  width: 100%;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.25rem;
+  padding: 0.75rem 0.75rem;
+  box-sizing: border-box;
+  background-color: #55c3c0;
+  color: #fff9f0;
+  font-weight: 500;
+}
+
+.adminFormInput:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(56, 178, 172, 0.15);
+  border-color: #38b2ac;
+}
+
+.formRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  width: 100%;
+}
+
+.imageUploadBox {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  background-color: #55c3c0;
+  color: #fff9f0;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  box-sizing: border-box;
+  min-height: 40px;
+  flex: 1 1 auto;
+}
+
+.imageUploadText {
+  display: inline-block;
+  max-width: 320px;
+  font-weight: 800;
+  font-size: 1rem;
+  color: #fff9f0;
+  text-overflow: ellipsis;
+  display: inline-block;
+  min-width: 0;            
+  max-width: 100%;         
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.imageUploadFilename {
+  display: inline-block;
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  background: rgba(255, 255, 255, 0.85);
+  color: #1f2937;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  margin-left: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.imageUploadIcon {
+  width: 28px;
+  height: 28px;
+  margin-left: auto;
+  object-fit: contain;
+  display: inline-block;
+}
+
+.labelBox {
+  width: 100%;
+  position: relative;
+  background-color: #55c3c0;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  box-sizing: border-box;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  min-height: 48px;
+  flex-wrap: wrap;
+}
+
+.labelBoxInner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  width: 100%;
+  color: #fff9f0;
+  font-size: 12px;
+}
+
+.adminLabelInput {
+  border: none;
+  color: #fff9f0;
+  font-size: 12px;
+}
+
+.adminLabelInput:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.adminLabels {
+  background-color: #566273;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 0.25rem;
+  padding: 0.1rem 0.2rem;
+  font-weight: 800;
+}
+
+.adminLabelRemove {
+  background: transparent;
+  border: none;
+  color: inherit;
+  padding: 0;
+  margin-left: 0.25rem;
+  cursor: pointer;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1em;
+  height: 1em;
+}
+
+.adminLabelRemove:focus {
+  outline: 2px solid rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
+}
+
+.adminSaveButton {
+  padding: 0.5rem 1.5rem;
+  background-color: #55c3c0;
+  color: #fff9f0;
+  border-radius: 0.25rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+.adminSaveButton[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

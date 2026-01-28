@@ -30,6 +30,8 @@ export const createResource = async (req: Request, res: Response) => {
       age_groups,
       language,
       time_to_read,
+      external_url,
+      image_s3_key,
       label_ids,
     } = req.body;
 
@@ -43,6 +45,7 @@ export const createResource = async (req: Request, res: Response) => {
         age_groups: age_groups ?? [],
         language,
         time_to_read,
+        image_s3_key: image_s3_key ?? undefined,
         labels: label_ids
           ? {
               create: label_ids.map((labelId: string) => ({
@@ -55,6 +58,18 @@ export const createResource = async (req: Request, res: Response) => {
         labels: { include: { label: true } },
       },
     });
+
+    if (typeof external_url !== 'undefined' && external_url) {
+      await prisma.externalResources.create({
+        data: { resource_fk: resource.id, external_url },
+      });
+    }
+
+    if (typeof image_s3_key !== 'undefined' && image_s3_key) {
+      await prisma.internalHostedResources.create({
+        data: { resource_fk: resource.id, s3_key: image_s3_key },
+      });
+    }
 
     res.status(201).json(resource);
   } catch (error) {
@@ -154,8 +169,28 @@ export const updateResource = async (req: Request, res: Response) => {
       age_groups,
       language,
       time_to_read,
+      external_url,
+      image_s3_key,
       label_ids,
     } = req.body;
+
+  // Upsert external URL by resource_fk
+  if (typeof external_url !== 'undefined') {
+    await prisma.externalResources.upsert({
+      where: { resource_fk: id },
+      update: { external_url },
+      create: { resource_fk: id, external_url },
+    });
+  }
+
+  // Upsert internal hosted resource
+  if (typeof image_s3_key !== 'undefined') {
+    await prisma.internalHostedResources.upsert({
+      where: { resource_fk: id },
+      update: { s3_key: image_s3_key },
+      create: { resource_fk: id, s3_key: image_s3_key },
+    });
+  }
 
     const updated = await prisma.resource.update({
       where: { id },
@@ -168,6 +203,7 @@ export const updateResource = async (req: Request, res: Response) => {
         age_groups: age_groups ?? undefined,
         language: language ?? undefined,
         time_to_read: time_to_read ?? undefined,
+        image_s3_key: image_s3_key ?? undefined,
         ...(label_ids && {
           labels: {
             deleteMany: {},
