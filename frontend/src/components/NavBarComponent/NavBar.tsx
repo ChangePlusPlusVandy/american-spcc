@@ -47,12 +47,27 @@ export default function DefaultNav({ isAdmin = false }: { isAdmin?: boolean }) {
               appearance: 'none',
               outline: 'none',
             }}
-            onClick={() => navigate('/')}
+            onClick={() => window.open('https://americanspcc.org/', '_blank')}
           >
             <img src={aspccLogoTurqoise} alt="logo" className="relative h-10" />
           </button>
         </div>
         <div className="flex items-center gap-x-6 font-semibold text-sm">
+          <button
+            className="flex items-center !text-[#566273]"
+            style={{
+              background: 'transparent',
+              border: 'none',
+              padding: 0,
+              margin: 0,
+              boxShadow: 'none',
+              appearance: 'none',
+              outline: 'none',
+            }}
+            onClick={() => navigate('/')}
+          >
+            Programs
+          </button>
           <div className="relative group inline-block">
             <button
               className="flex items-center !text-[#566273]"
