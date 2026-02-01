@@ -1,164 +1,160 @@
-
 .imageWrapper {
-    height: 160px;
-    background: #e6f6f3;
+  height: 160px;
+  background: #e6f6f3;
 }
-  
+
 .imageWrapper img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
-  
+
 .imagePlaceholder {
-    width: 100%;
-    height: 100%;
-    background: #bfeae3;
+  width: 100%;
+  height: 100%;
+  background: #bfeae3;
 }
-  
+
 .content {
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
 }
-  
+
 .categoryIcon {
-    width: 20px;
-    height: 20px;
+  width: 20px;
+  height: 20px;
 }
 
 .category {
-    font-size: 0.75rem;
-    margin-top: 0.25rem;
-    color: #f0fffc;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  color: #f0fffc;
 }
 
 .wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-  
-.titleRow {
-    display: flex;
-    justify-content: flex-end;
-    font-weight: 600;
-    color: #1f2937;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
-  
+.titleRow {
+  display: flex;
+  justify-content: flex-end;
+  font-weight: 600;
+  color: #1f2937;
+}
+
 .imageFrame {
-    margin: 12px 0;
-    display: flex;
-    justify-content: center;
+  margin: 12px 0;
+  display: flex;
+  justify-content: center;
 }
-  
+
 .imageFrame img {
-    width: 100%;
-    border-radius: 10px;
+  width: 100%;
+  border-radius: 10px;
 }
-  
+
 .actions button {
-    background: none;
-    border: none;
-    color: #ef4444;
-    cursor: pointer;
+  background: none;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
 }
 
 .cardBody {
-    padding: 1.25rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
-  
+
 .header {
   display: flex;
   justify-content: flex-start;
 }
 
 .cardWrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    height: 100%;
-  }
-  
-.card { 
-    position: relative;
-    background: #66d1c1;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  height: 100%;
+}
+
+.card {
+  position: relative;
+  background: #66d1c1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex: 1;
 }
 
 .formatIcon {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    width: 22px;
-    height: 22px;
-    object-fit: contain;
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
 }
-  
+
 .title {
-    font-size: 1.15rem;
-    font-weight: 700;
-    margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 0;
 }
-  
+
 .imageContainer {
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    overflow: hidden;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
 }
-  
+
 .imageContainer img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
-  
+
 .tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
-  
+
 .tag {
-    background-color: #f5f5f5;
-    color: #006666;
-    border: 1px solid #000;
-    padding: 1px 7px;
-    border-radius: 20px;
-    font-size: 0.65rem;
-    font-weight: 600;
-    white-space: nowrap;
-    font-family: 'Lato', sans-serif;
-}  
-  
+  background-color: #f5f5f5;
+  color: #006666;
+  border: 1px solid #000;
+  padding: 1px 7px;
+  border-radius: 20px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  white-space: nowrap;
+  font-family: 'Lato', sans-serif;
+}
+
 .actions {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    font-size: 0.9rem;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  font-size: 0.9rem;
 }
-  
-  
+
 .delete {
-    color: red;
-    background: none;
-    border: none;
-    cursor: pointer;
+  color: red;
+  background: none;
+  border: none;
+  cursor: pointer;
 }
-  
+
 .edit {
-    color: #006666;
-    background: none;
-    border: none;
-    cursor: pointer;
+  color: #006666;
+  background: none;
+  border: none;
+  cursor: pointer;
 }
-  

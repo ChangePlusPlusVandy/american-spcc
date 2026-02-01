@@ -4,7 +4,8 @@ import { useAuth } from '@clerk/clerk-react';
 import { API_BASE_URL } from '@/config/api';
 import './AdminCategoryContent.css';
 import AdminResourceCard from '@/components/AdminResourceCardComponent/AdminResourceCard';
-import { Resource, ResourceForm, ResourceEditorForm } from '@/components/AdminContentEditComponent/AdminContentEdit';
+import type { Resource, ResourceForm,} from '@/components/AdminContentEditComponent/AdminContentEdit';
+import ResourceEditorForm from '@/components/AdminContentEditComponent/AdminContentEdit';
 
 import { CATEGORY_DISPLAY_MAP, CATEGORY_ICON_MAP } from '@constants/categories';
 
@@ -32,14 +33,7 @@ export default function AdminCategoryContent() {
   const displayTitle = categoryEnum ? CATEGORY_DISPLAY_MAP[categoryEnum] : 'Category Not Found';
   const categoryIcon = categoryEnum ? CATEGORY_ICON_MAP[categoryEnum] : undefined;
 
-  async function handleSave(payload: ResourceForm) {
-
-  }
-
-  useEffect(() => {
-    if (!categoryEnum) return;
-
-    async function fetchResources() {
+  async function fetchResources() {
       try {
         setLoading(true);
         const token = await getToken();
@@ -60,6 +54,34 @@ export default function AdminCategoryContent() {
         setLoading(false);
       }
     }
+
+  async function handleSave(payload: ResourceForm) {
+
+  }
+
+  async function handleDelete(id: string) {
+    try {
+      const token = await getToken();
+      const res = await fetch(`${API_BASE_URL}/api/resources/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (res.ok) {
+          console.log(`successfully deleted ${id}`);
+          fetchResources();
+        } else {
+          console.error(`Failed to delete ${id}`);
+      }
+    } catch (error) {
+      console.error(`error deleting ${id}: `, error)
+    } 
+  };
+
+  useEffect(() => {
+    if (!categoryEnum) return;
 
     fetchResources();
   }, [categoryEnum, getToken]);
@@ -117,6 +139,7 @@ export default function AdminCategoryContent() {
                     setEditing(resource);
                     setOpen(true);
                   }}
+                  onDelete={handleDelete}
                 />
               ))}
             </div>

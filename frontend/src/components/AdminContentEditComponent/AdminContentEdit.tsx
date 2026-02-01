@@ -85,13 +85,11 @@ export type ResourceForm = {
 export default function ResourceEditorForm({
   resource,
   onSave,
-  onDelete,
   onClose,
 }: {
   resource?: Resource;
   category?: string;
   onSave: (t: ResourceForm) => Promise<void>;
-  onDelete?: (id: string) => Promise<void>;
   onClose: () => void;
 }) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -103,6 +101,7 @@ export default function ResourceEditorForm({
   const [selectedLabelIds, setSelectedLabelIds] = useState<string[]>(
     () => resource?.labels?.map((l) => l.label_id) ?? []
   );
+
   const [form, setForm] = useState<ResourceForm>({
     title: resource?.title ?? null,
     description: resource?.description ?? null,
