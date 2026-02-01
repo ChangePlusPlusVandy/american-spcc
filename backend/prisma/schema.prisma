@@ -84,7 +84,7 @@ model ResourceLabel {
   id          String        @id @default(cuid())
   resource_id String
   label_id    String
-  resource    Resource      @relation(fields: [resource_id], references: [id])
+  resource    Resource      @relation(fields: [resource_id], references: [id], onDelete:Cascade)
   label       CategoryLabel @relation(fields: [label_id], references: [id])
 
   @@unique([resource_id, label_id])
@@ -95,7 +95,7 @@ model ExternalResources {
   id           String   @id @default(cuid())
   resource_fk  String   @unique
   external_url String
-  resource     Resource @relation(fields: [resource_fk], references: [id])
+  resource     Resource @relation(fields: [resource_fk], references: [id], onDelete: Cascade)
 
   @@map("externalResources")
 }
@@ -171,7 +171,7 @@ model InternalHostedResources {
   id          String   @id @default(cuid())
   resource_fk String   @unique
   s3_key      String
-  resource    Resource @relation(fields: [resource_fk], references: [id])
+  resource    Resource @relation(fields: [resource_fk], references: [id], onDelete: Cascade)
 
   @@map("internalHostedResources")
 }
