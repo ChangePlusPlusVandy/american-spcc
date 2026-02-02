@@ -4,7 +4,7 @@ import { useAuth } from '@clerk/clerk-react';
 import { API_BASE_URL } from '@/config/api';
 import './AdminCategoryContent.css';
 import AdminResourceCard from '@/components/AdminResourceCardComponent/AdminResourceCard';
-import TopicEditorForm from '@/components/AdminContentEditComponent/AdminContentEdit';
+import { Resource, ResourceForm, ResourceEditorForm } from '@/components/AdminContentEditComponent/AdminContentEdit';
 
 import { CATEGORY_DISPLAY_MAP, CATEGORY_ICON_MAP } from '@constants/categories';
 
@@ -32,7 +32,9 @@ export default function AdminCategoryContent() {
   const displayTitle = categoryEnum ? CATEGORY_DISPLAY_MAP[categoryEnum] : 'Category Not Found';
   const categoryIcon = categoryEnum ? CATEGORY_ICON_MAP[categoryEnum] : undefined;
 
-  async function handleSave(payload: any) {}
+  async function handleSave(payload: ResourceForm) {
+
+  }
 
   useEffect(() => {
     if (!categoryEnum) return;
@@ -140,8 +142,8 @@ export default function AdminCategoryContent() {
               <h2 className="text-2xl font-extrabold text-[#55C3C0]">Content Editing</h2>
             </div>
 
-            <TopicEditorForm
-              topic={editing}
+            <ResourceEditorForm
+              resource={editing}
               category={categoryEnum}
               onSave={async (p) => {
                 await handleSave(p);
