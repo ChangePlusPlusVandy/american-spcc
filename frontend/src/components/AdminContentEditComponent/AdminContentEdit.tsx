@@ -68,6 +68,7 @@ export type Resource = {
 };
 
 export type ResourceForm = {
+  id?: string | null;
   title: string | null;
   description?: string | null;
   resource_url?: string | null;
@@ -75,7 +76,7 @@ export type ResourceForm = {
   selectedLabelIds: string[] | null;
   newLabelNames: string[] | null;
   category: CategoryType | null;
-  age_groups: AgeGroup | null;
+  age_groups: AgeGroup[] | null;
   time_to_read: number | null;
   language: Language | null;
   resource_type: ResourceType | null;
@@ -103,6 +104,7 @@ export default function ResourceEditorForm({
   );
 
   const [form, setForm] = useState<ResourceForm>({
+    id: resource?.id ?? null,
     title: resource?.title ?? null,
     description: resource?.description ?? null,
     resource_url: resource?.externalResources?.external_url ?? null,
@@ -145,16 +147,16 @@ const imageDisplayName = form.image instanceof File ? form.image.name : imageKey
         }
       }
 
-      setForm({...form, 
+      const finalForm = {...form, 
         hosting_type: hosting_type, 
         selectedLabelIds: selectedLabelIds,
         newLabelNames: newLabelNames
-      });
-      await onSave(form);
+      }
+      setForm(finalForm);
+      await onSave(finalForm);
       onClose();
     } catch (err) {
       console.error(err);
-      alert('Save failed');
     } finally {
       setSaving(false);
     }
@@ -352,8 +354,8 @@ const imageDisplayName = form.image instanceof File ? form.image.name : imageKey
           <label className="block">
             <div className={styles.adminFormName}>Age Group</div>
             <select
-              value={form.age_groups ?? ''}
-              onChange={(e) => setForm({ ...form, age_groups: e.target.value as AgeGroup })}
+              value={form.age_groups[0] ?? ''}
+              onChange={(e) => setForm({ ...form, age_groups: [e.target.value as AgeGroup ] })}
               required
               className={styles.adminFormInput}
             >

@@ -4,7 +4,7 @@ import { useAuth } from '@clerk/clerk-react';
 import { API_BASE_URL } from '@/config/api';
 import './AdminCategoryContent.css';
 import AdminResourceCard from '@/components/AdminResourceCardComponent/AdminResourceCard';
-import type { Resource, ResourceForm,} from '@/components/AdminContentEditComponent/AdminContentEdit';
+import type {CategoryType, Resource, ResourceForm,} from '@/components/AdminContentEditComponent/AdminContentEdit';
 import ResourceEditorForm from '@/components/AdminContentEditComponent/AdminContentEdit';
 
 import { CATEGORY_DISPLAY_MAP, CATEGORY_ICON_MAP } from '@constants/categories';
@@ -53,11 +53,122 @@ export default function AdminCategoryContent() {
       } finally {
         setLoading(false);
       }
-    }
+    };
+
+  
+  async function handleNewLabels(category_type: CategoryType, labels: string[]) {
+    const token = await getToken();
+    const promises = labels.map((label_name) =>
+      fetch(`${API_BASE_URL}/api/labels`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ label_name, category: category_type }),
+      }).then(async (res) => {
+        if (!res.ok) {
+          const text = await res.text();
+          console.error("Error creating new labels, ", text);
+          throw new Error(`Failed to create label "${label_name}": ${text}`);
+        }
+        return res.json();
+      })
+    );
+
+    const results = await Promise.allSettled(promises);
+    const createdIds: string[] = [];
+    results.forEach((r) => {
+      if (r.status === 'fulfilled' && r.value && r.value.id) {
+        createdIds.push(r.value.id);
+      } else if (r.status === 'rejected') {
+        console.error(r.reason);
+      }
+    });
+    return createdIds;
+  }
+
+  async function handleNewImage(id: string, upload: File) {
+    const token = await getToken();
+    const ext = (upload.type.split('/')[1] || upload.name.split('.').pop() || 'bin').replace(
+      /\W/g,
+      ''
+    );
+    const imageKey = `resources/${id}/${Date.now()}-${Math.random()
+      .toString(36)
+      .slice(2, 8)}.${ext}`;
+
+    const presignRes = await fetch(`${API_BASE_URL}/api/test/s3-presign`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ imageKey, contentType: upload.type }),
+    });
+
+    if (!presignRes.ok) throw new Error(`Failed to get presigned URL: ${await presignRes.text()}`);
+    const { url, imageKey: returnedKey } = await presignRes.json();
+    const uploadRes = await fetch(url, {
+      method: 'PUT',
+      headers: { 'Content-Type': upload.type },
+      body: upload,
+    });
+    if (!uploadRes.ok)
+      throw new Error(`S3 upload failed: ${uploadRes.status} ${await uploadRes.text()}`);
+
+    return returnedKey ?? imageKey;
+  }
 
   async function handleSave(payload: ResourceForm) {
+    console.log(payload);
+    const token = await getToken();
+    const isUpdate = Boolean((payload as any).id);
+    const url = `${API_BASE_URL}/api/resources${isUpdate ? `/${(payload as any).id}` : ''}`;
+    const method = isUpdate ? 'PUT' : 'POST';
+    let image_s3_key = null;
+    let label_ids = payload.selectedLabelIds ?? [];
+    if (payload.image) {
+      image_s3_key = await handleNewImage(payload.id, payload.image);
+    }
 
-  }
+    if (payload.newLabelNames) {
+      const new_labels = await handleNewLabels(payload.category, payload.newLabelNames);
+      label_ids = [...label_ids, ...new_labels];
+    }
+    const body: any = {
+      title: payload.title,
+      description: payload.description ?? null,
+      resource_type: payload.resource_type ?? undefined,
+      hosting_type: payload.hosting_type ?? undefined,
+      category: payload.category ?? undefined,
+      age_groups: payload.age_groups,
+      language: payload.language ?? undefined,
+      time_to_read: payload.time_to_read ?? undefined,
+      external_url: payload.resource_url ?? null,
+      label_ids: label_ids,
+      image_s3_key: image_s3_key ?? null
+    };
+
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (res.ok) {
+        await fetchResources();
+      } else {
+        console.error('Failed to save resource:', await res.text());
+      }
+    } catch (err) {
+      console.error('Error saving resource:', err);
+    }
+  };
 
   async function handleDelete(id: string) {
     try {
