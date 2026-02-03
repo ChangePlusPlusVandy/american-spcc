@@ -13,10 +13,12 @@ export function getS3() {
 
   s3 = new S3Client({
     region: AWS_REGION || 'us-east-1',
-    credentials: {
-      accessKeyId: AWS_ACCESS_KEY_ID,
-      secretAccessKey: AWS_SECRET_ACCESS_KEY,
-    },
+    endpoint: 'http://localhost:9000',
+    forcePathStyle: true,
+    // credentials: {
+    //   accessKeyId: AWS_ACCESS_KEY_ID,
+    //   secretAccessKey: AWS_SECRET_ACCESS_KEY,
+    // },
   })
 
   return s3
