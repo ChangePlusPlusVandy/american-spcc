@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { GetObjectCommand } from '@aws-sdk/client-s3';
+import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { getS3 } from '../config/s3';
 
@@ -24,5 +24,24 @@ router.get('/s3-test', async (_req, res) => {
     res.status(500).json({ error: 'S3 test failed' });
   }
 });
+
+router.post('/s3-presign', async (req, res) => {
+  try {
+    const { imageKey, contentType } = req.body;
+    if (!imageKey) return res.status(400).json({ error: 'imageKey required' });
+
+    const command = new PutObjectCommand({
+      Bucket: process.env.S3_BUCKET_NAME!,
+      Key: imageKey,
+    });
+
+    const url = await getSignedUrl(s3, command, { expiresIn: 60 * 5 });
+    res.json({ url, imageKey });
+  } catch (err) {
+    console.error('Failed to create presigned URL', err);
+    res.status(500).json({ error: 'Failed to create presigned URL' });
+  }
+});
+
 
 export default router;

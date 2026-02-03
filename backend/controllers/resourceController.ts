@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { GetObjectCommand } from '@aws-sdk/client-s3';
+import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { getS3 } from '../config/s3';
 import { CATEGORY_TYPE } from '@prisma/client';
@@ -171,23 +171,22 @@ export const updateResource = async (req: Request, res: Response) => {
       label_ids,
     } = req.body;
 
-    // Upsert external URL by resource_fk
-    if (typeof external_url !== 'undefined') {
-      await prisma.externalResources.upsert({
-        where: { resource_fk: id },
-        update: { external_url },
-        create: { resource_fk: id, external_url },
-      });
-    }
 
-    // Upsert internal hosted resource
-    if (typeof image_s3_key !== 'undefined') {
-      await prisma.internalHostedResources.upsert({
-        where: { resource_fk: id },
-        update: { s3_key: image_s3_key },
-        create: { resource_fk: id, s3_key: image_s3_key },
-      });
-    }
+  await prisma.externalResources.deleteMany({ where: { resource_fk: id }});
+  if (external_url !== '' && external_url !== null) {
+      await prisma.externalResources.create({
+      data: { resource_fk: id, external_url },
+    });
+  }
+  
+  // Upsert internal hosted resource
+  if (image_s3_key) {
+    await prisma.internalHostedResources.upsert({
+      where: { resource_fk: id },
+      update: { s3_key: image_s3_key },
+      create: { resource_fk: id, s3_key: image_s3_key },
+    });
+  }
 
     const updated = await prisma.resource.update({
       where: { id },

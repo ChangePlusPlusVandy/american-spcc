@@ -12,7 +12,9 @@ export type ResourceType =
   | 'WEBPAGE'
   | 'INTERACTIVE_QUIZ'
   | 'OTHER';
-// export type HostingType = 'INTERNAL'|'EXTERNAL'|'OTHER';
+
+export type HostingType = 'INTERNAL' | 'EXTERNAL' | 'OTHER';
+
 export type CategoryType =
   | 'PARENTING_SKILLS_RELATIONSHIPS'
   | 'CHILD_DEVELOPMENT'
@@ -22,6 +24,7 @@ export type CategoryType =
   | 'HEALTH_WELLBEING'
   | 'LIFE_SKILLS_INDEPENDENCE'
   | 'FAMILY_SUPPORT_COMMUNITY';
+
 export type AgeGroup =
   | 'AGE_0_3'
   | 'AGE_4_6'
@@ -29,6 +32,7 @@ export type AgeGroup =
   | 'AGE_11_13'
   | 'AGE_14_18'
   | 'AGE_18_ABOVE';
+
 export type Language = 'ENGLISH' | 'SPANISH' | 'OTHER';
 
 export type CategoryLabel = {
@@ -44,32 +48,49 @@ export type ResourceLabel = {
   label: CategoryLabel;
 };
 
-type Topic = {
-  id: string;
-  title: string;
-  description: string;
-  resource_url?: string | null;
-  image?: File | null;
-  labels: string[] | ResourceLabel[];
-  category: CategoryType;
-  age_groups: AgeGroup;
-  time_to_read: number;
-  language: Language;
-  resource_type?: ResourceType | null;
+type ExternalResources = {
+  external_url: string;
 };
 
-type SavePayload = Topic | Omit<Topic, 'id'>;
+export type Resource = {
+  id: string;
+  title: string;
+  description?: string | null;
+  resource_type: ResourceType;
+  hosting_type: HostingType;
+  category: CategoryType;
+  age_groups: AgeGroup[];
+  language: Language;
+  time_to_read: number;
+  labels: ResourceLabel[];
+  image_s3_key?: string | null;
+  externalResources?: ExternalResources | null;
+};
 
-export default function TopicEditorForm({
-  topic,
+export type ResourceForm = {
+  id?: string | null;
+  title: string | null;
+  description?: string | null;
+  resource_url?: string | null;
+  image?: File | null;
+  selectedLabelIds: string[] | null;
+  newLabelNames: string[] | null;
+  category: CategoryType | null;
+  age_groups: AgeGroup[] | null;
+  time_to_read: number | null;
+  language: Language | null;
+  resource_type: ResourceType | null;
+  hosting_type: HostingType | null;
+};
+
+export default function ResourceEditorForm({
+  resource,
   onSave,
-  onDelete,
   onClose,
 }: {
-  topic?: Topic;
+  resource?: Resource;
   category?: string;
-  onSave: (t: SavePayload) => Promise<void>;
-  onDelete?: (id: string) => Promise<void>;
+  onSave: (t: ResourceForm) => Promise<void>;
   onClose: () => void;
 }) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -77,53 +98,74 @@ export default function TopicEditorForm({
   const [suggestions, setSuggestions] = useState<CategoryLabel[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [availableLabels, setAvailableLabels] = useState<CategoryLabel[]>([]);
-  const [newLabels, setNewLabels] = useState<string[]>([]);
-  const [selectedLabelIds, setSelectedLabelIds] = useState<string[]>([]);
+  const [newLabelNames, setNewLabelNames] = useState<string[]>([]);
+  const [selectedLabelIds, setSelectedLabelIds] = useState<string[]>(
+    () => resource?.labels?.map((l) => l.label_id) ?? []
+  );
 
-  const [form, setForm] = useState({
-    title: topic?.title ?? '',
-    description: topic?.description ?? '',
-    resourceUrl: topic?.resource_url ?? '',
-    image: topic?.image ?? null,
-    labels: topic?.labels ?? null,
-    category: topic?.category ?? null,
-    ageGroup: topic?.age_groups ?? null,
-    timeToRead: topic?.time_to_read ?? null,
-    language: topic?.language ?? null,
-    resourceType: topic?.resource_type ?? null,
+  const [form, setForm] = useState<ResourceForm>({
+    id: resource?.id ?? null,
+    title: resource?.title ?? null,
+    description: resource?.description ?? null,
+    resource_url: resource?.externalResources?.external_url ?? null,
+    image: null,
+    selectedLabelIds: null,
+    newLabelNames: null,
+    category: resource?.category ?? null,
+    age_groups: resource?.age_groups ?? [],
+    time_to_read: resource?.time_to_read ?? null,
+    language: resource?.language ?? null,
+    resource_type: resource?.resource_type ?? null,
+    hosting_type: resource?.hosting_type ?? null,
   });
   const [saving, setSaving] = useState(false);
+
+  const getBasename = (key?: string | null) => {
+    if (!key) return null;
+    const parts = key.split('/');
+    return parts[parts.length - 1] || key;
+  };
+  const imageDisplayName = form.image instanceof File ? form.image.name : null;
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
     try {
-      const labelsForSave = {
-        label_ids: selectedLabelIds, // existing label ids
-        new_labels: newLabels, // free-text labels to create
+      let hosting_type = form.hosting_type;
+      if (!hosting_type) {
+        if (form.resource_url || form.image) {
+          if (!form.resource_url) {
+            hosting_type = 'INTERNAL';
+          } else if (!form.image) {
+            hosting_type = 'EXTERNAL';
+          } else {
+            hosting_type = 'OTHER';
+          }
+        } else {
+          hosting_type = 'OTHER';
+        }
+      }
+
+      const finalForm = {
+        ...form,
+        hosting_type: hosting_type,
+        selectedLabelIds: selectedLabelIds,
+        newLabelNames: newLabelNames,
       };
-
-      const payload: SavePayload & { label_ids?: string[]; new_labels?: string[] } = topic
-        ? { ...topic, ...form, ...labelsForSave }
-        : ({ ...form, ...labelsForSave } as Omit<Topic, 'id'> & {
-            label_ids?: string[];
-            new_labels?: string[];
-          });
-
-      await onSave(payload);
+      setForm(finalForm);
+      await onSave(finalForm);
       onClose();
     } catch (err) {
       console.error(err);
-      alert('Save failed');
     } finally {
       setSaving(false);
     }
   }
 
   useEffect(() => {
-    if (!topic?.labels) return;
-    setNewLabels((topic.labels as ResourceLabel[]).map((l) => l.label.label_name));
-  }, [topic?.id]);
+    if (!resource?.labels) return;
+    setSelectedLabelIds(resource.labels.map((l) => l.label_id));
+  }, [form?.selectedLabelIds]);
 
   useEffect(() => {
     if (!form.category) {
@@ -158,14 +200,10 @@ export default function TopicEditorForm({
   }, [labelInput, form.category, availableLabels]);
 
   useEffect(() => {
-    console.log('selectedLabelIds ->', selectedLabelIds);
-    console.log('newLabelIds ->', newLabels);
-  }, [selectedLabelIds, newLabels]);
-
-  useEffect(() => {
     let cancelled = false;
 
     async function load() {
+      if (!form.category) return;
       try {
         const res = await fetch(
           `${API_BASE_URL}/api/labels?category=${encodeURIComponent(form.category)}`
@@ -197,7 +235,7 @@ export default function TopicEditorForm({
     return () => {
       cancelled = true;
     };
-  }, [form.category, topic]);
+  }, [form.category, resource]);
 
   return (
     <form onSubmit={handleSave} className="relative">
@@ -206,7 +244,7 @@ export default function TopicEditorForm({
           <label className="block">
             <div className={styles.adminFormName}>Title</div>
             <input
-              value={form.title}
+              value={form.title ?? ''}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
               required
               className={styles.adminFormInput}
@@ -216,9 +254,8 @@ export default function TopicEditorForm({
           <label className="block">
             <div className={styles.adminFormName}>Description</div>
             <textarea
-              value={form.description}
+              value={form.description ?? ''}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
-              required
               className={styles.adminFormInput}
               style={{ height: '10rem' }}
             />
@@ -227,8 +264,8 @@ export default function TopicEditorForm({
           <label className="block">
             <div className={styles.adminFormName}>Resource URL</div>
             <input
-              value={form.resourceUrl}
-              onChange={(e) => setForm({ ...form, resourceUrl: e.target.value })}
+              value={form.resource_url ?? ''}
+              onChange={(e) => setForm({ ...form, resource_url: e.target.value })}
               className={styles.adminFormInput}
             />
           </label>
@@ -248,8 +285,8 @@ export default function TopicEditorForm({
                 }}
               ></div>
 
-              {form.image && typeof form.image !== 'string' ? (
-                <div className={styles.imageUploadText}>{(form.image as File).name}</div>
+              {imageDisplayName ? (
+                <div className={styles.imageUploadText}>{imageDisplayName}</div>
               ) : (
                 <div className={styles.imageUploadText}>.jpeg, .jpg, .png</div>
               )}
@@ -281,8 +318,8 @@ export default function TopicEditorForm({
               setAvailableLabels={setAvailableLabels}
               selectedLabelIds={selectedLabelIds}
               setSelectedLabelIds={setSelectedLabelIds}
-              newLabels={newLabels}
-              setNewLabels={setNewLabels}
+              newLabelNames={newLabelNames}
+              setNewLabelNames={setNewLabelNames}
             />
           </label>
         </div>
@@ -311,12 +348,19 @@ export default function TopicEditorForm({
           <label className="block">
             <div className={styles.adminFormName}>Age Group</div>
             <select
-              value={form.ageGroup ?? ''}
-              onChange={(e) => setForm({ ...form, ageGroup: e.target.value as AgeGroup })}
+              multiple
+              value={form.age_groups ?? []}
+              onChange={(e) =>
+      setForm({
+        ...form,
+        age_groups: Array.from(e.target.selectedOptions).map(
+          (o) => o.value as AgeGroup
+        ),
+      })
+    }
               required
               className={styles.adminFormInput}
             >
-              <option value="">Select age group</option>
               <option value="AGE_0_3">0 - 3</option>
               <option value="AGE_4_6">4 - 6</option>
               <option value="AGE_7_10">7 - 10</option>
@@ -330,11 +374,11 @@ export default function TopicEditorForm({
             <div className={styles.adminFormName}>Time-To-Read</div>
             <input
               type="number"
-              value={form.timeToRead ?? ''}
+              value={form.time_to_read ?? ''}
               onChange={(e) =>
                 setForm({
                   ...form,
-                  timeToRead: e.target.value === '' ? null : Number(e.target.value),
+                  time_to_read: e.target.value === '' ? null : Number(e.target.value),
                 })
               }
               className={styles.adminFormInput}
@@ -359,8 +403,8 @@ export default function TopicEditorForm({
           <label className="block">
             <div className={styles.adminFormName}>Resource Type</div>
             <select
-              value={form.resourceType ?? ''}
-              onChange={(e) => setForm({ ...form, resourceType: e.target.value as ResourceType })}
+              value={form.resource_type ?? ''}
+              onChange={(e) => setForm({ ...form, resource_type: e.target.value as ResourceType })}
               className={styles.adminFormInput}
               required
             >

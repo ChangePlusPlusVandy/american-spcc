@@ -1,4 +1,8 @@
 import styles from './AdminResourceCard.module.css';
+import React, { useState } from 'react';
+import ConfirmDialog from './ConfirmDialog';
+
+
 import pdfIcon from '@/assets/pdf.png';
 import txtIcon from '@/assets/txt.png';
 import videoIcon from '@/assets/video.png';
@@ -23,10 +27,11 @@ export type AdminResourceCardProps = {
   tags: string[];
   resourceType: string;
   onEdit?: () => void;
-  onDelete?: () => void;
+  onDelete?: (id: string) => void;
 };
 
 export default function AdminResourceCard({
+  id,
   title,
   imageUrl,
   tags,
@@ -35,6 +40,13 @@ export default function AdminResourceCard({
   onEdit,
   onDelete,
 }: AdminResourceCardProps) {
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
+  const handleConfirmDelete = () => {
+    onDelete?.(id);
+    setConfirmOpen(false);
+  };
+  
   return (
     <div className={styles.cardWrapper}>
       <div className={styles.card}>
@@ -64,7 +76,7 @@ export default function AdminResourceCard({
         </div>
       </div>
       <div className={styles.actions}>
-        <button className={styles.delete} onClick={onDelete}>
+        <button className={styles.delete} onClick={() => setConfirmOpen(true)}>
           delete
         </button>
         <span>|</span>
@@ -72,6 +84,12 @@ export default function AdminResourceCard({
           edit
         </button>
       </div>
+      <ConfirmDialog
+        open={confirmOpen}
+        title={title}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setConfirmOpen(false)}
+      />
     </div>
   );
 }

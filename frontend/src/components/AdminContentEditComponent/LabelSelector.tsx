@@ -1,4 +1,4 @@
-import type { CategoryLabel, CategoryType } from './AdminContentEdit';
+import type { CategoryLabel, CategoryType, ResourceLabel } from './AdminContentEdit';
 import styles from './AdminContentEdit.module.css';
 import type { Dispatch, SetStateAction } from 'react';
 
@@ -13,8 +13,8 @@ export default function LabelSelector({
   setAvailableLabels,
   selectedLabelIds,
   setSelectedLabelIds,
-  newLabels,
-  setNewLabels,
+  newLabelNames,
+  setNewLabelNames,
 }: {
   category?: CategoryType | null;
   labelInput: string;
@@ -26,16 +26,12 @@ export default function LabelSelector({
   setAvailableLabels: Dispatch<SetStateAction<CategoryLabel[]>>;
   selectedLabelIds: string[];
   setSelectedLabelIds: Dispatch<SetStateAction<string[]>>;
-  newLabels: string[];
-  setNewLabels: Dispatch<SetStateAction<string[]>>;
+  newLabelNames: string[];
+  setNewLabelNames: Dispatch<SetStateAction<string[]>>;
 }) {
   if (!category) {
     return <div className="text-sm text-gray-500">Select a category first to pick labels</div>;
   }
-
-  const handleSelectedRemove = (id: string) => {
-    setSelectedLabelIds((prev) => prev.filter((l) => l !== id));
-  };
 
   return (
     <div className={styles.labelBox}>
@@ -50,10 +46,10 @@ export default function LabelSelector({
                 type="button"
                 onMouseDown={(ev) => {
                   ev.stopPropagation();
-                  handleSelectedRemove(id);
+                  setSelectedLabelIds((prev) => prev.filter((x) => x !== id));
                 }}
                 className={styles.adminLabelRemove}
-                aria-label={`Remove ${lab?.label_name ?? id}`}
+                aria-label={`Remove ${id}`}
               >
                 ×
               </button>
@@ -61,14 +57,14 @@ export default function LabelSelector({
           );
         })}
 
-        {newLabels.map((nl) => (
+        {newLabelNames.map((nl) => (
           <span key={nl} className={styles.adminLabels}>
             {nl}
             <button
               type="button"
               onMouseDown={(ev) => {
                 ev.stopPropagation();
-                setNewLabels((prev) => prev.filter((n) => n !== nl));
+                setNewLabelNames((prev) => prev.filter((n) => n !== nl));
               }}
               className={styles.adminLabelRemove}
               aria-label={`Remove ${nl}`}
@@ -91,9 +87,23 @@ export default function LabelSelector({
               e.preventDefault();
               const val = labelInput.trim();
               if (!val) return;
-              setNewLabels((p) =>
-                p.some((n) => n.toLowerCase() === val.toLowerCase()) ? p : [...p, val]
-              );
+              const match =
+                suggestions.find((s) => s.label_name.toLowerCase() === val.toLowerCase()) ||
+                availableLabels.find((s) => s.label_name.toLowerCase() === val.toLowerCase());
+
+              if (match) {
+                if (!selectedLabelIds.includes(match.id)) {
+                  setSelectedLabelIds((p) => [...p, match.id]);
+                }
+                setAvailableLabels((prev) =>
+                  prev.some((x) => x.id === match.id) ? prev : [match, ...prev]
+                );
+              } else {
+                setNewLabelNames((p) =>
+                  p.some((n) => n.toLowerCase() === val.toLowerCase()) ? p : [...p, val]
+                );
+              }
+
               setLabelInput('');
               setShowSuggestions(false);
             } else if (e.key === 'Escape') {
