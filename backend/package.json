@@ -2,15 +2,14 @@
   "name": "backend",
   "version": "1.0.0",
   "main": "index.js",
-"scripts": {
-  "dev": "ts-node-dev --respawn --transpile-only server.ts",
-  "build": "prisma generate",
-  "format": "prettier --write .",
-  "format:check": "prettier --check .",
-  "test": "jest",
-  "test:watch": "jest --watchAll",
-  "test:coverage": "jest --coverage"
-},
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only server.ts",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "jest",
+    "test:watch": "jest --watchAll",
+    "test:coverage": "jest --coverage"
+  },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
   },
