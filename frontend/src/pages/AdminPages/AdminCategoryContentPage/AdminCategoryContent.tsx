@@ -4,7 +4,11 @@ import { useAuth } from '@clerk/clerk-react';
 import { API_BASE_URL } from '@/config/api';
 import './AdminCategoryContent.css';
 import AdminResourceCard from '@/components/AdminResourceCardComponent/AdminResourceCard';
-import type {CategoryType, Resource, ResourceForm,} from '@/components/AdminContentEditComponent/AdminContentEdit';
+import type {
+  CategoryType,
+  Resource,
+  ResourceForm,
+} from '@/components/AdminContentEditComponent/AdminContentEdit';
 import ResourceEditorForm from '@/components/AdminContentEditComponent/AdminContentEdit';
 
 import { CATEGORY_DISPLAY_MAP, CATEGORY_ICON_MAP } from '@constants/categories';
@@ -34,28 +38,27 @@ export default function AdminCategoryContent() {
   const categoryIcon = categoryEnum ? CATEGORY_ICON_MAP[categoryEnum] : undefined;
 
   async function fetchResources() {
-      try {
-        setLoading(true);
-        const token = await getToken();
-        const res = await fetch(`${API_BASE_URL}/api/resources?category=${categoryEnum}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if (res.ok) {
-          const data = await res.json();
-          setResources(data);
-        } else {
-          console.error('Failed to fetch resources');
-        }
-      } catch (error) {
-        console.error('Error fetching resources:', error);
-      } finally {
-        setLoading(false);
+    try {
+      setLoading(true);
+      const token = await getToken();
+      const res = await fetch(`${API_BASE_URL}/api/resources?category=${categoryEnum}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setResources(data);
+      } else {
+        console.error('Failed to fetch resources');
       }
-    };
+    } catch (error) {
+      console.error('Error fetching resources:', error);
+    } finally {
+      setLoading(false);
+    }
+  }
 
-  
   async function handleNewLabels(category_type: CategoryType, labels: string[]) {
     const token = await getToken();
     const promises = labels.map((label_name) =>
@@ -69,7 +72,7 @@ export default function AdminCategoryContent() {
       }).then(async (res) => {
         if (!res.ok) {
           const text = await res.text();
-          console.error("Error creating new labels, ", text);
+          console.error('Error creating new labels, ', text);
           throw new Error(`Failed to create label "${label_name}": ${text}`);
         }
         return res.json();
@@ -147,7 +150,7 @@ export default function AdminCategoryContent() {
       time_to_read: payload.time_to_read ?? undefined,
       external_url: payload.resource_url ?? null,
       label_ids: label_ids,
-      image_s3_key: image_s3_key ?? null
+      image_s3_key: image_s3_key ?? null,
     };
 
     try {
@@ -168,7 +171,7 @@ export default function AdminCategoryContent() {
     } catch (err) {
       console.error('Error saving resource:', err);
     }
-  };
+  }
 
   async function handleDelete(id: string) {
     try {
@@ -181,15 +184,15 @@ export default function AdminCategoryContent() {
       });
 
       if (res.ok) {
-          console.log(`successfully deleted ${id}`);
-          fetchResources();
-        } else {
-          console.error(`Failed to delete ${id}`);
+        console.log(`successfully deleted ${id}`);
+        fetchResources();
+      } else {
+        console.error(`Failed to delete ${id}`);
       }
     } catch (error) {
-      console.error(`error deleting ${id}: `, error)
-    } 
-  };
+      console.error(`error deleting ${id}: `, error);
+    }
+  }
 
   useEffect(() => {
     if (!categoryEnum) return;
