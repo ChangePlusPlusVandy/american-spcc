@@ -22,10 +22,7 @@ app.use(
       if (!origin) return callback(null, true);
 
       if (origin === 'http://localhost:5173') return callback(null, true);
-      if (
-        origin.endsWith('.vercel.app') &&
-        origin.includes('american-spcc')
-      ) {
+      if (origin.endsWith('.vercel.app') && origin.includes('american-spcc')) {
         return callback(null, true);
       }
 
@@ -34,7 +31,6 @@ app.use(
     credentials: true,
   })
 );
-
 
 app.use(express.json());
 app.use(clerkMiddleware());

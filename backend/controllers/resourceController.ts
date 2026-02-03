@@ -1,9 +1,8 @@
 import { Request, Response } from 'express';
 import { GetObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { getS3 } from '../config/s3'
+import { getS3 } from '../config/s3';
 import { CATEGORY_TYPE } from '@prisma/client';
-
 
 const getSignedImageUrl = async (key: string) => {
   const s3 = getS3();
@@ -16,7 +15,6 @@ const getSignedImageUrl = async (key: string) => {
     expiresIn: 60 * 5,
   });
 };
-
 
 export const createResource = async (req: Request, res: Response) => {
   try {
@@ -90,7 +88,6 @@ export const getAllResources = async (req: Request, res: Response) => {
     ) {
       where.category = category as CATEGORY_TYPE;
     }
-    
 
     if (label_id) {
       where.labels = {
@@ -174,23 +171,23 @@ export const updateResource = async (req: Request, res: Response) => {
       label_ids,
     } = req.body;
 
-  // Upsert external URL by resource_fk
-  if (typeof external_url !== 'undefined') {
-    await prisma.externalResources.upsert({
-      where: { resource_fk: id },
-      update: { external_url },
-      create: { resource_fk: id, external_url },
-    });
-  }
+    // Upsert external URL by resource_fk
+    if (typeof external_url !== 'undefined') {
+      await prisma.externalResources.upsert({
+        where: { resource_fk: id },
+        update: { external_url },
+        create: { resource_fk: id, external_url },
+      });
+    }
 
-  // Upsert internal hosted resource
-  if (typeof image_s3_key !== 'undefined') {
-    await prisma.internalHostedResources.upsert({
-      where: { resource_fk: id },
-      update: { s3_key: image_s3_key },
-      create: { resource_fk: id, s3_key: image_s3_key },
-    });
-  }
+    // Upsert internal hosted resource
+    if (typeof image_s3_key !== 'undefined') {
+      await prisma.internalHostedResources.upsert({
+        where: { resource_fk: id },
+        update: { s3_key: image_s3_key },
+        create: { resource_fk: id, s3_key: image_s3_key },
+      });
+    }
 
     const updated = await prisma.resource.update({
       where: { id },
@@ -273,8 +270,8 @@ export const getFeaturedResources = async (req: Request, res: Response) => {
         }
 
         // check if the imageURL is not null here
-        if(imageUrl == null){
-          throw new Error("No image URL in s3 bukcet for the provided image key")
+        if (imageUrl == null) {
+          throw new Error('No image URL in s3 bukcet for the provided image key');
         }
 
         return {
@@ -327,8 +324,7 @@ export const searchResources = async (req: Request, res: Response) => {
         for (const token of tokens) {
           if (r.title) score += (r.title.toLowerCase().split(token).length - 1) * 3;
           if (r.category) score += (r.category.toLowerCase().split(token).length - 1) * 2;
-          if (r.description)
-            score += (r.description.toLowerCase().split(token).length - 1);
+          if (r.description) score += r.description.toLowerCase().split(token).length - 1;
         }
 
         return { ...r, score };
@@ -341,19 +337,18 @@ export const searchResources = async (req: Request, res: Response) => {
       scored.map(async ({ score, image_s3_key, ...rest }) => ({
         ...rest,
         imageUrl: image_s3_key
-        ? await (() => {
-            const s3 = getS3();
-            return getSignedUrl(
-              s3,
-              new GetObjectCommand({
-                Bucket: process.env.S3_BUCKET_NAME!,
-                Key: image_s3_key,
-              }),
-              { expiresIn: 60 * 5 }
-            );
-          })()
-        : null,
-      
+          ? await (() => {
+              const s3 = getS3();
+              return getSignedUrl(
+                s3,
+                new GetObjectCommand({
+                  Bucket: process.env.S3_BUCKET_NAME!,
+                  Key: image_s3_key,
+                }),
+                { expiresIn: 60 * 5 }
+              );
+            })()
+          : null,
       }))
     );
 

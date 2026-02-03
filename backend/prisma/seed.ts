@@ -84,9 +84,15 @@ async function main() {
   // Seed external URLs for featured "Getting Started" resources
   const featuredResourceUrls: { title: string; url: string }[] = [
     { title: 'Take the ACEs Quiz', url: 'https://americanspcc.org/take-the-aces-quiz' },
-    { title: 'Positive Childhood Experiences', url: 'https://americanspcc.org/positive-childhood-experience' },
+    {
+      title: 'Positive Childhood Experiences',
+      url: 'https://americanspcc.org/positive-childhood-experience',
+    },
     { title: 'What Is Positive Parenting?', url: 'https://americanspcc.org/positive-parenting/' },
-    { title: 'What Is Positive Discipline?', url: 'https://americanspcc.org/what-is-positive-discipline/' },
+    {
+      title: 'What Is Positive Discipline?',
+      url: 'https://americanspcc.org/what-is-positive-discipline/',
+    },
     { title: 'Coregulation', url: 'https://americanspcc.org/coregulation/' },
     { title: 'Take the PCEs Quiz', url: 'https://americanspcc.org/take-the-pces-quiz/' },
   ];

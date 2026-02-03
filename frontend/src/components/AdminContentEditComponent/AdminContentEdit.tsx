@@ -236,37 +236,35 @@ export default function TopicEditorForm({
           <label className={styles.formRow}>
             <div className={styles.adminFormName}>Image Upload</div>
             <div className={styles.imageUploadBox}>
-            <div
-              role="button"
-              tabIndex={0}
-              onClick={() => fileInputRef.current?.click()}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  fileInputRef.current?.click();
-                }
-              }}
-            ></div>
+              <div
+                role="button"
+                tabIndex={0}
+                onClick={() => fileInputRef.current?.click()}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    fileInputRef.current?.click();
+                  }
+                }}
+              ></div>
 
-            {form.image && typeof form.image !== 'string' ? (
-      <div className={styles.imageUploadText}>
-        {(form.image as File).name}
-      </div>
-    ) : (
-      <div className={styles.imageUploadText}>.jpeg, .jpg, .png</div>
-    )}
-            <img src={cloudUpload} alt="upload" className={styles.imageUploadIcon} />
+              {form.image && typeof form.image !== 'string' ? (
+                <div className={styles.imageUploadText}>{(form.image as File).name}</div>
+              ) : (
+                <div className={styles.imageUploadText}>.jpeg, .jpg, .png</div>
+              )}
+              <img src={cloudUpload} alt="upload" className={styles.imageUploadIcon} />
 
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              style={{ display: 'none' }}
-              onChange={(e) => {
-                const f = e.target.files?.[0] ?? null;
-                setForm({ ...form, image: f });
-              }}
-            />
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                style={{ display: 'none' }}
+                onChange={(e) => {
+                  const f = e.target.files?.[0] ?? null;
+                  setForm({ ...form, image: f });
+                }}
+              />
             </div>
           </label>
 

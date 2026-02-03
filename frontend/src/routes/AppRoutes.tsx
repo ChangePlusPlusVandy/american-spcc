@@ -41,23 +41,20 @@ export default function AppRoutes() {
 
       {/* ADMIN */}
       <Route path="/admin" element={<AdminRoute />}>
+        {/* ADMIN CENTER (WITH SIDEBAR) */}
+        <Route path="admin-center" element={<AdminCenter />}>
+          <Route index element={<Navigate to="content-management" replace />} />
+          <Route path="profile" element={<AdminProfile />} />
+          <Route path="content-management" element={<AdminContent />} />
+          <Route path="data-analytics" element={<AdminAnalytics />} />
+        </Route>
 
-      {/* ADMIN CENTER (WITH SIDEBAR) */}
-      <Route path="admin-center" element={<AdminCenter />}>
-        <Route index element={<Navigate to="content-management" replace />} />
-        <Route path="profile" element={<AdminProfile />} />
-        <Route path="content-management" element={<AdminContent />} />
-        <Route path="data-analytics" element={<AdminAnalytics />} />
+        {/* CATEGORY VIEW (NO SIDEBAR) */}
+        <Route
+          path="admin-center/content-management/:category"
+          element={<AdminCategoryContent />}
+        />
       </Route>
-
-      {/* CATEGORY VIEW (NO SIDEBAR) */}
-      <Route
-        path="admin-center/content-management/:category"
-        element={<AdminCategoryContent />}
-      />
-
-      </Route>
-
     </Routes>
   );
 }

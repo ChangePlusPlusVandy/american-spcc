@@ -27,7 +27,7 @@
       "@assets/*": ["src/assets/*"],
       "@utils/*": ["src/utils/*"],
       "@types/*": ["src/types/*"],
-      "@constants/*": ["src/constants/*"] 
+      "@constants/*": ["src/constants/*"]
     }
   },
   "include": ["src"]

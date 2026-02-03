@@ -1,77 +1,74 @@
 .admin-category-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 24px;
-    align-items: stretch;
-  }
-  
-  
-.admin-category-content {
-    background: #fff9f0;
-    padding: 32px;
-    min-height: 100vh;
-  }
-  
-.admin-category-shell {
-    background: #fffaf1;
-    border: 2px solid #6b7280;
-    border-radius: 16px;
-    padding: 32px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+  align-items: stretch;
 }
-  
+
+.admin-category-content {
+  background: #fff9f0;
+  padding: 32px;
+  min-height: 100vh;
+}
+
+.admin-category-shell {
+  background: #fffaf1;
+  border: 2px solid #6b7280;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
 
 .admin-category-header-row {
-    margin-bottom: 16px;
+  margin-bottom: 16px;
 }
-  
+
 .admin-category-title-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
 }
 
 .back-button {
-    background: #66d1c1;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-weight: bold;
-    cursor: pointer;
+  background: #66d1c1;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
 }
-  
+
 .new-content-button {
-    background: #66d1c1;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 6px;
-    font-weight: bold;
-    cursor: pointer;
+  background: #66d1c1;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
 }
 
 .categoryIcon {
-    width: 1em;
-    height: 1em;
-    flex: 0 0 auto;
-    object-fit: contain;
+  width: 1em;
+  height: 1em;
+  flex: 0 0 auto;
+  object-fit: contain;
 }
 
 .admin-category-title {
-    display: flex;
-    align-items: center;
-    gap: 0.6em;
-    font-size: clamp(1.2rem, 1.6vw, 1.8rem);
-    font-weight: 600;
-    color: #66d1c1;
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  font-size: clamp(1.2rem, 1.6vw, 1.8rem);
+  font-weight: 600;
+  color: #66d1c1;
 }
-  
+
 .admin-category-title-icon {
-    width: 2em;
-    height: 2em;
-    flex-shrink: 0;
-    object-fit: contain;
+  width: 2em;
+  height: 2em;
+  flex-shrink: 0;
+  object-fit: contain;
 }
-  

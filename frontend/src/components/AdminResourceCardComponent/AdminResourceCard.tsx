@@ -16,16 +16,16 @@ const FORMAT_ICON_MAP: Record<string, string> = {
 };
 
 export type AdminResourceCardProps = {
-    id: string;
-    title: string;
-    imageUrl: string;
-    category: string;
-    tags: string[];
-    resourceType: string; 
-    onEdit?: () => void;
-    onDelete?: () => void;
-  };
-  
+  id: string;
+  title: string;
+  imageUrl: string;
+  category: string;
+  tags: string[];
+  resourceType: string;
+  onEdit?: () => void;
+  onDelete?: () => void;
+};
+
 export default function AdminResourceCard({
   title,
   imageUrl,
@@ -35,19 +35,18 @@ export default function AdminResourceCard({
   onEdit,
   onDelete,
 }: AdminResourceCardProps) {
-
   return (
     <div className={styles.cardWrapper}>
       <div className={styles.card}>
-      {FORMAT_ICON_MAP[resourceType] && (
-        <img
-        src={FORMAT_ICON_MAP[resourceType]}
-        alt={resourceType}
-        className={styles.formatIcon}
-        />
-    )}
+        {FORMAT_ICON_MAP[resourceType] && (
+          <img
+            src={FORMAT_ICON_MAP[resourceType]}
+            alt={resourceType}
+            className={styles.formatIcon}
+          />
+        )}
         <h3 className={styles.title}>{title}</h3>
-  
+
         <div className={styles.imageContainer}>
           {imageUrl ? (
             <img src={imageUrl} alt={title} />
@@ -55,7 +54,7 @@ export default function AdminResourceCard({
             <div className={styles.imagePlaceholder} />
           )}
         </div>
-  
+
         <div className={styles.tags}>
           {tags.map((tag) => (
             <span key={tag} className={styles.tag}>
@@ -65,9 +64,13 @@ export default function AdminResourceCard({
         </div>
       </div>
       <div className={styles.actions}>
-        <button className={styles.delete} onClick={onDelete}>delete</button>
+        <button className={styles.delete} onClick={onDelete}>
+          delete
+        </button>
         <span>|</span>
-        <button className={styles.edit} onClick={onEdit}>edit</button>
+        <button className={styles.edit} onClick={onEdit}>
+          edit
+        </button>
       </div>
     </div>
   );

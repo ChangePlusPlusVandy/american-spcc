@@ -1,8 +1,5 @@
 import express from 'express';
-import {
-  getAdminMe,
-  updateAdminMe,
-} from '../controllers/adminUserController';
+import { getAdminMe, updateAdminMe } from '../controllers/adminUserController';
 
 const router = express.Router();
 

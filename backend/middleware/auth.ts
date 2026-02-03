@@ -8,11 +8,7 @@ import prisma from '../config/prisma';
  * Roles: PARENT, ADMIN
  */
 
-export const authenticateUser = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const authenticateUser = (req: Request, res: Response, next: NextFunction) => {
   const { userId } = getAuth(req);
 
   if (!userId) {
@@ -22,11 +18,7 @@ export const authenticateUser = (
   next();
 };
 
-export const syncParentWithDB = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const syncParentWithDB = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { userId: clerkId } = getAuth(req);
 
@@ -41,8 +33,7 @@ export const syncParentWithDB = async (
     if (!parent) {
       const clerkUser = await clerkClient.users.getUser(clerkId);
       const email =
-        clerkUser.primaryEmailAddress?.emailAddress ??
-        clerkUser.emailAddresses?.[0]?.emailAddress;
+        clerkUser.primaryEmailAddress?.emailAddress ?? clerkUser.emailAddresses?.[0]?.emailAddress;
 
       if (!email) {
         return res.status(400).json({ error: 'Clerk user has no email' });
@@ -64,11 +55,7 @@ export const syncParentWithDB = async (
   }
 };
 
-export const requireParent = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const requireParent = (req: Request, res: Response, next: NextFunction) => {
   const parent = (req as any).parent;
 
   if (!parent) {

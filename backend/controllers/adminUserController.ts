@@ -68,9 +68,7 @@ export const updateAdminMe = async (req: Request, res: Response) => {
 
     return res.json({
       ...updatedAdmin,
-      full_name: [updatedAdmin.first_name, updatedAdmin.last_name]
-        .filter(Boolean)
-        .join(' '),
+      full_name: [updatedAdmin.first_name, updatedAdmin.last_name].filter(Boolean).join(' '),
     });
   } catch (err) {
     console.error('updateAdminMe failed:', err);
