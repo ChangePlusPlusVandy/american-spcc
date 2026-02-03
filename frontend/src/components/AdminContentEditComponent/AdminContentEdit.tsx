@@ -59,7 +59,7 @@ export type Resource = {
   resource_type: ResourceType;
   hosting_type: HostingType;
   category: CategoryType;
-  age_groups: AgeGroup;
+  age_groups: AgeGroup[];
   language: Language;
   time_to_read: number;
   labels: ResourceLabel[];
@@ -112,7 +112,7 @@ export default function ResourceEditorForm({
     selectedLabelIds: null,
     newLabelNames: null,
     category: resource?.category ?? null,
-    age_groups: resource?.age_groups ?? null,
+    age_groups: resource?.age_groups ?? [],
     time_to_read: resource?.time_to_read ?? null,
     language: resource?.language ?? null,
     resource_type: resource?.resource_type ?? null,
@@ -121,12 +121,11 @@ export default function ResourceEditorForm({
   const [saving, setSaving] = useState(false);
 
   const getBasename = (key?: string | null) => {
-  if (!key) return null;
-  const parts = key.split('/');
-  return parts[parts.length - 1] || key;
-};
-const imageKeyName = getBasename(resource?.image_s3_key ?? null);
-const imageDisplayName = form.image instanceof File ? form.image.name : imageKeyName;
+    if (!key) return null;
+    const parts = key.split('/');
+    return parts[parts.length - 1] || key;
+  };
+  const imageDisplayName = form.image instanceof File ? form.image.name : null;
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
@@ -349,12 +348,19 @@ const imageDisplayName = form.image instanceof File ? form.image.name : imageKey
           <label className="block">
             <div className={styles.adminFormName}>Age Group</div>
             <select
-              value={form.age_groups[0] ?? ''}
-              onChange={(e) => setForm({ ...form, age_groups: [e.target.value as AgeGroup ] })}
+              multiple
+              value={form.age_groups ?? []}
+              onChange={(e) =>
+      setForm({
+        ...form,
+        age_groups: Array.from(e.target.selectedOptions).map(
+          (o) => o.value as AgeGroup
+        ),
+      })
+    }
               required
               className={styles.adminFormInput}
             >
-              <option value="">Select age group</option>
               <option value="AGE_0_3">0 - 3</option>
               <option value="AGE_4_6">4 - 6</option>
               <option value="AGE_7_10">7 - 10</option>
