@@ -6,10 +6,12 @@ import {
   updateResource,
   searchResources,
   deleteResource,
+  getFeaturedResources,
 } from '../controllers/resourceController';
 
 const router = express.Router();
 
+router.get('/featured', getFeaturedResources);
 router.get('/search', searchResources);
 router.post('/', createResource);
 router.get('/', getAllResources);

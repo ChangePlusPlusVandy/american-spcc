@@ -47,10 +47,9 @@ export default function AdminCenter() {
   useEffect(() => {
     if (!isLoaded) return;
     if (!isAdmin) return;
-  
+
     fetchAdmin();
   }, [isLoaded, isAdmin]);
-  
 
   if (!isLoaded) return null;
 

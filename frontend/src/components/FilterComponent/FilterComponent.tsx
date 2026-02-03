@@ -29,12 +29,8 @@ export default function FilterComponent({
   const topicInitial = TOPICS.slice(0, 3);
   const topicFull = TOPICS;
 
-  const ageInitial = [
-    'Infant & Toddler (0–3)',
-    'Preschool (4–6)',
-    'Elementary (7–10)',
-  ];
-  
+  const ageInitial = ['Infant & Toddler (0–3)', 'Preschool (4–6)', 'Elementary (7–10)'];
+
   const ageFull = [
     'Infant & Toddler (0–3)',
     'Preschool (4–6)',
@@ -43,7 +39,6 @@ export default function FilterComponent({
     'High School (14–18)',
     'University & Above (18+)',
   ];
-  
 
   const [showAllTopics, setShowAllTopics] = useState(false);
   const [showAllAges, setShowAllAges] = useState(false);
@@ -60,7 +55,7 @@ export default function FilterComponent({
 
   const handleAgeClick = (age: string) => {
     console.log('Clicked age label:', age);
-    console.log('Mapped enum:', AGE_TO_ENUM?.[age]);  
+    console.log('Mapped enum:', AGE_TO_ENUM?.[age]);
     if (!onAgeChange) return;
 
     if (selectedAges.includes(age)) {

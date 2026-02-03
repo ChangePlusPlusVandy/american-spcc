@@ -158,16 +158,12 @@ export const updateCurrentUser = async (req: Request, res: Response) => {
 
     if (relationship !== undefined) {
       data.relationship =
-        relationship && relationship !== ''
-          ? (relationship as RELATIONSHIP_TYPE)
-          : null;
+        relationship && relationship !== '' ? (relationship as RELATIONSHIP_TYPE) : null;
     }
 
     if (household_type !== undefined) {
       data.household_type =
-        household_type && household_type !== ''
-          ? (household_type as HOUSEHOLD_TYPE)
-          : null;
+        household_type && household_type !== '' ? (household_type as HOUSEHOLD_TYPE) : null;
     }
 
     if (Array.isArray(topics_of_interest)) {

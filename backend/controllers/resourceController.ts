@@ -1,9 +1,8 @@
 import { Request, Response } from 'express';
 import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { getS3 } from '../config/s3'
+import { getS3 } from '../config/s3';
 import { CATEGORY_TYPE } from '@prisma/client';
-
 
 const getSignedImageUrl = async (key: string) => {
   const s3 = getS3();
@@ -89,7 +88,6 @@ export const getAllResources = async (req: Request, res: Response) => {
     ) {
       where.category = category as CATEGORY_TYPE;
     }
-    
 
     if (label_id) {
       where.labels = {
@@ -234,6 +232,68 @@ export const deleteResource = async (req: Request, res: Response) => {
   }
 };
 
+// Featured "Getting Started" resource titles (stakeholder-recommended)
+const FEATURED_RESOURCE_TITLES = [
+  'Take the ACEs Quiz',
+  'Positive Childhood Experiences',
+  'What Is Positive Parenting?',
+  'What Is Positive Discipline?',
+  'Coregulation',
+  'Take the PCEs Quiz',
+];
+
+export const getFeaturedResources = async (req: Request, res: Response) => {
+  try {
+    const { prisma } = await import('../config/prisma');
+
+    // Fetch the 6 stakeholder-recommended resources by title
+    const resources = await prisma.resource.findMany({
+      where: {
+        title: {
+          in: FEATURED_RESOURCE_TITLES,
+        },
+      },
+      include: {
+        labels: { include: { label: true } },
+        externalResources: true,
+      },
+    });
+
+    // Add signed image URLs
+    const resourcesWithImages = await Promise.all(
+      resources.map(async (resource) => {
+        let imageUrl: string | null = null;
+
+        if (resource.image_s3_key) {
+          imageUrl = await getSignedImageUrl(resource.image_s3_key);
+        }
+
+        // check if the imageURL is not null here
+        if (imageUrl == null) {
+          throw new Error('No image URL in s3 bukcet for the provided image key');
+        }
+
+        return {
+          ...resource,
+          imageUrl,
+        };
+      })
+    );
+
+    // Sort resources to match the order in FEATURED_RESOURCE_TITLES
+    const sortedResources = resourcesWithImages.sort((a, b) => {
+      const aIndex = FEATURED_RESOURCE_TITLES.indexOf(a.title);
+      const bIndex = FEATURED_RESOURCE_TITLES.indexOf(b.title);
+      return aIndex - bIndex;
+    });
+
+    res.json(sortedResources);
+  } catch (error) {
+    console.error('Error fetching featured resources:', error);
+    res.status(500).json({ error: 'Failed to fetch featured resources' });
+  }
+};
+
 export const searchResources = async (req: Request, res: Response) => {
   try {
     const { prisma } = await import('../config/prisma');
@@ -263,8 +323,7 @@ export const searchResources = async (req: Request, res: Response) => {
         for (const token of tokens) {
           if (r.title) score += (r.title.toLowerCase().split(token).length - 1) * 3;
           if (r.category) score += (r.category.toLowerCase().split(token).length - 1) * 2;
-          if (r.description)
-            score += (r.description.toLowerCase().split(token).length - 1);
+          if (r.description) score += r.description.toLowerCase().split(token).length - 1;
         }
 
         return { ...r, score };
@@ -277,19 +336,18 @@ export const searchResources = async (req: Request, res: Response) => {
       scored.map(async ({ score, image_s3_key, ...rest }) => ({
         ...rest,
         imageUrl: image_s3_key
-        ? await (() => {
-            const s3 = getS3();
-            return getSignedUrl(
-              s3,
-              new GetObjectCommand({
-                Bucket: process.env.S3_BUCKET_NAME!,
-                Key: image_s3_key,
-              }),
-              { expiresIn: 60 * 5 }
-            );
-          })()
-        : null,
-      
+          ? await (() => {
+              const s3 = getS3();
+              return getSignedUrl(
+                s3,
+                new GetObjectCommand({
+                  Bucket: process.env.S3_BUCKET_NAME!,
+                  Key: image_s3_key,
+                }),
+                { expiresIn: 60 * 5 }
+              );
+            })()
+          : null,
       }))
     );
 

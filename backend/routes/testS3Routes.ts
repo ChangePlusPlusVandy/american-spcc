@@ -1,10 +1,9 @@
 import { Router } from 'express';
 import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { getS3 } from '../config/s3'
+import { getS3 } from '../config/s3';
 
-const s3 = getS3()
-
+const s3 = getS3();
 
 const router = Router();
 

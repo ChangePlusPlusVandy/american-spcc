@@ -7,11 +7,10 @@ import {
   deleteUser,
   updateCurrentUser,
 } from '../controllers/userController';
-import { clerkMiddleware, requireAuth } from '@clerk/express'
-
+import { clerkMiddleware, requireAuth } from '@clerk/express';
 
 const router = express.Router();
-router.use(clerkMiddleware())
+router.use(clerkMiddleware());
 
 router.patch('/me', requireAuth(), updateCurrentUser);
 router.get('/', getAllUsers);

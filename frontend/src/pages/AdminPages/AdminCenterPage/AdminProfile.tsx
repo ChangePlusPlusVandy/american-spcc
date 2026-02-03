@@ -47,15 +47,12 @@ export default function AdminProfile() {
   if (loading || !dbUser) return <div>Loading…</div>;
 
   const isValid =
-  editForm.first_name.trim() !== '' ||
-  editForm.last_name.trim() !== '' ||
-  !!editForm.avatarFile;
+    editForm.first_name.trim() !== '' || editForm.last_name.trim() !== '' || !!editForm.avatarFile;
 
   const hasChanges =
-  editForm.first_name !== (dbUser.first_name ?? '') ||
-  editForm.last_name !== (dbUser.last_name ?? '') ||
-  !!editForm.avatarFile;
-
+    editForm.first_name !== (dbUser.first_name ?? '') ||
+    editForm.last_name !== (dbUser.last_name ?? '') ||
+    !!editForm.avatarFile;
 
   const validate = () => {
     if (!hasChanges) {
@@ -64,8 +61,6 @@ export default function AdminProfile() {
     }
     return true;
   };
-  
-  
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] ?? null;
@@ -108,7 +103,7 @@ export default function AdminProfile() {
         body: JSON.stringify({
           first_name: editForm.first_name.trim() || undefined,
           last_name: editForm.last_name.trim() || undefined,
-        }),        
+        }),
       });
 
       if (!res.ok) {

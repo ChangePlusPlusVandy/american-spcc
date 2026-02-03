@@ -36,9 +36,7 @@ export const createCollection = async (req: Request, res: Response) => {
     res.status(201).json(collection);
   } catch (error: any) {
     if (error.code === 'P2002') {
-      return res
-        .status(409)
-        .json({ error: 'A collection with this name already exists.' });
+      return res.status(409).json({ error: 'A collection with this name already exists.' });
     }
 
     console.error('Error creating collection:', error);
@@ -155,9 +153,7 @@ export const renameCollection = async (req: Request, res: Response) => {
     res.json(updated);
   } catch (error: any) {
     if (error.code === 'P2002') {
-      return res
-        .status(409)
-        .json({ error: 'A collection with this name already exists.' });
+      return res.status(409).json({ error: 'A collection with this name already exists.' });
     }
 
     console.error('Error renaming collection:', error);
@@ -233,9 +229,7 @@ export const addResourceToCollection = async (req: Request, res: Response) => {
     res.status(201).json(item);
   } catch (error: any) {
     if (error.code === 'P2002') {
-      return res
-        .status(409)
-        .json({ error: 'Resource already exists in this collection.' });
+      return res.status(409).json({ error: 'Resource already exists in this collection.' });
     }
 
     console.error('Error adding resource to collection:', error);
