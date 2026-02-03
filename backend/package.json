@@ -4,12 +4,14 @@
   "main": "index.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only server.ts",
+    "vercel-build": "prisma generate",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "jest",
     "test:watch": "jest --watchAll",
     "test:coverage": "jest --coverage"
   },
+
   "prisma": {
     "seed": "tsx prisma/seed.ts"
   },
