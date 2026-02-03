@@ -3,12 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import homepageBackground from '../../assets/SPCC - Homepage.png';
 import searchIcon from '../../assets/search_icon.png';
 import { API_BASE_URL } from '@/config/api';
+
 interface Resource {
   id: string;
   title: string;
   description?: string | null;
   hosting_type: 'EXTERNAL' | 'INTERNAL' | 'OTHER';
   externalResources?: { external_url: string } | null;
+  imageUrl?: string | null;
 }
 
 function Landing() {
@@ -16,7 +18,29 @@ function Landing() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Resource[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [featuredResources, setFeaturedResources] = useState<Resource[]>([]);
+  const [isFeaturedLoading, setIsFeaturedLoading] = useState(true);
   const searchRef = useRef<HTMLDivElement | null>(null);
+
+  // Fetch featured "Getting Started" resources
+  useEffect(() => {
+    const fetchFeaturedResources = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/resources/featured`);
+        if (response.ok) {
+          const data = await response.json();
+          setFeaturedResources(data);
+        }
+      } catch (error) {
+        console.error('Error fetching featured resources:', error);
+      } finally {
+        setIsFeaturedLoading(false);
+      }
+    };
+
+    fetchFeaturedResources();
+  }, []);
+
   const searchResources = async (query: string) => {
     if (!query.trim()) {
       console.log('Empty query, clearing results');
@@ -207,7 +231,7 @@ function Landing() {
         </div>
       </div>
 
-      {/* Hot topics */}
+      {/* Getting Started */}
       <div className="relative -mt-0 z-30 px-2 md:px-8 pb-9 bg-[#6EC6C5]">
         <div>
           <h2
@@ -219,13 +243,75 @@ function Landing() {
               fontSize: '25px',
             }}
           >
-            Hot Topics
+            Getting Started
           </h2>
         </div>
-        <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-[#F7E9D7] shadow p-4 w-full h-64 items-center justify-center"></div>
-          <div className="bg-[#F7E9D7] shadow p-4 w-full h-64 items-center justify-center"></div>
-          <div className="bg-[#F7E9D7] shadow p-4 w-full h-64 items-center justify-center"></div>{' '}
+        <div
+          className="flex gap-6 overflow-x-auto pb-4"
+          style={{
+            scrollbarWidth: 'thin',
+            scrollbarColor: '#566273 #F7E9D7',
+          }}
+        >
+          {isFeaturedLoading ? (
+            // Loading placeholders
+            Array.from({ length: 6 }).map((_, index) => (
+              <div
+                key={index}
+                className="flex-shrink-0 w-64 h-64 bg-[#F7E9D7] shadow rounded-lg animate-pulse"
+              />
+            ))
+          ) : featuredResources.length > 0 ? (
+            featuredResources.map((resource) => (
+              <button
+                key={resource.id}
+                onClick={() => {
+                  if (
+                    resource.hosting_type === 'EXTERNAL' &&
+                    resource.externalResources?.external_url
+                  ) {
+                    window.open(
+                      resource.externalResources.external_url,
+                      '_blank',
+                      'noopener,noreferrer'
+                    );
+                  } else {
+                    navigate(`/resource/${resource.id}`);
+                  }
+                }}
+                className="flex-shrink-0 w-64 h-64 bg-[#F7E9D7] shadow rounded-lg overflow-hidden cursor-pointer hover:shadow-lg transition-shadow duration-200 focus:outline-none focus:ring-2 focus:ring-[#55C3C0]"
+              >
+                <div className="relative w-full h-full flex flex-col">
+                  {/* Image */}
+                  <div className="flex-1 w-full overflow-hidden">
+                    {resource.imageUrl ? (
+                      <img
+                        src={resource.imageUrl}
+                        alt={resource.title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-[#E8D9C5] flex items-center justify-center">
+                        <span className="text-[#566273] text-4xl">📚</span>
+                      </div>
+                    )}
+                  </div>
+                  {/* Title at bottom */}
+                  <div className="w-full p-3 bg-[#F7E9D7]">
+                    <p
+                      className="text-[#566273] text-sm font-semibold text-center line-clamp-2"
+                      style={{ fontFamily: 'Open Sans, sans-serif' }}
+                    >
+                      {resource.title}
+                    </p>
+                  </div>
+                </div>
+              </button>
+            ))
+          ) : (
+            // Fallback if no resources found
+            <p className="text-[#566273]">No featured resources available.</p>
+          )}
         </div>
       </div>
     </div>

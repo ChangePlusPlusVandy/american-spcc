@@ -79,9 +79,42 @@ async function main() {
         },
       });
     }
-  }}
+  }
 
-  main()
+  // Seed external URLs for featured "Getting Started" resources
+  const featuredResourceUrls: { title: string; url: string }[] = [
+    { title: 'Take the ACEs Quiz', url: 'https://americanspcc.org/take-the-aces-quiz' },
+    { title: 'Positive Childhood Experiences', url: 'https://americanspcc.org/positive-childhood-experience' },
+    { title: 'What Is Positive Parenting?', url: 'https://americanspcc.org/positive-parenting/' },
+    { title: 'What Is Positive Discipline?', url: 'https://americanspcc.org/what-is-positive-discipline/' },
+    { title: 'Coregulation', url: 'https://americanspcc.org/coregulation/' },
+    { title: 'Take the PCEs Quiz', url: 'https://americanspcc.org/take-the-pces-quiz/' },
+  ];
+
+  for (const { title, url } of featuredResourceUrls) {
+    // Find the resource by title
+    const resource = await prisma.resource.findUnique({
+      where: { title },
+    });
+
+    if (resource) {
+      // Upsert the external URL (create if not exists, update if exists)
+      await prisma.externalResources.upsert({
+        where: { resource_fk: resource.id },
+        update: { external_url: url },
+        create: {
+          resource_fk: resource.id,
+          external_url: url,
+        },
+      });
+      console.log(`✓ Added external URL for: ${title}`);
+    } else {
+      console.log(`✗ Resource not found: ${title}`);
+    }
+  }
+}
+
+main()
   .catch((e) => {
     console.error(e);
     process.exit(1);

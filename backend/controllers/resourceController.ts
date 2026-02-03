@@ -236,6 +236,68 @@ export const deleteResource = async (req: Request, res: Response) => {
   }
 };
 
+// Featured "Getting Started" resource titles (stakeholder-recommended)
+const FEATURED_RESOURCE_TITLES = [
+  'Take the ACEs Quiz',
+  'Positive Childhood Experiences',
+  'What Is Positive Parenting?',
+  'What Is Positive Discipline?',
+  'Coregulation',
+  'Take the PCEs Quiz',
+];
+
+export const getFeaturedResources = async (req: Request, res: Response) => {
+  try {
+    const { prisma } = await import('../config/prisma');
+
+    // Fetch the 6 stakeholder-recommended resources by title
+    const resources = await prisma.resource.findMany({
+      where: {
+        title: {
+          in: FEATURED_RESOURCE_TITLES,
+        },
+      },
+      include: {
+        labels: { include: { label: true } },
+        externalResources: true,
+      },
+    });
+
+    // Add signed image URLs
+    const resourcesWithImages = await Promise.all(
+      resources.map(async (resource) => {
+        let imageUrl: string | null = null;
+
+        if (resource.image_s3_key) {
+          imageUrl = await getSignedImageUrl(resource.image_s3_key);
+        }
+
+        // check if the imageURL is not null here
+        if(imageUrl == null){
+          throw new Error("No image URL in s3 bukcet for the provided image key")
+        }
+
+        return {
+          ...resource,
+          imageUrl,
+        };
+      })
+    );
+
+    // Sort resources to match the order in FEATURED_RESOURCE_TITLES
+    const sortedResources = resourcesWithImages.sort((a, b) => {
+      const aIndex = FEATURED_RESOURCE_TITLES.indexOf(a.title);
+      const bIndex = FEATURED_RESOURCE_TITLES.indexOf(b.title);
+      return aIndex - bIndex;
+    });
+
+    res.json(sortedResources);
+  } catch (error) {
+    console.error('Error fetching featured resources:', error);
+    res.status(500).json({ error: 'Failed to fetch featured resources' });
+  }
+};
+
 export const searchResources = async (req: Request, res: Response) => {
   try {
     const { prisma } = await import('../config/prisma');
