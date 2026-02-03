@@ -25,7 +25,7 @@ export type CategoryType =
   | 'LIFE_SKILLS_INDEPENDENCE'
   | 'FAMILY_SUPPORT_COMMUNITY';
 
-  export type AgeGroup =
+export type AgeGroup =
   | 'AGE_0_3'
   | 'AGE_4_6'
   | 'AGE_7_10'
@@ -33,7 +33,7 @@ export type CategoryType =
   | 'AGE_14_18'
   | 'AGE_18_ABOVE';
 
-  export type Language = 'ENGLISH' | 'SPANISH' | 'OTHER';
+export type Language = 'ENGLISH' | 'SPANISH' | 'OTHER';
 
 export type CategoryLabel = {
   id: string;
@@ -140,18 +140,19 @@ const imageDisplayName = form.image instanceof File ? form.image.name : imageKey
           } else if (!form.image) {
             hosting_type = 'EXTERNAL';
           } else {
-            hosting_type='OTHER';
+            hosting_type = 'OTHER';
           }
         } else {
-          hosting_type='OTHER';
+          hosting_type = 'OTHER';
         }
       }
 
-      const finalForm = {...form, 
-        hosting_type: hosting_type, 
+      const finalForm = {
+        ...form,
+        hosting_type: hosting_type,
         selectedLabelIds: selectedLabelIds,
-        newLabelNames: newLabelNames
-      }
+        newLabelNames: newLabelNames,
+      };
       setForm(finalForm);
       await onSave(finalForm);
       onClose();
@@ -200,14 +201,10 @@ const imageDisplayName = form.image instanceof File ? form.image.name : imageKey
   }, [labelInput, form.category, availableLabels]);
 
   useEffect(() => {
-    console.log('selectedLabelIds ->', selectedLabelIds);
-    console.log('newLabelIds ->', newLabelNames);
-  }, [selectedLabelIds, newLabelNames]);
-
-  useEffect(() => {
     let cancelled = false;
 
     async function load() {
+      if (!form.category) return;
       try {
         const res = await fetch(
           `${API_BASE_URL}/api/labels?category=${encodeURIComponent(form.category)}`
@@ -248,7 +245,7 @@ const imageDisplayName = form.image instanceof File ? form.image.name : imageKey
           <label className="block">
             <div className={styles.adminFormName}>Title</div>
             <input
-              value={form.title}
+              value={form.title ?? ''}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
               required
               className={styles.adminFormInput}
@@ -258,7 +255,7 @@ const imageDisplayName = form.image instanceof File ? form.image.name : imageKey
           <label className="block">
             <div className={styles.adminFormName}>Description</div>
             <textarea
-              value={form.description}
+              value={form.description ?? ''}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               className={styles.adminFormInput}
               style={{ height: '10rem' }}
@@ -268,7 +265,7 @@ const imageDisplayName = form.image instanceof File ? form.image.name : imageKey
           <label className="block">
             <div className={styles.adminFormName}>Resource URL</div>
             <input
-              value={form.resource_url}
+              value={form.resource_url ?? ''}
               onChange={(e) => setForm({ ...form, resource_url: e.target.value })}
               className={styles.adminFormInput}
             />
@@ -277,37 +274,35 @@ const imageDisplayName = form.image instanceof File ? form.image.name : imageKey
           <label className={styles.formRow}>
             <div className={styles.adminFormName}>Image Upload</div>
             <div className={styles.imageUploadBox}>
-            <div
-              role="button"
-              tabIndex={0}
-              onClick={() => fileInputRef.current?.click()}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  fileInputRef.current?.click();
-                }
-              }}
-            ></div>
+              <div
+                role="button"
+                tabIndex={0}
+                onClick={() => fileInputRef.current?.click()}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    fileInputRef.current?.click();
+                  }
+                }}
+              ></div>
 
-            {form.image && typeof form.image !== 'string' ? (
-      <div className={styles.imageUploadText}>
-        {(form.image as File).name}
-      </div>
-    ) : (
-      <div className={styles.imageUploadText}>.jpeg, .jpg, .png</div>
-    )}
-            <img src={cloudUpload} alt="upload" className={styles.imageUploadIcon} />
+              {imageDisplayName ? (
+                <div className={styles.imageUploadText}>{imageDisplayName}</div>
+              ) : (
+                <div className={styles.imageUploadText}>.jpeg, .jpg, .png</div>
+              )}
+              <img src={cloudUpload} alt="upload" className={styles.imageUploadIcon} />
 
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              style={{ display: 'none' }}
-              onChange={(e) => {
-                const f = e.target.files?.[0] ?? null;
-                setForm({ ...form, image: f });
-              }}
-            />
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                style={{ display: 'none' }}
+                onChange={(e) => {
+                  const f = e.target.files?.[0] ?? null;
+                  setForm({ ...form, image: f });
+                }}
+              />
             </div>
           </label>
 
