@@ -45,7 +45,7 @@ export const getResourceLabelById = async (req: Request, res: Response) => {
 
     const label = await prisma.resourceLabel.findUnique({
       where: { id },
-      include: { resource: true, label: true},
+      include: { resource: true, label: true },
     });
 
     if (!label) {

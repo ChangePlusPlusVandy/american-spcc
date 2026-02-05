@@ -171,22 +171,21 @@ export const updateResource = async (req: Request, res: Response) => {
       label_ids,
     } = req.body;
 
-
-  await prisma.externalResources.deleteMany({ where: { resource_fk: id }});
-  if (external_url !== '' && external_url !== null) {
+    await prisma.externalResources.deleteMany({ where: { resource_fk: id } });
+    if (external_url !== '' && external_url !== null) {
       await prisma.externalResources.create({
-      data: { resource_fk: id, external_url },
-    });
-  }
-  
-  // Upsert internal hosted resource
-  if (image_s3_key) {
-    await prisma.internalHostedResources.upsert({
-      where: { resource_fk: id },
-      update: { s3_key: image_s3_key },
-      create: { resource_fk: id, s3_key: image_s3_key },
-    });
-  }
+        data: { resource_fk: id, external_url },
+      });
+    }
+
+    // Upsert internal hosted resource
+    if (image_s3_key) {
+      await prisma.internalHostedResources.upsert({
+        where: { resource_fk: id },
+        update: { s3_key: image_s3_key },
+        create: { resource_fk: id, s3_key: image_s3_key },
+      });
+    }
 
     const updated = await prisma.resource.update({
       where: { id },

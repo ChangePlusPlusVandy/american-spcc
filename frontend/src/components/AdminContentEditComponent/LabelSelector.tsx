@@ -113,9 +113,9 @@ export default function LabelSelector({
           className={styles.adminLabelInput}
         />
       </div>
-      <div className="relative">
+      <div className="relative w-full">
         {showSuggestions && suggestions.length > 0 && (
-          <ul className="absolute z-10 bg-white border mt-1 max-h-48 overflow-auto">
+          <ul className="absolute z-10 bg-white border mt-1 max-h-48 overflow-auto w-full rounded-md">
             {suggestions.slice(0, 10).map((s) => (
               <li
                 key={s.id}

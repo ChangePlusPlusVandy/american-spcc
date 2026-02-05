@@ -351,13 +351,11 @@ export default function ResourceEditorForm({
               multiple
               value={form.age_groups ?? []}
               onChange={(e) =>
-      setForm({
-        ...form,
-        age_groups: Array.from(e.target.selectedOptions).map(
-          (o) => o.value as AgeGroup
-        ),
-      })
-    }
+                setForm({
+                  ...form,
+                  age_groups: Array.from(e.target.selectedOptions).map((o) => o.value as AgeGroup),
+                })
+              }
               required
               className={styles.adminFormInput}
             >
