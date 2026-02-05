@@ -18,9 +18,9 @@
 }
 
 .admin-card {
-  flex: 0 0 30%;      /* makes it bigger relative to the panel */
-  max-width: 360px;  /* caps size on large screens */
-  min-width: 260px;  /* keeps it usable on small screens */
+  flex: 0 0 30%;
+  max-width: 360px;
+  min-width: 260px;
 
   background: #5b6474;
   border-radius: 28px;
@@ -70,13 +70,22 @@
 }
 
 .admin-email-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
   font-size: 12px;
   font-weight: 600;
+  max-width: 100%;
 }
 
 .admin-email {
   color: black;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
+
 
 .admin-btn {
   width: 100%;
@@ -124,7 +133,7 @@
   color: #6b7280;
 }
 .admin-btn {
-  display: block; /* makes NavLink behave exactly like button */
+  display: block;
 }
 
 .admin-tabs {
@@ -133,12 +142,11 @@
   justify-items: center;
   box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
 }
-/* ===== Content Management Grid ===== */
 
 .cms-grid {
   width: 100%;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* 🔑 */
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 24px;
   margin-top: 24px;
 }
@@ -178,6 +186,6 @@
   }
 
   .admin-card {
-    position: static; /* disable sticky on mobile */
+    position: static;
   }
 }
