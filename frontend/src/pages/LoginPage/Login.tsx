@@ -21,26 +21,10 @@ export default function Login() {
 
   useEffect(() => {
     if (!isLoaded || !isSignedIn) return;
-
-    const redirect = async () => {
-      const token = await getToken();
-      if (!token) return;
-
-      const res = await fetch(`${API_BASE_URL}/api/auth/me`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      const me = await res.json();
-
-      if (me.role === 'ADMIN') {
-        navigate('/admin', { replace: true });
-      } else {
-        navigate('/', { replace: true });
-      }
-    };
-
-    redirect();
-  }, [isLoaded, isSignedIn]);
+  
+    navigate('/', { replace: true });
+  }, [isLoaded, isSignedIn, navigate]);
+  
 
   if (!isLoaded) return null;
 
