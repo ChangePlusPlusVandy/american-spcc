@@ -59,13 +59,11 @@ describe('ResourceLabelController', () => {
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ id: 'cktest1234abcd' }));
     });
 
-
     it('should handle Prisma errors gracefully', async () => {
       prismaMock.categoryLabel.create.mockRejectedValue(new Error('Database error'));
 
       const req = mockReq({
-        body: { resource_id: 'cktest2345abcd',
-        label_id: 'cktest3456abcd'},
+        body: { resource_id: 'cktest2345abcd', label_id: 'cktest3456abcd' },
       });
       const res = mockRes();
 
@@ -106,8 +104,7 @@ describe('ResourceLabelController', () => {
 
     it('should filter labels by category when query param provided', async () => {
       prismaMock.resourceLabel.findMany.mockResolvedValue([
-        { id: 'cktest3333', resource_id: 'cktest4444',
-        label_id: 'cktest5555', },
+        { id: 'cktest3333', resource_id: 'cktest4444', label_id: 'cktest5555' },
       ] as any);
 
       const req = mockReq({ query: { resource_id: 'cktest4444' } });
@@ -168,8 +165,7 @@ describe('ResourceLabelController', () => {
 
       const req = mockReq({
         params: { id: 'cktest5555' },
-        body: { resource_id: 'cktestUpdate',
-        label_id: 'newLabelId' },
+        body: { resource_id: 'cktestUpdate', label_id: 'newLabelId' },
       });
       const res = mockRes();
 
@@ -177,8 +173,7 @@ describe('ResourceLabelController', () => {
 
       expect(prismaMock.categoryLabel.update).toHaveBeenCalledWith({
         where: { id: 'cktest5555' },
-        data: { resource_id: 'cktestUpdate',
-        label_id: 'newLabelId', },
+        data: { resource_id: 'cktestUpdate', label_id: 'newLabelId' },
       });
       expect(res.json).toHaveBeenCalledWith(updated);
     });

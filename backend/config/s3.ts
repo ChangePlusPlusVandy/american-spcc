@@ -13,7 +13,7 @@ export function getS3() {
 
   s3 = new S3Client({
     region: AWS_REGION || 'us-east-1',
-  })
+  });
 
   return s3;
 }

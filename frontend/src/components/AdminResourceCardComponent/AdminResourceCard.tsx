@@ -2,7 +2,6 @@ import styles from './AdminResourceCard.module.css';
 import React, { useState } from 'react';
 import ConfirmDialog from './ConfirmDialog';
 
-
 import pdfIcon from '@/assets/pdf.png';
 import txtIcon from '@/assets/txt.png';
 import videoIcon from '@/assets/video.png';
@@ -46,7 +45,7 @@ export default function AdminResourceCard({
     onDelete?.(id);
     setConfirmOpen(false);
   };
-  
+
   return (
     <div className={styles.cardWrapper}>
       <div className={styles.card}>
