@@ -237,7 +237,7 @@ function Landing() {
           <h2
             className="font-extrabold font-[Suez_One] text-[#566273] mb-6"
             style={{
-              fontFamily: 'Suez One',
+              fontFamily: 'Lato, sans-serif',
               fontWeight: 1000,
               fontStyle: 'Regular',
               fontSize: '25px',
