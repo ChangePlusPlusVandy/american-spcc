@@ -11,7 +11,6 @@
   color: #4b5563;
 }
 
-
 .admin-row {
   display: flex;
   gap: 32px;
@@ -19,14 +18,16 @@
 }
 
 .admin-card {
-  width: 300px;
+  flex: 0 0 30%;      /* makes it bigger relative to the panel */
+  max-width: 360px;  /* caps size on large screens */
+  min-width: 260px;  /* keeps it usable on small screens */
+
   background: #5b6474;
   border-radius: 28px;
   padding: 48px 24px;
   color: white;
   box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
 
-  /* for fixed scrolling */
   position: sticky;
   top: 80px;
   z-index: 10;
@@ -96,15 +97,18 @@
 
 .admin-panel {
   flex: 1;
+  max-width: 70%;
   background: #fffaf1;
   border-radius: 24px;
   padding: 32px;
   min-height: 420px;
   border: 2px solid #5b6474;
+
   display: flex;
   flex-direction: column;
   align-items: center;
 }
+
 
 .admin-panel-title {
   color: #57c5c1;
@@ -134,10 +138,11 @@
 .cms-grid {
   width: 100%;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* 🔑 */
   gap: 24px;
   margin-top: 24px;
 }
+
 
 .cms-card {
   display: flex;
@@ -159,4 +164,20 @@
   font-weight: 600;
   color: #57c5c1;
   text-align: center;
+}
+
+@media (max-width: 900px) {
+  .admin-row {
+    flex-direction: column;
+  }
+
+  .admin-card,
+  .admin-panel {
+    max-width: 100%;
+    flex: none;
+  }
+
+  .admin-card {
+    position: static; /* disable sticky on mobile */
+  }
 }
