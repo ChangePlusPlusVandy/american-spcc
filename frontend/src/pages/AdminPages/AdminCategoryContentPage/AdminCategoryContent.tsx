@@ -10,6 +10,7 @@ import type {
   ResourceForm,
 } from '@/components/AdminContentEditComponent/AdminContentEdit';
 import ResourceEditorForm from '@/components/AdminContentEditComponent/AdminContentEdit';
+import imageCompression from "browser-image-compression";
 
 import { CATEGORY_DISPLAY_MAP, CATEGORY_ICON_MAP } from '@constants/categories';
 
@@ -122,7 +123,20 @@ export default function AdminCategoryContent() {
 
     return returnedKey ?? imageKey;
   }
-
+  async function compressImage(file: File) {
+    const options = {
+      maxSizeMB: 0.5,
+      maxWidthOrHeight: 1200,
+      useWebWorker: true,
+    };
+  
+    const compressedBlob = await imageCompression(file, options);
+  
+    return new File([compressedBlob], file.name, {
+      type: compressedBlob.type,
+    });
+  }
+  
   async function handleSave(payload: ResourceForm) {
     console.log(payload);
     const token = await getToken();
@@ -132,8 +146,10 @@ export default function AdminCategoryContent() {
     let image_s3_key = null;
     let label_ids = payload.selectedLabelIds ?? [];
     if (payload.image && payload.id) {
-      image_s3_key = await handleNewImage(payload.id, payload.image);
+      const compressed = await compressImage(payload.image);
+      image_s3_key = await handleNewImage(payload.id, compressed);
     }
+    
     if (payload.newLabelNames && payload.category) {
       const new_labels = await handleNewLabels(payload.category, payload.newLabelNames);
       label_ids = [...label_ids, ...new_labels];
