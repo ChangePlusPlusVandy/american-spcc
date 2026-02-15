@@ -41,7 +41,7 @@ export default function LabelSelector({
             availableLabels.find((l) => l.id === id) || suggestions.find((l) => l.id === id);
           return (
             <span key={id} className={styles.adminLabels}>
-              {lab?.label_name ?? id}
+              {lab?.label_name ?? 'Loading…'}
               <button
                 type="button"
                 onMouseDown={(ev) => {

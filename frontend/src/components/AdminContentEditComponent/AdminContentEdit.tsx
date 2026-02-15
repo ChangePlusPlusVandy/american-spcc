@@ -97,7 +97,10 @@ export default function ResourceEditorForm({
   const [labelInput, setLabelInput] = useState('');
   const [suggestions, setSuggestions] = useState<CategoryLabel[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [availableLabels, setAvailableLabels] = useState<CategoryLabel[]>([]);
+  const [availableLabels, setAvailableLabels] = useState<CategoryLabel[]>(
+    () => resource?.labels?.map((rl) => rl.label) ?? []
+  );
+  
   const [newLabelNames, setNewLabelNames] = useState<string[]>([]);
   const [selectedLabelIds, setSelectedLabelIds] = useState<string[]>(
     () => resource?.labels?.map((l) => l.label_id) ?? []
@@ -162,11 +165,18 @@ export default function ResourceEditorForm({
     }
   }
 
-  useEffect(() => {
-    if (!resource?.labels) return;
-    setSelectedLabelIds(resource.labels.map((l) => l.label_id));
-  }, [form?.selectedLabelIds]);
 
+  useEffect(() => {
+    if (!resource) return;
+    setSelectedLabelIds(resource.labels.map((l) => l.label_id));
+    setAvailableLabels((prev) => {
+      const map = new Map<string, CategoryLabel>();
+      prev.forEach((p) => map.set(p.id, p));
+      resource.labels.forEach((rl) => map.set(rl.label.id, rl.label));
+      return Array.from(map.values());
+    });
+  }, [resource?.id]);
+  
   useEffect(() => {
     if (!form.category) {
       setSuggestions([]);
@@ -235,7 +245,7 @@ export default function ResourceEditorForm({
     return () => {
       cancelled = true;
     };
-  }, [form.category, resource]);
+  }, [form.category]);
 
   return (
     <form onSubmit={handleSave} className="relative">
