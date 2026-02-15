@@ -4,17 +4,6 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { getS3 } from '../config/s3';
 import { CATEGORY_TYPE } from '@prisma/client';
 
-const getSignedImageUrl = async (key: string) => {
-  const s3 = getS3();
-  const command = new GetObjectCommand({
-    Bucket: process.env.S3_BUCKET_NAME!,
-    Key: key,
-  });
-
-  return getSignedUrl(s3, command, {
-    expiresIn: 60 * 5,
-  });
-};
 
 export const createResource = async (req: Request, res: Response) => {
   try {
@@ -118,16 +107,8 @@ export const getAllResources = async (req: Request, res: Response) => {
         let imageUrl: string | null = null;
 
         if (resource.image_s3_key) {
-          const s3 = getS3();
-          const command = new GetObjectCommand({
-            Bucket: process.env.S3_BUCKET_NAME!,
-            Key: resource.image_s3_key,
-          });
-
-          imageUrl = await getSignedUrl(s3, command, {
-            expiresIn: 60 * 5, // 5 minutes
-          });
-        }
+          imageUrl = `https://${process.env.S3_BUCKET_NAME}.s3.us-east-2.amazonaws.com/${resource.image_s3_key}`;
+        }        
 
         return {
           ...resource,
@@ -146,7 +127,7 @@ export const getAllResources = async (req: Request, res: Response) => {
 export const getResourceById = async (req: Request, res: Response) => {
   try {
     const { prisma } = await import('../config/prisma');
-    const id = req.params.id;
+    const id = req.params.id as string;
     const resource = await prisma.resource.findUnique({
       where: { id },
       include: {
@@ -165,7 +146,7 @@ export const getResourceById = async (req: Request, res: Response) => {
 export const updateResource = async (req: Request, res: Response) => {
   try {
     const { prisma } = await import('../config/prisma');
-    const id = req.params.id;
+    const id = req.params.id as string;
 
     const {
       title,
@@ -294,13 +275,9 @@ export const getFeaturedResources = async (req: Request, res: Response) => {
         let imageUrl: string | null = null;
 
         if (resource.image_s3_key) {
-          imageUrl = await getSignedImageUrl(resource.image_s3_key);
+          imageUrl = `https://${process.env.S3_BUCKET_NAME}.s3.us-east-2.amazonaws.com/${resource.image_s3_key}`;
         }
-
-        // check if the imageURL is not null here
-        if (imageUrl == null) {
-          throw new Error('No image URL in s3 bukcet for the provided image key');
-        }
+        
 
         return {
           ...resource,
@@ -365,18 +342,8 @@ export const searchResources = async (req: Request, res: Response) => {
       scored.map(async ({ score, image_s3_key, ...rest }) => ({
         ...rest,
         imageUrl: image_s3_key
-          ? await (() => {
-              const s3 = getS3();
-              return getSignedUrl(
-                s3,
-                new GetObjectCommand({
-                  Bucket: process.env.S3_BUCKET_NAME!,
-                  Key: image_s3_key,
-                }),
-                { expiresIn: 60 * 5 }
-              );
-            })()
-          : null,
+        ? `https://${process.env.S3_BUCKET_NAME}.s3.us-east-2.amazonaws.com/${image_s3_key}`
+        : null,      
       }))
     );
 
