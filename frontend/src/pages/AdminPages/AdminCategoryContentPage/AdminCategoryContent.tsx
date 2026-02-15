@@ -182,17 +182,20 @@ export default function AdminCategoryContent() {
           Authorization: `Bearer ${token}`,
         },
       });
-
+  
+      const text = await res.text();
+  
       if (res.ok) {
         console.log(`successfully deleted ${id}`);
         fetchResources();
       } else {
-        console.error(`Failed to delete ${id}`);
+        console.error(`Delete failed (${res.status}):`, text);
       }
     } catch (error) {
       console.error(`error deleting ${id}: `, error);
     }
   }
+  
 
   useEffect(() => {
     if (!categoryEnum) return;
