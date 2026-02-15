@@ -10,7 +10,7 @@ import type {
   ResourceForm,
 } from '@/components/AdminContentEditComponent/AdminContentEdit';
 import ResourceEditorForm from '@/components/AdminContentEditComponent/AdminContentEdit';
-
+import imageCompression from 'browser-image-compression';
 import { CATEGORY_DISPLAY_MAP, CATEGORY_ICON_MAP } from '@constants/categories';
 
 const CATEGORY_MAP: Record<string, string> = {
@@ -91,26 +91,53 @@ export default function AdminCategoryContent() {
     return createdIds;
   }
 
-  async function handleNewImage(id: string, upload: File) {
+
+  async function handleNewImage(upload: File) {
     const token = await getToken();
   
-    const formData = new FormData();
-    formData.append('image', upload);
-  
-    const res = await fetch(`${API_BASE_URL}/api/test/upload-image`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      body: formData,
+    // 🔥 Compress before upload
+    const compressedFile = await imageCompression(upload, {
+      maxWidthOrHeight: 1200,
+      maxSizeMB: 1,
+      useWebWorker: true,
     });
   
-    if (!res.ok) {
-      throw new Error(`Upload failed: ${await res.text()}`);
+    const ext = compressedFile.type.split('/')[1] || 'webp';
+    const imageKey = `resources/${Date.now()}.${ext}`;
+  
+    // 1️⃣ Ask backend for presigned URL
+    const presignRes = await fetch(`${API_BASE_URL}/api/test/s3-presign`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        imageKey,
+        contentType: compressedFile.type,
+      }),
+    });
+  
+    if (!presignRes.ok) {
+      throw new Error(await presignRes.text());
     }
   
-    const { key } = await res.json();
-    return key;
+    const { url } = await presignRes.json();
+  
+    // 2️⃣ Upload directly to S3 (bypasses Vercel)
+    const uploadRes = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': compressedFile.type,
+      },
+      body: compressedFile,
+    });
+  
+    if (!uploadRes.ok) {
+      throw new Error('S3 upload failed');
+    }
+  
+    return imageKey;
   }
   
 
@@ -162,7 +189,7 @@ export default function AdminCategoryContent() {
   
     // 🔹 IMAGE UPLOAD (for both create + update)
     if (payload.image && resourceId) {
-      image_s3_key = await handleNewImage(resourceId, payload.image);
+      image_s3_key = await handleNewImage(payload.image);
     }
   
     // 🔹 FINAL UPDATE (for image OR update case)

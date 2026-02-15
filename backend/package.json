@@ -27,6 +27,7 @@
     "@clerk/types": "^4.101.9",
     "@prisma/client": "5.22.0",
     "aws-sdk": "^2.1693.0",
+    "browser-image-compression": "^2.0.2",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
