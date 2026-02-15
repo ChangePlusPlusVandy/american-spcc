@@ -231,15 +231,35 @@ export const updateResource = async (req: Request, res: Response) => {
 export const deleteResource = async (req: Request, res: Response) => {
   try {
     const { prisma } = await import('../config/prisma');
-    const id = req.params.id;
+    const id = req.params.id as string;
 
-    await prisma.resource.delete({ where: { id } });
+    // 1️⃣ Delete join table rows (labels)
+    await prisma.resourceLabel.deleteMany({
+      where: { resource_id: id },
+    });    
+
+    // 2️⃣ Delete external resources
+    await prisma.externalResources.deleteMany({
+      where: { resource_fk: id },
+    });
+
+    // 3️⃣ Delete internal hosted resources
+    await prisma.internalHostedResources.deleteMany({
+      where: { resource_fk: id },
+    });
+
+    // 4️⃣ Finally delete the resource itself
+    await prisma.resource.delete({
+      where: { id },
+    });
+
     res.json({ message: 'Resource deleted successfully' });
   } catch (error) {
     console.error('Error deleting resource:', error);
     res.status(500).json({ error: 'Failed to delete resource' });
   }
 };
+
 
 // Featured "Getting Started" resource titles (stakeholder-recommended)
 const FEATURED_RESOURCE_TITLES = [
