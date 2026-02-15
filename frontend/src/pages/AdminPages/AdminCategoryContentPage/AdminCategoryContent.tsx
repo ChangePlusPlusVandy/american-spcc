@@ -97,7 +97,7 @@ export default function AdminCategoryContent() {
     const formData = new FormData();
     formData.append('image', upload);
   
-    const res = await fetch(`${API_BASE_URL}/api/upload-image`, {
+    const res = await fetch(`${API_BASE_URL}/api/test/upload-image`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
