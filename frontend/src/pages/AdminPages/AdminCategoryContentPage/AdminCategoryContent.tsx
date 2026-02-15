@@ -93,53 +93,40 @@ export default function AdminCategoryContent() {
 
   async function handleNewImage(id: string, upload: File) {
     const token = await getToken();
-    const ext = (upload.type.split('/')[1] || upload.name.split('.').pop() || 'bin').replace(
-      /\W/g,
-      ''
-    );
-    const imageKey = `resources/${id}/${Date.now()}-${Math.random()
-      .toString(36)
-      .slice(2, 8)}.${ext}`;
-
-    const presignRes = await fetch(`${API_BASE_URL}/api/test/s3-presign`, {
+  
+    const formData = new FormData();
+    formData.append('image', upload);
+  
+    const res = await fetch(`${API_BASE_URL}/api/upload-image`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ imageKey, contentType: upload.type }),
+      body: formData,
     });
-
-    if (!presignRes.ok) throw new Error(`Failed to get presigned URL: ${await presignRes.text()}`);
-    const { url, imageKey: returnedKey } = await presignRes.json();
-    const uploadRes = await fetch(url, {
-      method: 'PUT',
-      headers: { 'Content-Type': upload.type },
-      body: upload,
-    });
-    if (!uploadRes.ok)
-      throw new Error(`S3 upload failed: ${uploadRes.status} ${await uploadRes.text()}`);
-
-    return returnedKey ?? imageKey;
+  
+    if (!res.ok) {
+      throw new Error(`Upload failed: ${await res.text()}`);
+    }
+  
+    const { key } = await res.json();
+    return key;
   }
+  
 
   async function handleSave(payload: ResourceForm) {
-    console.log(payload);
     const token = await getToken();
-    const isUpdate = Boolean((payload as any).id);
-    const url = `${API_BASE_URL}/api/resources${isUpdate ? `/${(payload as any).id}` : ''}`;
-    const method = isUpdate ? 'PUT' : 'POST';
-    let image_s3_key = null;
+    const isUpdate = Boolean(payload.id);
+  
+    let image_s3_key: string | null = null;
     let label_ids = payload.selectedLabelIds ?? [];
-    if (payload.image) {
-      image_s3_key = await handleNewImage(payload.id, payload.image);
-    }
-
-    if (payload.newLabelNames) {
+  
+    if (payload.newLabelNames && payload.category) {
       const new_labels = await handleNewLabels(payload.category, payload.newLabelNames);
       label_ids = [...label_ids, ...new_labels];
     }
-    const body: any = {
+  
+    const baseBody: any = {
       title: payload.title,
       description: payload.description ?? null,
       resource_type: payload.resource_type ?? undefined,
@@ -149,29 +136,53 @@ export default function AdminCategoryContent() {
       language: payload.language ?? undefined,
       time_to_read: payload.time_to_read ?? undefined,
       external_url: payload.resource_url ?? null,
-      label_ids: label_ids,
-      image_s3_key: image_s3_key ?? null,
+      label_ids,
     };
-
-    try {
-      const res = await fetch(url, {
-        method,
+  
+    let resourceId = payload.id;
+  
+    // 🔹 CREATE FLOW
+    if (!isUpdate) {
+      const createRes = await fetch(`${API_BASE_URL}/api/resources`, {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(body),
+        body: JSON.stringify({ ...baseBody, image_s3_key: null }),
       });
-
-      if (res.ok) {
-        await fetchResources();
-      } else {
-        console.error('Failed to save resource:', await res.text());
+  
+      if (!createRes.ok) {
+        throw new Error(await createRes.text());
       }
-    } catch (err) {
-      console.error('Error saving resource:', err);
+  
+      const created = await createRes.json();
+      resourceId = created.id;
     }
+  
+    // 🔹 IMAGE UPLOAD (for both create + update)
+    if (payload.image && resourceId) {
+      image_s3_key = await handleNewImage(resourceId, payload.image);
+    }
+  
+    // 🔹 FINAL UPDATE (for image OR update case)
+    if (isUpdate || image_s3_key) {
+      await fetch(`${API_BASE_URL}/api/resources/${resourceId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          ...baseBody,
+          image_s3_key: image_s3_key ?? undefined,
+        }),
+      });
+    }
+  
+    await fetchResources();
   }
+  
 
   async function handleDelete(id: string) {
     try {
