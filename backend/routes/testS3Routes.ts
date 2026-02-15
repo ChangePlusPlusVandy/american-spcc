@@ -33,7 +33,10 @@ router.post('/s3-presign', async (req, res) => {
     const command = new PutObjectCommand({
       Bucket: process.env.S3_BUCKET_NAME!,
       Key: imageKey,
+      ContentType: contentType,
+      CacheControl: "public, max-age=31536000, immutable",
     });
+    
 
     const url = await getSignedUrl(s3, command, { expiresIn: 60 * 5 });
     res.json({ url, imageKey });
