@@ -94,13 +94,15 @@ export default function AdminCategoryContent() {
 
   async function handleNewImage(id: string, upload: File) {
     const token = await getToken();
-    const ext = (upload.type.split('/')[1] || upload.name.split('.').pop() || 'bin').replace(
-      /\W/g,
-      ''
-    );
-    const imageKey = `resources/${id}/${Date.now()}-${Math.random()
-      .toString(36)
-      .slice(2, 8)}.${ext}`;
+    const originalName = upload.name;
+
+    const safeName = originalName
+      .toLowerCase()
+      .replace(/\s+/g, '-')    
+      .replace(/[^a-z0-9.\-_]/g, '');
+    
+    const imageKey = `resources/${id}/${safeName}`;
+    
 
     const presignRes = await fetch(`${API_BASE_URL}/api/test/s3-presign`, {
       method: 'POST',

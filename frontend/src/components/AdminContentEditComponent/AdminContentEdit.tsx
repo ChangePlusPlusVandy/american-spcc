@@ -128,7 +128,11 @@ export default function ResourceEditorForm({
     const parts = key.split('/');
     return parts[parts.length - 1] || key;
   };
-  const imageDisplayName = form.image instanceof File ? form.image.name : null;
+  const imageDisplayName =
+  form.image instanceof File
+    ? form.image.name
+    : getBasename(resource?.image_s3_key);
+
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
