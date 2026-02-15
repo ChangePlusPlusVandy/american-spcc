@@ -115,8 +115,13 @@ export default function AdminCategoryContent() {
     const { url, imageKey: returnedKey } = await presignRes.json();
     const uploadRes = await fetch(url, {
       method: 'PUT',
+      headers: {
+        'Content-Type': upload.type,
+        'Cache-Control': 'public, max-age=31536000, immutable',
+      },
       body: upload,
     });
+    
     
     if (!uploadRes.ok)
       throw new Error(`S3 upload failed: ${uploadRes.status} ${await uploadRes.text()}`);
