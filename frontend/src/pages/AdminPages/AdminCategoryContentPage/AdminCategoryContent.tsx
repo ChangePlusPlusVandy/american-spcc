@@ -10,7 +10,7 @@ import type {
   ResourceForm,
 } from '@/components/AdminContentEditComponent/AdminContentEdit';
 import ResourceEditorForm from '@/components/AdminContentEditComponent/AdminContentEdit';
-import imageCompression from 'browser-image-compression';
+
 import { CATEGORY_DISPLAY_MAP, CATEGORY_ICON_MAP } from '@constants/categories';
 
 const CATEGORY_MAP: Record<string, string> = {
@@ -91,61 +91,42 @@ export default function AdminCategoryContent() {
     return createdIds;
   }
 
-
-  async function handleNewImage(upload: File) {
+  async function handleNewImage(id: string, upload: File) {
     const token = await getToken();
-  
-    // 🔥 Compress before upload
-    const compressedFile = await imageCompression(upload, {
-      maxWidthOrHeight: 1200,
-      maxSizeMB: 1,
-      useWebWorker: true,
-    });
-  
-    const ext = compressedFile.type.split('/')[1] || 'webp';
-    const imageKey = `resources/${Date.now()}.${ext}`;
-  
-    // 1️⃣ Ask backend for presigned URL
+    const ext = (upload.type.split('/')[1] || upload.name.split('.').pop() || 'bin').replace(
+      /\W/g,
+      ''
+    );
+    const imageKey = `resources/${id}/${Date.now()}-${Math.random()
+      .toString(36)
+      .slice(2, 8)}.${ext}`;
+
     const presignRes = await fetch(`${API_BASE_URL}/api/test/s3-presign`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({
-        imageKey,
-        contentType: compressedFile.type,
-      }),
+      body: JSON.stringify({ imageKey, contentType: upload.type }),
     });
-  
-    if (!presignRes.ok) {
-      throw new Error(await presignRes.text());
-    }
-  
-    const { url } = await presignRes.json();
-  
-    // 2️⃣ Upload directly to S3 (bypasses Vercel)
+
+    if (!presignRes.ok) throw new Error(`Failed to get presigned URL: ${await presignRes.text()}`);
+    const { url, imageKey: returnedKey } = await presignRes.json();
     const uploadRes = await fetch(url, {
       method: 'PUT',
-      headers: {
-        'Content-Type': compressedFile.type,
-      },
-      body: compressedFile,
+      headers: { 'Content-Type': upload.type },
+      body: upload,
     });
-  
-    if (!uploadRes.ok) {
-      throw new Error('S3 upload failed');
-    }
-  
-    return imageKey;
+    if (!uploadRes.ok)
+      throw new Error(`S3 upload failed: ${uploadRes.status} ${await uploadRes.text()}`);
+
+    return returnedKey ?? imageKey;
   }
-  
 
   async function handleSave(payload: ResourceForm) {
     const token = await getToken();
     const isUpdate = Boolean(payload.id);
   
-    let image_s3_key: string | null = null;
     let label_ids = payload.selectedLabelIds ?? [];
   
     if (payload.newLabelNames && payload.category) {
@@ -168,7 +149,7 @@ export default function AdminCategoryContent() {
   
     let resourceId = payload.id;
   
-    // 🔹 CREATE FLOW
+    // 🔹 CREATE FIRST
     if (!isUpdate) {
       const createRes = await fetch(`${API_BASE_URL}/api/resources`, {
         method: 'POST',
@@ -187,12 +168,14 @@ export default function AdminCategoryContent() {
       resourceId = created.id;
     }
   
-    // 🔹 IMAGE UPLOAD (for both create + update)
+    // 🔹 Upload image AFTER we have ID
+    let image_s3_key: string | null = null;
+  
     if (payload.image && resourceId) {
-      image_s3_key = await handleNewImage(payload.image);
+      image_s3_key = await handleNewImage(resourceId, payload.image);
     }
   
-    // 🔹 FINAL UPDATE (for image OR update case)
+    // 🔹 Final update (for image OR update case)
     if (isUpdate || image_s3_key) {
       await fetch(`${API_BASE_URL}/api/resources/${resourceId}`, {
         method: 'PUT',
@@ -210,7 +193,6 @@ export default function AdminCategoryContent() {
     await fetchResources();
   }
   
-
   async function handleDelete(id: string) {
     try {
       const token = await getToken();
