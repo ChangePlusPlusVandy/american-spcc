@@ -33,6 +33,16 @@ export const createResource = async (req: Request, res: Response) => {
       label_ids,
     } = req.body;
 
+    console.log("CREATE DATA:", {
+      title,
+      resource_type,
+      hosting_type,
+      category,
+      language,
+      time_to_read,
+      label_ids,
+    });
+    
     const resource = await prisma.resource.create({
       data: {
         title,
